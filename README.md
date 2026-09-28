@@ -23,6 +23,8 @@
 
 <img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=600&size=22&duration=2600&pause=900&color=0A84FF&center=true&vCenter=true&multiline=false&repeat=true&width=850&height=50&lines=Computer+Science+Undergraduate;Full-Stack+Developer;React+%7C+TypeScript+%7C+Node.js;UI%2FUX+%26+Software+Development;Entrepreneur+%7C+Building+Digital+Solutions" alt="Typing introduction" />
 
+<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=17&duration=2200&pause=700&color=BF5AF2&center=true&vCenter=true&repeat=true&width=850&height=38&lines=Interactive+Desktop+Portfolio;Projects+%7C+Skills+%7C+Experience+%7C+Services;Explore+the+Live+macOS-Inspired+Experience" alt="Portfolio highlights typing animation" />
+
 <br>
 
 **A portfolio that behaves like a desktop — not just another website.**
@@ -34,6 +36,8 @@
 [![Vite](https://img.shields.io/badge/Vite-6-646CFF?style=for-the-badge&logo=vite&logoColor=ffffff)](https://vite.dev/)
 ![Responsive](https://img.shields.io/badge/Responsive-Desktop_%7C_Tablet_%7C_Mobile-34C759?style=for-the-badge)
 ![PWA](https://img.shields.io/badge/PWA-Ready-FF375F?style=for-the-badge)
+[![Live Portfolio](https://img.shields.io/badge/LIVE_PORTFOLIO-OPEN_NOW-34C759?style=for-the-badge&logo=vercel&logoColor=white)](https://m-r-ahamed-portfolio.vercel.app/)
+[![Deployment](https://img.shields.io/badge/DEPLOYMENT-VERCEL-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://m-r-ahamed-portfolio.vercel.app/)
 
 <br>
 
@@ -44,6 +48,32 @@
 <br>
 
 <img src="https://capsule-render.vercel.app/api?type=rect&height=3&color=gradient" width="100%" alt="gradient divider">
+
+</div>
+
+---
+
+# 🌐 Live Portfolio
+
+<div align="center">
+
+<img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=600&size=18&duration=2100&pause=700&color=FF9F0A&center=true&vCenter=true&repeat=true&width=800&height=42&lines=Portfolio+Now+Live+on+Vercel;Desktop+%7C+Tablet+%7C+Mobile;Click+Below+to+Launch+the+Experience" alt="Live deployment typing animation" />
+
+<br>
+
+<a href="https://m-r-ahamed-portfolio.vercel.app/">
+  <img src="./public/assets/screenshots/desktop.jpg" alt="M.R.Ahamed live portfolio desktop preview" width="92%">
+</a>
+
+<br><br>
+
+[![Launch Portfolio](https://img.shields.io/badge/LAUNCH_PORTFOLIO-0A84FF?style=for-the-badge&logo=vercel&logoColor=white)](https://m-r-ahamed-portfolio.vercel.app/)
+[![View Source](https://img.shields.io/badge/VIEW_SOURCE-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Ahamed369/M.R.Ahamed-Portfolio)
+[![LinkedIn](https://img.shields.io/badge/CONNECT_LINKEDIN-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/mr-ahamed-6146a5276)
+
+<br>
+
+**Production:** Vercel &nbsp; • &nbsp; **Frontend:** React + TypeScript + Vite &nbsp; • &nbsp; **Experience:** Responsive + PWA
 
 </div>
 
@@ -74,11 +104,15 @@ The goal is simple:
 
 <div align="center">
 
+<a href="https://m-r-ahamed-portfolio.vercel.app/">
 <img src="./public/assets/screenshots/desktop.jpg" alt="M.R.Ahamed macOS-inspired portfolio desktop" width="95%">
+</a>
 
 <br><br>
 
 ### ✨ Explore • Launch • Interact • Discover
+
+[![Open Live Desktop](https://img.shields.io/badge/OPEN_LIVE_DESKTOP-FF375F?style=for-the-badge&logo=vercel&logoColor=white)](https://m-r-ahamed-portfolio.vercel.app/)
 
 </div>
 
@@ -706,6 +740,7 @@ mindmap
 ![Git](https://img.shields.io/badge/Git-Version_Control-F05032?style=flat-square&logo=git&logoColor=white)
 ![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=flat-square&logo=github&logoColor=white)
 ![npm](https://img.shields.io/badge/npm-Package_Manager-CB3837?style=flat-square&logo=npm&logoColor=white)
+![Vercel](https://img.shields.io/badge/Vercel-Production-000000?style=flat-square&logo=vercel&logoColor=white)
 
 </div>
 
@@ -1295,6 +1330,24 @@ npm run preview
 
 ---
 
+# ☁️ Production Deployment
+
+<div align="center">
+
+[![Status](https://img.shields.io/badge/STATUS-LIVE-34C759?style=for-the-badge)](https://m-r-ahamed-portfolio.vercel.app/)
+[![Platform](https://img.shields.io/badge/PLATFORM-VERCEL-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://m-r-ahamed-portfolio.vercel.app/)
+[![Responsive](https://img.shields.io/badge/RESPONSIVE-DESKTOP_TABLET_MOBILE-BF5AF2?style=for-the-badge)](https://m-r-ahamed-portfolio.vercel.app/)
+
+<br>
+
+### [Open the live portfolio](https://m-r-ahamed-portfolio.vercel.app/)
+
+<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=16&duration=2000&pause=700&color=34C759&center=true&vCenter=true&repeat=true&width=760&height=38&lines=Build+Complete+%7C+Deployment+Live;Responsive+Experience+Ready;Explore+M.R.Ahamed+Portfolio" alt="Deployment status typing animation" />
+
+</div>
+
+---
+
 # 🧪 Commands
 
 | Command | Purpose |
@@ -1448,6 +1501,10 @@ Third-party application names, logos and services referenced within the portfoli
 ### 🖥️ Launch the Desktop
 ### 🚀 Discover the Projects
 ### 🤝 Let's Build Something Meaningful
+
+<br>
+
+[![Launch Live Portfolio](https://img.shields.io/badge/LAUNCH_LIVE_PORTFOLIO-FF9F0A?style=for-the-badge&logo=vercel&logoColor=white)](https://m-r-ahamed-portfolio.vercel.app/)
 
 <br>
 
