@@ -1,0 +1,724 @@
+/* ═══════════════════════ v9 — system additions ═══════════════════════ */
+
+/* ── Dock position on screen: left / right (desktop layouts only) ── */
+:root[data-dock='left'] .desktop:not(.compact) .dock-wrap,
+:root[data-dock='right'] .desktop:not(.compact) .dock-wrap {
+  top: 30px;
+  bottom: 0;
+  left: 6px;
+  right: auto;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+:root[data-dock='right'] .desktop:not(.compact) .dock-wrap {
+  left: auto;
+  right: 6px;
+  align-items: flex-end;
+}
+:root[data-dock='left'] .desktop:not(.compact) .dock,
+:root[data-dock='right'] .desktop:not(.compact) .dock {
+  flex-direction: column;
+  align-items: flex-start;
+  height: auto;
+  width: calc(var(--dock-size) + 13px);
+  max-height: calc(100vh - 44px);
+  padding: 7px 0 7px 6px;
+}
+:root[data-dock='right'] .desktop:not(.compact) .dock {
+  align-items: flex-end;
+  padding: 7px 6px 7px 0;
+}
+:root[data-dock='left'] .desktop:not(.compact) .dock-sep,
+:root[data-dock='right'] .desktop:not(.compact) .dock-sep {
+  width: calc(var(--dock-size) - 4px);
+  height: 1px;
+  margin: 4px 2px;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+:root[data-dock='left'] .desktop:not(.compact) .dock-label {
+  left: calc(100% + 14px);
+  bottom: auto;
+  top: 50%;
+  transform: translate(5px, -50%);
+}
+:root[data-dock='right'] .desktop:not(.compact) .dock-label {
+  left: auto;
+  right: calc(100% + 14px);
+  bottom: auto;
+  top: 50%;
+  transform: translate(-5px, -50%);
+}
+:root[data-dock='left'] .desktop:not(.compact) .dock-item:hover .dock-label,
+:root[data-dock='right'] .desktop:not(.compact) .dock-item:hover .dock-label {
+  transform: translate(0, -50%);
+}
+:root[data-dock='left'] .desktop:not(.compact) .dock-dot {
+  left: -4px;
+  top: 50%;
+  bottom: auto;
+  margin: -2px 0 0;
+}
+:root[data-dock='right'] .desktop:not(.compact) .dock-dot {
+  left: auto;
+  right: -4px;
+  top: 50%;
+  bottom: auto;
+  margin: -2px 0 0;
+}
+:root[data-dock='left'] .desktop:not(.compact) .dock-stack,
+:root[data-dock='right'] .desktop:not(.compact) .dock-stack {
+  bottom: 40px;
+}
+:root[data-dock='left'] .desktop:not(.compact) .dock-stack {
+  left: calc(var(--dock-size, 48px) + 30px);
+  right: auto;
+}
+:root[data-dock='right'] .desktop:not(.compact) .dock-stack {
+  right: calc(var(--dock-size, 48px) + 30px);
+  left: auto;
+}
+
+/* ── Show indicators for open applications: off ── */
+:root[data-dock-dots='off'] .dock-dot {
+  display: none;
+}
+
+/* ── Automatically hide and show the Dock ── */
+.dock-wrap.autohide .dock {
+  transition:
+    transform 0.42s cubic-bezier(0.2, 0.8, 0.2, 1),
+    opacity 0.3s,
+    background 0.5s var(--ease);
+  transform: translate3d(0, calc(100% + 14px), 0);
+  opacity: 0.001;
+}
+:root[data-dock='left'] .desktop:not(.compact) .dock-wrap.autohide .dock {
+  transform: translate3d(calc(-100% - 14px), 0, 0);
+}
+:root[data-dock='right'] .desktop:not(.compact) .dock-wrap.autohide .dock {
+  transform: translate3d(calc(100% + 14px), 0, 0);
+}
+.dock-wrap.autohide.reveal .dock,
+:root.dock-peek .dock-wrap.autohide .dock,
+:root[data-dock] .desktop:not(.compact) .dock-wrap.autohide.reveal .dock,
+:root.dock-peek .desktop:not(.compact) .dock-wrap.autohide .dock {
+  transform: none;
+  opacity: 1;
+}
+/* keep the dock measurable for the genie target even while hidden */
+.dock-wrap.autohide:not(.reveal) .dock-label {
+  display: none;
+}
+
+/* ── Applications pop-up (double-click the Launchpad icon) ── */
+.apps-pop {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--dock-size, 48px) + 34px);
+  width: min(720px, calc(100vw - 24px));
+  height: min(520px, calc(100vh - var(--dock-size, 48px) - 90px));
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto;
+  border-radius: 26px;
+  color: #fff;
+  background: linear-gradient(160deg, rgba(90, 90, 110, 0.42), rgba(30, 30, 40, 0.5));
+  backdrop-filter: blur(40px) saturate(1.8);
+  -webkit-backdrop-filter: blur(40px) saturate(1.8);
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.25);
+  transform-origin: 50% 100%;
+  animation: appsPopIn 0.34s cubic-bezier(0.2, 0.9, 0.25, 1.15);
+  z-index: 3;
+  overflow: hidden;
+}
+@keyframes appsPopIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px) scale(0.86);
+  }
+}
+:root[data-dock='left'] .desktop:not(.compact) .apps-pop {
+  left: calc(var(--dock-size, 48px) + 30px);
+  bottom: 40px;
+  transform: none;
+  transform-origin: 0 50%;
+  animation-name: appsPopSide;
+}
+:root[data-dock='right'] .desktop:not(.compact) .apps-pop {
+  left: auto;
+  right: calc(var(--dock-size, 48px) + 30px);
+  bottom: 40px;
+  transform: none;
+  transform-origin: 100% 50%;
+  animation-name: appsPopSide;
+}
+@keyframes appsPopSide {
+  from {
+    opacity: 0;
+    transform: scale(0.86);
+  }
+}
+.apps-pop-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px 8px;
+}
+.apps-pop-head strong {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  flex: 1;
+}
+.apps-pop-head input {
+  width: 180px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 0;
+  outline: none;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.16);
+  box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.3);
+  font: inherit;
+  font-size: 13px;
+}
+.apps-pop-head input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+.apps-pop-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 4px 16px 10px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.apps-pop-tabs::-webkit-scrollbar {
+  display: none;
+}
+.apps-pop-tabs button {
+  flex: none;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.08);
+  transition: background 0.2s, color 0.2s;
+}
+.apps-pop-tabs button:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+.apps-pop-tabs button.on {
+  color: #111;
+  background: rgba(255, 255, 255, 0.92);
+}
+.apps-pop-grid {
+  flex: 1;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+  align-content: start;
+  gap: 6px 4px;
+  padding: 6px 14px 14px;
+}
+.apps-pop-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 4px;
+  border-radius: 14px;
+  animation: appsItemIn 0.3s both cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: background 0.15s, transform 0.15s;
+}
+.apps-pop-item:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+.apps-pop-item:active {
+  transform: scale(0.94);
+}
+@keyframes appsItemIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.9);
+  }
+}
+.apps-pop-item .apps-pop-ic,
+.apps-pop-item .app-icon {
+  width: 56px;
+  height: 56px;
+  display: block;
+}
+.apps-pop-item span {
+  font-size: 11.5px;
+  line-height: 1.2;
+  text-align: center;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+.apps-pop-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  opacity: 0.7;
+  padding: 40px 0;
+}
+.apps-pop-foot {
+  padding: 8px 20px 12px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+  border-top: 0.5px solid rgba(255, 255, 255, 0.14);
+}
+.desktop.compact .apps-pop {
+  bottom: calc(var(--dock-size, 48px) + 26px);
+  height: min(560px, calc(100vh - var(--dock-size, 48px) - 80px));
+  border-radius: 22px;
+}
+.desktop.compact .apps-pop-head input {
+  width: 130px;
+}
+.desktop.compact .apps-pop-grid {
+  grid-template-columns: repeat(4, 1fr);
+}
+.desktop.compact .apps-pop-foot {
+  display: none;
+}
+
+/* ── long context sub-menus (Add App to Desktop) scroll ── */
+.ctx-sub {
+  max-height: min(70vh, 520px);
+  overflow-y: auto;
+}
+
+/* ═════════════ FaceTime / WhatsApp call UI (v9) ═════════════ */
+.call9-in {
+  position: fixed;
+  top: 38px;
+  right: 14px;
+  z-index: 105500;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: min(380px, calc(100vw - 28px));
+  padding: 12px 14px;
+  border-radius: 20px;
+  color: #fff;
+  background: rgba(40, 40, 46, 0.62);
+  backdrop-filter: blur(30px) saturate(1.8);
+  -webkit-backdrop-filter: blur(30px) saturate(1.8);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.25), inset 0 0 0 0.5px rgba(255, 255, 255, 0.2);
+  animation: call9Drop 0.45s cubic-bezier(0.2, 0.9, 0.25, 1.2);
+}
+@keyframes call9Drop {
+  from {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.92);
+  }
+}
+.call9-in-av {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  object-fit: cover;
+  animation: call9Ring 1.1s ease-in-out infinite;
+}
+@keyframes call9Ring {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(48, 209, 88, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 0 9px rgba(48, 209, 88, 0);
+  }
+}
+.call9-in-t {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.call9-in-t b {
+  font-size: 14px;
+}
+.call9-in-t span {
+  font-size: 11.5px;
+  opacity: 0.75;
+}
+.call9-round {
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 18px;
+  transition: transform 0.15s, filter 0.15s;
+}
+.call9-round:hover {
+  filter: brightness(1.1);
+  transform: scale(1.06);
+}
+.call9-round.decline {
+  background: #ff3b30;
+}
+.call9-round.accept {
+  background: #30d158;
+  animation: call9Wiggle 1.2s ease-in-out infinite;
+}
+@keyframes call9Wiggle {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  10%,
+  30% {
+    transform: rotate(-12deg);
+  }
+  20%,
+  40% {
+    transform: rotate(12deg);
+  }
+  50% {
+    transform: rotate(0);
+  }
+}
+.call9 {
+  position: fixed;
+  z-index: 105000;
+  right: 18px;
+  top: 44px;
+  width: min(380px, calc(100vw - 24px));
+  height: min(620px, calc(100vh - 140px));
+  display: flex;
+  flex-direction: column;
+  border-radius: 26px;
+  overflow: hidden;
+  color: #fff;
+  background: #111;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5), inset 0 0 0 0.5px rgba(255, 255, 255, 0.2);
+  animation: call9Open 0.45s cubic-bezier(0.2, 0.9, 0.25, 1.1);
+  transform-origin: 90% 0;
+}
+.call9.voice {
+  height: min(520px, calc(100vh - 140px));
+}
+@keyframes call9Open {
+  from {
+    opacity: 0;
+    transform: scale(0.85) translateY(-10px);
+  }
+}
+.call9.ph-ended {
+  animation: call9Shrink 0.5s ease forwards 6.4s;
+}
+@keyframes call9Shrink {
+  to {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+.call9-bg {
+  position: absolute;
+  inset: -20px;
+  background-size: cover;
+  background-position: center;
+  filter: blur(34px) saturate(1.3) brightness(0.55);
+  transform: scale(1.1);
+}
+.call9.app-wa .call9-bg {
+  filter: blur(40px) saturate(0.6) brightness(0.35) sepia(0.4) hue-rotate(60deg);
+}
+.call9.video.ph-active .call9-bg {
+  inset: 0;
+  filter: none;
+  transform: none;
+  animation: call9Ken 18s ease-in-out infinite alternate;
+}
+@keyframes call9Ken {
+  to {
+    transform: scale(1.08) translate(-2%, -2%);
+  }
+}
+.call9-head,
+.call9-center,
+.call9-controls,
+.call9-demo,
+.call9-floats {
+  position: relative;
+  z-index: 1;
+}
+.call9-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 22px 16px 6px;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+}
+.call9-app {
+  font-size: 11px;
+  opacity: 0.8;
+}
+.call9-head b {
+  font-size: 22px;
+  font-weight: 600;
+}
+.call9-status {
+  font-size: 13px;
+  opacity: 0.85;
+  font-variant-numeric: tabular-nums;
+}
+.call9-dots {
+  display: inline-flex;
+  gap: 2px;
+  margin-left: 3px;
+}
+.call9-dots i {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: call9Dot 1.2s infinite;
+}
+.call9-dots i:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.call9-dots i:nth-child(3) {
+  animation-delay: 0.4s;
+}
+@keyframes call9Dot {
+  50% {
+    opacity: 0.2;
+  }
+}
+.call9-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 0 20px;
+}
+.call9-avatar img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+.call9.video.ph-active .call9-avatar {
+  display: none;
+}
+.call9-avatar.pulse img {
+  animation: call9Pulse 1.6s ease-out infinite;
+}
+@keyframes call9Pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.45);
+  }
+  100% {
+    box-shadow: 0 0 0 26px rgba(255, 255, 255, 0);
+  }
+}
+.call9-cap {
+  margin: 0;
+  max-width: 300px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 13.5px;
+  line-height: 1.45;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  animation: call9Cap 0.4s ease;
+}
+.call9.video.ph-active .call9-center {
+  justify-content: flex-end;
+  padding-bottom: 12px;
+}
+@keyframes call9Cap {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+.call9-end-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 260px;
+  animation: call9Cap 0.4s ease;
+}
+.call9-end-actions button {
+  height: 38px;
+  border-radius: 12px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.16);
+}
+.call9-end-actions button.wa-btn {
+  background: #25d366;
+}
+.call9-self {
+  position: absolute;
+  z-index: 2;
+  right: 14px;
+  top: 96px;
+  width: 96px;
+  height: 128px;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #222;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  animation: call9Cap 0.4s ease;
+}
+.call9-self video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1);
+}
+.call9-self small {
+  position: absolute;
+  left: 6px;
+  bottom: 4px;
+  font-size: 10px;
+}
+.call9-floats {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.call9-floats span {
+  position: absolute;
+  bottom: 110px;
+  font-size: 34px;
+  animation: call9Float 2.2s ease-out forwards;
+}
+@keyframes call9Float {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.6);
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(-20px) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-300px) scale(1);
+  }
+}
+.call9-controls {
+  position: relative;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  gap: 3px;
+  margin: 0 10px 8px;
+  padding: 10px;
+  border-radius: 22px;
+  background: rgba(30, 30, 34, 0.55);
+  backdrop-filter: blur(24px) saturate(1.6);
+  -webkit-backdrop-filter: blur(24px) saturate(1.6);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), inset 0 0 0 0.5px rgba(255, 255, 255, 0.15);
+}
+.call9-ctl {
+  width: 42px;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-size: 18px;
+  color: #fff;
+  border-radius: 12px;
+  padding: 4px 0;
+  transition: background 0.15s;
+}
+.call9-ctl small {
+  font-size: 9px;
+  opacity: 0.8;
+}
+.call9-ctl:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+.call9-ctl.on {
+  background: rgba(255, 255, 255, 0.85);
+  color: #111;
+}
+.call9-ctl:disabled {
+  opacity: 0.4;
+}
+.call9-ctl.wa-ctl small {
+  color: #7ef0a5;
+}
+.call9-react {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 4px;
+  padding: 6px 8px;
+  border-radius: 999px;
+  background: rgba(30, 30, 34, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  animation: call9Cap 0.25s ease;
+}
+.call9-react button {
+  font-size: 22px;
+  transition: transform 0.15s;
+}
+.call9-react button:hover {
+  transform: scale(1.3);
+}
+.call9-demo {
+  margin: 0 0 10px;
+  font-size: 10px;
+  text-align: center;
+  opacity: 0.6;
+}
+.desktop.compact ~ .call9,
+.call9 {
+  max-width: calc(100vw - 24px);
+}
+@media (max-width: 700px) {
+  .call9 {
+    right: 12px;
+    left: 12px;
+    width: auto;
+    top: 36px;
+    height: calc(100dvh - 120px);
+  }
+}
+.chat-wa-real {
+  text-decoration: none;
+  color: #25d366;
+  font-weight: 700;
+}
+.ft-demo-in {
+  display: block;
+  margin: 6px 12px 0;
+  font-size: 11.5px;
+  color: var(--accent);
+}
+.cc-aa {
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1;
+}

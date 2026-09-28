@@ -1,0 +1,16 @@
+{
+  "name": "M.R. Ahamed — Portfolio",
+  "short_name": "M.R. Ahamed",
+  "description": "Interactive macOS-style portfolio of M.R. Ahamed — Computer Science Undergraduate & Full-Stack Developer, Kandy, Sri Lanka.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#1b1440",
+  "theme_color": "#7b6cf6",
+  "orientation": "any",
+  "icons": [
+    { "src": "./icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

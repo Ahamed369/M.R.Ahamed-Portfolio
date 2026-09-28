@@ -1,0 +1,566 @@
+/* launchpad-v5 — Launchpad, Mission Control, widget grid, desktop icon columns */
+
+/* ═══════════════════════════════ Launchpad ═══════════════════════════════ */
+.launchpad.lp5 {
+  padding: calc(var(--menubar-h) + 18px) 0 calc(var(--dock-size) + 26px);
+  background: rgba(24, 26, 40, 0.3);
+  backdrop-filter: blur(40px) saturate(1.5) brightness(0.92);
+  -webkit-backdrop-filter: blur(40px) saturate(1.5) brightness(0.92);
+  transform: scale(1.06);
+  transition:
+    opacity 0.28s ease,
+    transform 0.4s var(--ease-out),
+    visibility 0s linear 0.4s;
+}
+:root[data-theme='dark'] .launchpad.lp5 {
+  background: rgba(8, 8, 14, 0.42);
+}
+.launchpad.lp5.open {
+  transform: none;
+  transition:
+    opacity 0.3s ease,
+    transform 0.45s var(--ease-out),
+    visibility 0s;
+}
+.lp5-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+  width: min(320px, calc(100vw - 48px));
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 18px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.14);
+  box-shadow:
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.4),
+    0 4px 18px rgba(0, 0, 0, 0.12);
+  transition:
+    background 0.2s,
+    box-shadow 0.2s;
+}
+.lp5-search:focus-within {
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow:
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.55),
+    0 0 0 3px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+.lp5-search svg {
+  width: 15px;
+  height: 15px;
+  flex: none;
+  opacity: 0.85;
+}
+.lp5-search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-size: 14px;
+}
+.lp5-search input::placeholder {
+  color: rgba(255, 255, 255, 0.72);
+}
+.lp5-clear {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.22);
+}
+.lp5-clear svg {
+  width: 11px;
+  height: 11px;
+  opacity: 1;
+}
+.lp5-clear:focus-visible {
+  outline: 2px solid #fff;
+}
+
+.lp5-view {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  margin-top: 22px;
+  overflow: hidden;
+  touch-action: pan-y;
+}
+.lp5-track {
+  display: flex;
+  height: 100%;
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+.lp5-view.dragging .lp5-track {
+  transition: none;
+}
+.lp5-page {
+  flex: 0 0 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+}
+.lp5-grid {
+  width: var(--lp-grid-w);
+  height: 100%;
+  display: grid;
+  grid-template-columns: repeat(var(--lp-cols), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--lp-rows), minmax(0, 1fr));
+  align-items: center;
+}
+.lp5-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 4px 4px 6px;
+  margin: 0 auto;
+  max-width: 100%;
+  color: #fff;
+  border-radius: 14px;
+  -webkit-tap-highlight-color: transparent;
+}
+.launchpad.open .lp5-tile {
+  animation: lp5-in 0.62s cubic-bezier(0.34, 1.42, 0.64, 1) both;
+  animation-delay: var(--d, 0ms);
+}
+@keyframes lp5-in {
+  from {
+    opacity: 0;
+    transform: scale(0.55) translateY(18px);
+  }
+  60% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.launchpad:not(.open) .lp5-tile {
+  transition: transform 0.4s var(--ease-out);
+  transform: scale(1.08);
+}
+.lp5-icon {
+  position: relative;
+  display: block;
+  width: var(--lp-icon);
+  height: var(--lp-icon);
+  flex: none;
+  transition:
+    transform 0.22s var(--ease-out),
+    filter 0.15s;
+}
+.lp5-icon .app-icon svg {
+  filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.28));
+}
+@media (hover: hover) {
+  .lp5-tile:hover .lp5-icon {
+    transform: scale(1.06) translateY(-2px);
+  }
+}
+.lp5-tile:active .lp5-icon {
+  transform: scale(0.9);
+  filter: brightness(0.75);
+}
+.lp5-tile:focus-visible {
+  outline: none;
+}
+.lp5-tile:focus-visible .lp5-icon {
+  border-radius: 22%;
+  box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.95),
+    0 0 0 6px var(--accent);
+}
+.lp5-label {
+  max-width: min(130px, 100%);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.55),
+    0 0 1px rgba(0, 0, 0, 0.4);
+}
+.lp5-badge {
+  position: absolute;
+  top: -5%;
+  right: -7%;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 7px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: #ff3b30;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+.lp5-ext {
+  position: absolute;
+  right: -3px;
+  bottom: -3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  background: rgba(20, 20, 24, 0.62);
+  box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.6);
+}
+/* folder tile: 3×3 mini icons */
+.lp5-mini {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 7%;
+  padding: 13%;
+  border-radius: 23%;
+  background: rgba(255, 255, 255, 0.22);
+  box-shadow:
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.45),
+    0 6px 14px rgba(0, 0, 0, 0.14);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+:root[data-theme='dark'] .lp5-mini {
+  background: rgba(255, 255, 255, 0.14);
+}
+.lp5-mini > span {
+  min-width: 0;
+  min-height: 0;
+}
+.lp5-mini .app-icon svg {
+  filter: none;
+}
+.lp5-empty {
+  position: absolute;
+  inset: 30% 0 auto;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 15px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+.lp5-dots {
+  display: flex;
+  justify-content: center;
+  gap: 2px;
+  flex: none;
+  height: 30px;
+  align-items: center;
+}
+.lp5-dots button {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+}
+.lp5-dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.38);
+  transition:
+    background 0.2s,
+    transform 0.2s;
+}
+.lp5-dots button.on span {
+  background: #fff;
+  transform: scale(1.05);
+}
+.lp5-dots button:hover span {
+  background: rgba(255, 255, 255, 0.7);
+}
+.lp5-dots button:focus-visible {
+  outline: 2px solid #fff;
+}
+
+/* expanded folder */
+.launchpad.has-folder .lp5-view,
+.launchpad.has-folder .lp5-search,
+.launchpad.has-folder .lp5-dots {
+  filter: blur(14px);
+  opacity: 0.45;
+  transition:
+    filter 0.35s var(--ease-out),
+    opacity 0.35s;
+}
+.lp5-view,
+.lp5-search,
+.lp5-dots {
+  transition:
+    filter 0.35s var(--ease-out),
+    opacity 0.35s;
+}
+.lp5-folder-scrim {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  z-index: 2;
+  animation: lp5-fade 0.25s ease both;
+}
+@keyframes lp5-fade {
+  from {
+    opacity: 0;
+  }
+}
+.lp5-folder {
+  width: min(calc(var(--lp-icon) * 6.4 + 80px), calc(100vw - 32px));
+  padding: 22px 24px 26px;
+  border-radius: 32px;
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow:
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.45),
+    0 24px 60px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(40px) saturate(1.6);
+  -webkit-backdrop-filter: blur(40px) saturate(1.6);
+  animation: lp5-folder-in 0.42s cubic-bezier(0.34, 1.3, 0.64, 1) both;
+}
+:root[data-theme='dark'] .lp5-folder {
+  background: rgba(40, 40, 48, 0.45);
+}
+@keyframes lp5-folder-in {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+.lp5-folder h2 {
+  margin: 0 0 16px;
+  text-align: center;
+  color: #fff;
+  font-size: 22px;
+  font-weight: 600;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+.lp5-folder-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(calc(var(--lp-icon) + 34px), 1fr));
+  gap: 18px 6px;
+}
+.lp5-folder .lp5-tile {
+  animation: lp5-in 0.5s cubic-bezier(0.34, 1.42, 0.64, 1) both;
+  animation-delay: var(--d, 0ms);
+}
+
+@media (max-width: 699px) {
+  .launchpad.lp5 {
+    padding-top: calc(var(--menubar-h) + 12px);
+  }
+  .lp5-view {
+    margin-top: 16px;
+  }
+  .lp5-label {
+    font-size: 11.5px;
+  }
+  .lp5-tile {
+    gap: 6px;
+  }
+  .lp5-badge {
+    min-width: 20px;
+    height: 20px;
+    font-size: 11.5px;
+    padding: 0 5px;
+  }
+  .lp5-folder {
+    padding: 18px 12px 20px;
+    border-radius: 26px;
+  }
+  .lp5-folder-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+:root[data-motion='reduced'] .lp5-track {
+  transition-duration: 0.01ms;
+}
+
+/* ═══════════════════════════════ Mission Control ═══════════════════════════════ */
+/* backdrop sits between the desktop (wallpaper, widgets, icons) and the windows layer */
+.mc-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9;
+  pointer-events: none;
+  background: rgba(10, 12, 20, 0.34);
+  backdrop-filter: blur(22px) saturate(1.2);
+  -webkit-backdrop-filter: blur(22px) saturate(1.2);
+  opacity: 0;
+  transition: opacity 0.4s var(--ease);
+}
+.mc-backdrop.open {
+  opacity: 1;
+}
+/* hit targets, labels and the Spaces bar sit above the windows */
+.mc-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 11;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.mc-layer.open {
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 0.3s ease 0.18s;
+}
+.mc-active .win-pos {
+  pointer-events: none !important;
+}
+.mc-active .win-pos .window {
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.45);
+}
+.mc-spaces {
+  position: absolute;
+  top: var(--menubar-h);
+  left: 0;
+  right: 0;
+  height: 118px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(rgba(0, 0, 0, 0.22), rgba(0, 0, 0, 0.08));
+  box-shadow: inset 0 -0.5px 0 rgba(255, 255, 255, 0.14);
+}
+.mc-space {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: #fff;
+  border-radius: 10px;
+  transform: translateY(-8px);
+  transition: transform 0.45s var(--ease-out);
+}
+.mc-layer.open .mc-space {
+  transform: none;
+}
+.mc-space-img {
+  display: block;
+  height: 72px;
+  aspect-ratio: var(--mc-ratio, 1.6);
+  border-radius: 7px;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 2.5px rgba(255, 255, 255, 0.9),
+    0 6px 16px rgba(0, 0, 0, 0.35);
+  transition:
+    transform 0.2s var(--ease-out),
+    box-shadow 0.2s;
+}
+.mc-space-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.mc-space:hover .mc-space-img {
+  transform: scale(1.04);
+}
+.mc-space:focus-visible {
+  outline: none;
+}
+.mc-space:focus-visible .mc-space-img {
+  box-shadow:
+    0 0 0 3px var(--accent),
+    0 6px 16px rgba(0, 0, 0, 0.35);
+}
+.mc-space-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+.mc-thumb {
+  position: absolute;
+  border-radius: 10px;
+  background: transparent;
+  outline: 0 solid transparent;
+  transition: box-shadow 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.mc-thumb:hover,
+.mc-thumb:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px var(--accent),
+    0 0 0 6px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+.mc-label {
+  position: absolute;
+  top: calc(100% + 9px);
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: max(100%, 160px);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px 3px 4px;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  background: rgba(20, 20, 26, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: background 0.15s;
+}
+.mc-thumb:hover .mc-label,
+.mc-thumb:focus-visible .mc-label {
+  background: var(--accent-strong);
+}
+.mc-label-ico {
+  width: 20px;
+  height: 20px;
+  flex: none;
+}
+.mc-label-txt {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mc-empty {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 12px 22px;
+  border-radius: 14px;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 17px;
+  font-weight: 500;
+  background: rgba(0, 0, 0, 0.22);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+}
+@media (max-width: 699px) {
+  .mc-spaces {
+    height: 88px;
+  }
+  .mc-space-img {
+    height: 52px;
+  }
+  .mc-label {
+    font-size: 11.5px;
+  }
+}
