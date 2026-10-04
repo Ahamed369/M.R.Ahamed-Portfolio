@@ -51,7 +51,7 @@ self.addEventListener('fetch', (e) => {
         }
         return res;
       })
-      .catch(() => caches.match(req).then((hit) => hit || (req.mode === 'navigate' ? caches.match('./index.html').then((i) => i || caches.match('./offline.html')) : undefined))),
+      .catch(() => caches.match(req).then((hit) => hit || (req.mode === 'navigate' ? caches.match('./index.html').then((i) => i || caches.match('./offline.html')) : undefined)).then((r) => r || Response.error())),
   );
 });
 
