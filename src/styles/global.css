@@ -93,6 +93,11 @@ select {
   color: inherit;
 }
 
+/* v10.3 — no browser-default (2px inset) borders on text fields; any app style still wins (zero specificity) */
+:where(input:not([type='checkbox'], [type='radio'], [type='range'], [type='color'], [type='file']), textarea, select) {
+  border: 0.5px solid var(--sep, rgba(127, 127, 127, 0.3));
+}
+
 button {
   background: none;
   border: 0;
@@ -196,7 +201,7 @@ body.is-dragging * {
   position: fixed;
   inset: 0 0 auto 0;
   height: var(--menubar-h);
-  z-index: 100000;
+  z-index: var(--z-menubar, 100000);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -546,7 +551,7 @@ body.is-dragging * {
   bottom: 6px;
   display: flex;
   justify-content: center;
-  z-index: 90000;
+  z-index: var(--z-dock-wrap, 90000);
   pointer-events: none;
 }
 .dock {
@@ -981,7 +986,7 @@ body.is-dragging * {
 .boot {
   position: fixed;
   inset: 0;
-  z-index: 200000;
+  z-index: var(--z-boot, 200000);
   background: #000;
   display: flex;
   flex-direction: column;

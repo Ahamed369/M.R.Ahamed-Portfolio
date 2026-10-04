@@ -9,6 +9,7 @@ import { takeScreenshot, toggleScreenRecording, useScreenRecording } from '../sy
 import { sharePortfolio } from '../system/share';
 import { AppIcon } from './AppIcons';
 import type { AppId } from '../system/types';
+import { SysIcon, WxIcon, wxKind } from './SysIcons';
 
 type Panel = 'wifi' | 'bt' | 'airdrop' | 'display' | 'sound' | null;
 
@@ -367,15 +368,16 @@ export function ControlCenter() {
                 <span />
               </button>
             </div>
+            {sys.bluetooth && <div className="cc-sub-label">Devices (simulated)</div>}
             {sys.bluetooth &&
               DEVICES.map((d, i) => (
                 <div key={d} className="cc-list-item static">
                   <span className="cc-li-ico">{I.bt}</span>
                   {d}
-                  <span className="cc-li-status">{i === 0 ? 'Connected' : 'Not connected'}</span>
+                  <span className="cc-li-status">{i === 0 ? 'Connected (simulated)' : 'Not connected'}</span>
                 </div>
               ))}
-            <p className="cc-note">Simulated devices — for the macOS experience only.</p>
+            <p className="cc-note">Simulated devices — a website can’t see or connect to your real Bluetooth devices.</p>
           </>,
         )}
         {sub(
@@ -506,7 +508,7 @@ export function ControlCenter() {
             }}
             aria-label="Open Music"
           >
-            ♪
+            <SysIcon n="music" size={22} />
           </button>
           <div className="cc-now-text">
             <b>{music.track.title}</b>
@@ -534,7 +536,7 @@ export function ControlCenter() {
           aria-label="Open Weather"
         >
           <span className="cc-wx-emoji" aria-hidden="true">
-            {weather ? (WX[weather.code] ?? ['🌡'])[0] : '🌤'}
+            <WxIcon kind={weather ? wxKind(weather.code, new Date().getHours() >= 6 && new Date().getHours() < 18) : 'pcDay'} size={30} mono={!weather} />
           </span>
           <span className="cc-wx-text">
             <b>Kandy</b>
@@ -647,7 +649,7 @@ export function ControlCenter() {
               },
               { id: 'quicknote', label: 'Quick Note', on: false, app: 'stickies' as AppId, icon: <AppIcon name="stickies" /> },
               { id: 'call', label: 'FaceTime', on: false, app: 'facetime' as AppId, icon: <AppIcon name="facetime" /> },
-              { id: 'edit', label: 'Edit Controls…', on: false, app: 'settings' as AppId, args: { pane: 'controlcenter' }, icon: <span className="cc-aa">✎</span> },
+              { id: 'edit', label: 'Edit Controls…', on: false, app: 'settings' as AppId, args: { pane: 'controlcenter' }, icon: <SysIcon n="pencil" size={16} /> },
               {
                 id: 'share',
                 label: 'Share Portfolio',

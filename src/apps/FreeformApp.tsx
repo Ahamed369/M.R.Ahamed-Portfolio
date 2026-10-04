@@ -1,3 +1,4 @@
+import { doubleClick, isTouchUI } from '../system/input';
 import { useEffect, useRef, useState, type PointerEvent as RPointerEvent } from 'react';
 import { projects } from '../data/portfolio';
 import { readStore, writeStore } from '../system/storage';
@@ -366,7 +367,7 @@ export default function FreeformApp() {
             onKeyDown={(e) => e.key === 'Escape' && (e.currentTarget as HTMLTextAreaElement).blur()}
           />
         )}
-        <p className="ff-hint">Double-click a note to edit · drag the canvas with Select to pan · ⌘/Ctrl + scroll to zoom</p>
+        <p className="ff-hint">{doubleClick()} a note to edit · drag the canvas with Select to pan · {isTouchUI() ? 'use − / + to zoom' : '⌘/Ctrl + scroll to zoom'}</p>
       </div>
     </div>
   );

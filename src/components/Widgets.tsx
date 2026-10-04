@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type PointerEvent as RPointerEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { useSystem } from '../system/SystemContext';
-import { NEW_WIDGETS, useCustomize, WIDGETS, type WidgetId } from '../system/customize';
+import { useCustomize, WIDGET_GROUPS, WIDGETS, type WidgetId } from '../system/customize';
 import { ConfirmDialog } from './ConfirmDialog';
 import { personal, projects, socials } from '../data/portfolio';
 import { useWM } from '../system/WindowManager';
@@ -13,8 +13,9 @@ import { fmtDuration, useScreenTime } from '../system/screenTime';
 import { APPS } from '../system/apps';
 import { AppIcon } from './AppIcons';
 import type { AppId } from '../system/types';
-import { useFreeDrag, useWidgetPositions, type Pos } from '../system/desk';
+import { findWidgetSlot, useFreeDrag, useWidgetPositions, type Pos, type Rect } from '../system/desk';
 import { renderExtraWidget } from './WidgetsExtra';
+import { SysIcon, WxIcon, wxKind } from './SysIcons';
 
 function useTick(ms: number) {
   const [now, setNow] = useState(() => new Date());
@@ -55,7 +56,7 @@ function Clock({ tz, label, now, editable, onEdit }: { tz: string; label: string
       </svg>
       {editable ? (
         <button type="button" className="clock-label edit" onClick={onEdit} aria-label="Change your time zone">
-          {label} ✎
+          {label} <SysIcon n="pencil" size={9} />
         </button>
       ) : (
         <div className="clock-label">{label}</div>
@@ -77,8 +78,9 @@ const ZONES = [
   'America/Los_Angeles',
 ];
 
-export function Widgets() {
-  const now = useTick(1000);
+/** v10.3 — one desktop widget's content, usable on the desktop, in Notification Center and in the gallery */
+export function WidgetBody({ id, preview }: { id: WidgetId; preview?: boolean }) {
+  const now = useTick(preview ? 30000 : 1000);
   const localTz = useMemo(() => {
     try {
       return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
@@ -88,16 +90,87 @@ export function Widgets() {
   }, []);
   const [yourTz, setYourTz] = useState<string>(() => readStore('mra-your-tz', { tz: localTz }).tz);
   const [tzEditing, setTzEditing] = useState(false);
+  const zoneList = ZONES.includes(localTz) ? ZONES : [localTz, ...ZONES];
+  switch (id) {
+    case 'calendar':
+      return <Calendar now={now} />;
+    case 'clocks':
+      return (
+        <div className="widget clocks">
+          <Clock tz={personal.timezone} label={personal.city} now={now} />
+          <Clock tz={yourTz} label="Your Time" now={now} editable={!preview} onEdit={() => setTzEditing((e) => !e)} />
+          {tzEditing && (
+            <select
+              className="tz-select"
+              aria-label="Your time zone"
+              value={yourTz}
+              autoFocus
+              onChange={(e) => {
+                setYourTz(e.target.value);
+                writeStore('mra-your-tz', { tz: e.target.value });
+                setTzEditing(false);
+              }}
+              onBlur={() => setTzEditing(false)}
+            >
+              {zoneList.map((z) => (
+                <option key={z} value={z}>
+                  {z.replace(/_/g, ' ')}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
+      );
+    case 'screentime':
+      return <ScreenTimeWidget />;
+    case 'weather':
+      return <WeatherWidget />;
+    case 'github':
+      return <GitHubWidget />;
+    case 'current':
+      return <CurrentProjectWidget />;
+    case 'music':
+      return <MusicWidget />;
+    case 'reminders':
+      return <RemindersWidget />;
+    default:
+      return <>{renderExtraWidget(id)}</>;
+  }
+}
+
+/** v10.3 — what clicking each Mac widget opens (widgets with their own buttons keep those) */
+const WIDGET_TARGET: Partial<Record<WidgetId, [AppId, Record<string, string>?]>> = {
+  calendar: ['calendar'],
+  clocks: ['clock', { tab: 'world' }],
+  digital: ['clock', { tab: 'world' }],
+  weather: ['weather'],
+  battery: ['settings', { pane: 'battery' }],
+  sysinfo: ['activity'],
+  pomodoro: ['focusplanner', { tab: 'timer' }],
+  quicknote: ['stickies'],
+  contact: ['contacts'],
+};
+
+/** rectangles of every widget on the desktop except `skip` (for snapping / collisions) */
+const widgetRects = (skip?: Element | null): Rect[] =>
+  [...document.querySelectorAll('.desktop .wg-slot')]
+    .filter((el) => el !== skip && !el.classList.contains('wg-in-nc'))
+    .map((el) => {
+      const r = el.getBoundingClientRect();
+      return { x: r.left, y: r.top, w: r.width, h: r.height };
+    })
+    .filter((r) => r.w > 0 && r.h > 0);
+
+export function Widgets() {
   const cz = useCustomize();
   const [edit, setEdit] = useState(false);
   const [confirm, setConfirm] = useState<WidgetId | null>(null);
-  const [dragId, setDragId] = useState<WidgetId | null>(null);
   const [vp, setVp] = useState(() => ({ w: window.innerWidth, h: window.innerHeight }));
   const [pos, setPos] = useWidgetPositions();
+  const [snapPrev, setSnapPrev] = useState<{ p: Pos; w: number; h: number } | null>(null);
+  const others = useRef<Rect[]>([]);
   const freeOn = vp.w >= 700; // free placement on desktops/tablets; phones keep the column layout
   const freeIds = freeOn ? cz.widgets.filter((w) => pos[w]) : [];
-
-  const zoneList = ZONES.includes(localTz) ? ZONES : [localTz, ...ZONES];
 
   useEffect(() => {
     const onResize = () => setVp({ w: window.innerWidth, h: window.innerHeight });
@@ -115,54 +188,26 @@ export function Widgets() {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [edit, confirm]);
+  useEffect(() => {
+    document.documentElement.toggleAttribute('data-widget-edit', edit);
+    return () => document.documentElement.removeAttribute('data-widget-edit');
+  }, [edit]);
 
-  const render = (id: WidgetId) => {
-    switch (id) {
-      case 'calendar':
-        return <Calendar now={now} />;
-      case 'clocks':
-        return (
-          <div className="widget clocks">
-            <Clock tz={personal.timezone} label={personal.city} now={now} />
-            <Clock tz={yourTz} label="Your Time" now={now} editable onEdit={() => setTzEditing((e) => !e)} />
-            {tzEditing && (
-              <select
-                className="tz-select"
-                aria-label="Your time zone"
-                value={yourTz}
-                autoFocus
-                onChange={(e) => {
-                  setYourTz(e.target.value);
-                  writeStore('mra-your-tz', { tz: e.target.value });
-                  setTzEditing(false);
-                }}
-                onBlur={() => setTzEditing(false)}
-              >
-                {zoneList.map((z) => (
-                  <option key={z} value={z}>
-                    {z.replace(/_/g, ' ')}
-                  </option>
-                ))}
-              </select>
-            )}
-          </div>
-        );
-      case 'screentime':
-        return <ScreenTimeWidget />;
-      case 'weather':
-        return <WeatherWidget />;
-      case 'github':
-        return <GitHubWidget />;
-      case 'current':
-        return <CurrentProjectWidget />;
-      case 'music':
-        return <MusicWidget />;
-      case 'reminders':
-        return <RemindersWidget />;
-      default:
-        return renderExtraWidget(id);
-    }
-  };
+  // v10.3 — when editing starts, pin every column widget where it is, so each one can be moved on its own
+  useLayoutEffect(() => {
+    if (!edit || !freeOn) return;
+    const missing = cz.widgets.filter((w) => !pos[w]);
+    if (!missing.length) return;
+    const add: Record<string, Pos> = {};
+    missing.forEach((w) => {
+      const el = document.querySelector(`.desktop .wg-slot[data-wid="${w}"]`);
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      if (r.width) add[w] = { x: Math.round(r.left), y: Math.round(r.top) };
+    });
+    if (Object.keys(add).length) setPos((m) => ({ ...m, ...add }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [edit]);
 
   // Lay the widgets out in up to 3 aligned columns that never run under the Dock.
   const dock = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--dock-size')) || 48;
@@ -181,24 +226,33 @@ export function Widgets() {
     colH += h;
   }
 
-  const move = (from: WidgetId, to: WidgetId) => {
-    if (from === to) return;
-    const list = cz.widgets.filter((x) => x !== from);
-    list.splice(list.indexOf(to), 0, from);
-    cz.setWidgets(list);
+  /** first free slot for a newly added widget (top-left first, like macOS) */
+  const placeNew = (id: WidgetId, at?: Pos) => {
+    const meta = WIDGETS.find((w) => w.id === id);
+    const h = meta?.h ?? 140;
+    const w = 170;
+    const slot = findWidgetSlot(at?.x ?? 14, at?.y ?? 40, w, h, widgetRects());
+    if (!cz.widgets.includes(id)) cz.addWidget(id);
+    if (freeOn && slot) setPos((m) => ({ ...m, [id]: slot }));
   };
 
   const slotProps = (id: WidgetId) => ({
     id,
     edit,
-    dragging: dragId === id,
-    freeEnabled: freeOn && !edit,
-    setDragId,
-    move,
+    freeEnabled: freeOn && edit,
     setEdit,
     setConfirm,
     placed: !!pos[id],
+    onStart: (el: HTMLElement) => {
+      others.current = widgetRects(el);
+    },
+    resolve: (x: number, y: number, w: number, h: number) => findWidgetSlot(x, y, w, h, others.current),
+    onPreview: (p: Pos | null, w: number, h: number) => setSnapPrev(p ? { p, w, h } : null),
     onPlace: (p: Pos) => setPos((m) => ({ ...m, [id]: p })),
+    onToNc: () => {
+      cz.addNcWidget(id);
+      cz.setWidgets(cz.widgets.filter((x) => x !== id));
+    },
     onUnplace: () =>
       setPos((m) => {
         const n = { ...m };
@@ -206,7 +260,7 @@ export function Widgets() {
         return n;
       }),
     onResetAll: () => setPos({}),
-    children: render(id),
+    children: <WidgetBody id={id} />,
   });
 
   const confirmMeta = confirm ? WIDGETS.find((w) => w.id === confirm) : undefined;
@@ -223,44 +277,22 @@ export function Widgets() {
         ))}
       </aside>
       {freeIds.length > 0 && (
-        <div className="widgets-free" aria-label="Placed widgets">
+        <div className={`widgets-free ${edit ? 'wg-editing' : ''}`} aria-label="Placed widgets">
           {freeIds.map((id) => (
             <WidgetSlot key={id} {...slotProps(id)} pos={pos[id]} />
           ))}
         </div>
       )}
-      {edit &&
-        createPortal(
-          <div className="wg-gallery" role="dialog" aria-label="Widget gallery">
-            <div className="wg-g-head">
-              <b>Add Widgets</b>
-              <span>Click + to add a widget · − to remove · drag widgets anywhere on the desktop</span>
-              <button type="button" className="btn btn-primary" onClick={() => setEdit(false)}>
-                Done
-              </button>
-            </div>
-            <div className="wg-g-list">
-              {WIDGETS.map((w) => {
-                const on = cz.widgets.includes(w.id);
-                return (
-                  <button key={w.id} type="button" className={`wg-g-item ${on ? 'on' : ''}`} onClick={() => (on ? setConfirm(w.id) : cz.addWidget(w.id))}>
-                    <span className="wg-g-ico">
-                      <AppIcon name={w.icon} />
-                    </span>
-                    <span className="wg-g-label">
-                      {w.label}
-                      {NEW_WIDGETS.has(w.id) && !on && <em className="wg-g-new"> NEW</em>}
-                    </span>
-                    <span className="wg-g-state" aria-hidden="true">
-                      {on ? '−' : '+'}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>,
-          document.body,
-        )}
+      {snapPrev && <div className="wg-snap" style={{ left: snapPrev.p.x, top: snapPrev.p.y, width: snapPrev.w, height: snapPrev.h }} aria-hidden="true" />}
+      {edit && (
+        <WidgetGallery
+          onClose={() => setEdit(false)}
+          onAdd={(id, at) => placeNew(id, at)}
+          onAddNc={(id) => cz.addNcWidget(id)}
+          placed={cz.widgets}
+          inNc={cz.ncWidgets}
+        />
+      )}
       {confirm && confirmMeta && (
         <ConfirmDialog
           icon={confirmMeta.icon}
@@ -281,43 +313,55 @@ export function Widgets() {
 interface SlotProps {
   id: WidgetId;
   edit: boolean;
-  dragging: boolean;
   freeEnabled: boolean;
   placed: boolean;
   pos?: Pos;
-  setDragId: (id: WidgetId | null) => void;
-  move: (from: WidgetId, to: WidgetId) => void;
   setEdit: (v: boolean) => void;
   setConfirm: (id: WidgetId) => void;
+  onStart: (el: HTMLElement) => void;
+  resolve: (x: number, y: number, w: number, h: number) => Pos | null;
+  onPreview: (p: Pos | null, w: number, h: number) => void;
   onPlace: (p: Pos) => void;
+  onToNc: () => void;
   onUnplace: () => void;
   onResetAll: () => void;
   children: ReactNode;
 }
 
-/** One widget on the desktop: free-drag to place it anywhere (v9), reorder in edit mode, right-click menu. */
-function WidgetSlot({ id, edit, dragging, freeEnabled, placed, pos, setDragId, move, setEdit, setConfirm, onPlace, onUnplace, onResetAll, children }: SlotProps) {
+/**
+ * One widget on the desktop. v10.3: widgets only move in edit mode (Edit Widgets…),
+ * snap to the widget grid, never overlap and stay clear of the menu bar and Dock.
+ * Dropping one on the right edge of the screen moves it into Notification Center.
+ */
+function WidgetSlot({ id, edit, freeEnabled, placed, pos, setEdit, setConfirm, onStart, resolve, onPreview, onPlace, onToNc, onUnplace, onResetAll, children }: SlotProps) {
   const sys = useSystem();
-  const drag = useFreeDrag({ enabled: freeEnabled, onDrop: (p) => onPlace(p), ignore: 'input, select, textarea, .wg-remove, .tz-select' });
+  const wm = useWM();
+  const [ncHot, setNcHot] = useState(false);
+  const ncRef = useRef(false);
+  const drag = useFreeDrag({
+    enabled: freeEnabled,
+    onDrop: (p) => onPlace(p),
+    ignore: 'input, select, textarea, .wg-remove, .tz-select',
+    onStart,
+    resolve: (x, y, w, h) => {
+      const hot = x + w > window.innerWidth - 40;
+      if (hot !== ncRef.current) setNcHot(hot);
+      ncRef.current = hot;
+      return hot ? null : resolve(x, y, w, h);
+    },
+    onPreview,
+    onEnd: () => {
+      if (ncRef.current) onToNc();
+      ncRef.current = false;
+      setNcHot(false);
+    },
+  });
   return (
     <div
-      className={`wg-slot ${dragging ? 'dragging' : ''} ${pos ? 'wg-placed' : ''}`}
+      className={`wg-slot ${pos ? 'wg-placed' : ''} ${edit ? 'wg-edit' : ''} ${WIDGET_TARGET[id] ? 'wg-link' : ''}`}
+      data-wid={id}
       style={pos ? { left: pos.x, top: pos.y } : undefined}
-      draggable={edit && !pos}
       onPointerDown={drag.onPointerDown}
-      onDragStart={(e) => {
-        setDragId(id);
-        e.dataTransfer.effectAllowed = 'move';
-        e.dataTransfer.setData('text/plain', id);
-      }}
-      onDragOver={(e) => edit && e.preventDefault()}
-      onDrop={(e) => {
-        e.preventDefault();
-        const from = (e.dataTransfer.getData('text/plain') || null) as WidgetId | null;
-        if (from) move(from, id);
-        setDragId(null);
-      }}
-      onDragEnd={() => setDragId(null)}
       onContextMenu={(e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -326,10 +370,10 @@ function WidgetSlot({ id, edit, dragging, freeEnabled, placed, pos, setDragId, m
           y: e.clientY,
           items: [
             { label: 'Edit Widgets…', action: () => setEdit(true) },
-            { label: 'Add Widgets…', action: () => setEdit(true) },
             { label: '', sep: true },
             ...(placed ? [{ label: 'Return to Widget Column', action: onUnplace }] : []),
             { label: 'Arrange All Widgets in Columns', action: onResetAll },
+            { label: 'Move to Notification Center', action: onToNc },
             { label: '', sep: true },
             { label: 'Remove Widget', action: () => setConfirm(id) },
           ],
@@ -342,6 +386,12 @@ function WidgetSlot({ id, edit, dragging, freeEnabled, placed, pos, setDragId, m
           e.stopPropagation();
         }
       }}
+      onClick={(e) => {
+        // a click anywhere that isn't one of the widget's own controls opens its app
+        if (edit || (e.target as HTMLElement).closest('button, a, input, select, textarea, [role="button"], .tz-select')) return;
+        const t = WIDGET_TARGET[id];
+        if (t) wm.open(t[0], t[1]);
+      }}
     >
       {edit && (
         <button type="button" className="wg-remove" aria-label={`Remove ${WIDGETS.find((w) => w.id === id)?.label} widget`} onClick={() => setConfirm(id)}>
@@ -350,8 +400,146 @@ function WidgetSlot({ id, edit, dragging, freeEnabled, placed, pos, setDragId, m
           </svg>
         </button>
       )}
+      {ncHot && <span className="wg-nc-hint">Notification Center</span>}
       {children}
     </div>
+  );
+}
+
+/* ───────────── v10.3 — Widget gallery (like macOS Sonoma) ───────────── */
+
+function WidgetGallery({ onClose, onAdd, onAddNc, placed, inNc }: { onClose: () => void; onAdd: (id: WidgetId, at?: Pos) => void; onAddNc: (id: WidgetId) => void; placed: WidgetId[]; inNc: WidgetId[] }) {
+  const [sel, setSel] = useState<string>('all');
+  const [q, setQ] = useState('');
+  const [drag, setDrag] = useState<{ id: WidgetId; x: number; y: number; w: number; h: number; nc: boolean; over: boolean } | null>(null);
+  const ql = q.trim().toLowerCase();
+  const groups = WIDGET_GROUPS.filter((g) => !ql || `${g.app} ${g.ids.map((i) => WIDGETS.find((w) => w.id === i)?.label).join(' ')}`.toLowerCase().includes(ql));
+  const suggestions: WidgetId[] = ['clocks', 'calendar', 'photoframe', 'battery', 'quicknote', 'weather', 'reminders', 'contact'];
+  const label = (id: WidgetId) => WIDGETS.find((w) => w.id === id)?.label ?? id;
+  const shown = sel === 'all' ? null : WIDGET_GROUPS.find((g) => g.app === sel);
+
+  /** drag a preview out of the gallery onto the desktop / into Notification Center (click adds it too) */
+  const startDrag = (e: RPointerEvent<HTMLButtonElement>, id: WidgetId) => {
+    if (e.button !== 0) return;
+    const card = e.currentTarget.querySelector('.wgg-prev') as HTMLElement | null;
+    const r = (card ?? e.currentTarget).getBoundingClientRect();
+    const sx = e.clientX;
+    const sy = e.clientY;
+    const ox = sx - r.left;
+    const oy = sy - r.top;
+    let on = false;
+    const gallery = document.querySelector('.wgg')?.getBoundingClientRect();
+    const move = (ev: PointerEvent) => {
+      if (!on && Math.hypot(ev.clientX - sx, ev.clientY - sy) < 6) return;
+      on = true;
+      const nc = ev.clientX > window.innerWidth - 120;
+      const over = !!gallery && ev.clientX > gallery.left && ev.clientX < gallery.right && ev.clientY > gallery.top && ev.clientY < gallery.bottom;
+      setDrag({ id, x: ev.clientX - ox, y: ev.clientY - oy, w: r.width, h: r.height, nc, over });
+    };
+    const up = (ev: PointerEvent) => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+      setDrag(null);
+      if (!on) return;
+      if (ev.clientX > window.innerWidth - 120) onAddNc(id);
+      else if (!(gallery && ev.clientX > gallery.left && ev.clientX < gallery.right && ev.clientY > gallery.top && ev.clientY < gallery.bottom)) onAdd(id, { x: ev.clientX - ox, y: ev.clientY - oy });
+      suppress.current = performance.now();
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+  };
+  const suppress = useRef(0);
+
+  const card = (id: WidgetId, big = false) => {
+    const on = placed.includes(id);
+    return (
+      <button
+        key={id}
+        type="button"
+        className={`wgg-card ${big ? 'big' : ''} ${on ? 'on' : ''}`}
+        onPointerDown={(e) => startDrag(e, id)}
+        onClick={() => performance.now() - suppress.current > 300 && !on && onAdd(id)}
+        title={on ? `${label(id)} is on the desktop` : `Add ${label(id)} — or drag it to the desktop or Notification Center`}
+        aria-label={on ? `${label(id)} (on the desktop)` : `Add ${label(id)} widget`}
+      >
+        <span className="wgg-prev" aria-hidden="true" inert>
+          <WidgetBody id={id} preview />
+        </span>
+        <span className="wgg-name">
+          {label(id)}
+          {inNc.includes(id) && <small> · in Notification Center</small>}
+        </span>
+        {!on && <i className="wgg-plus">+</i>}
+      </button>
+    );
+  };
+
+  return createPortal(
+    <>
+      <div className="wgg" role="dialog" aria-label="Widget gallery">
+        <aside className="wgg-side">
+          <label className="wgg-search">
+            <SysIcon n="search" size={13} />
+            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search Widgets" aria-label="Search Widgets" autoFocus />
+          </label>
+          <nav aria-label="Widget apps">
+            <button type="button" className={sel === 'all' ? 'on' : ''} onClick={() => setSel('all')}>
+              <span className="wgg-all" aria-hidden="true">
+                <SysIcon n="widget" size={14} />
+              </span>
+              All Widgets
+            </button>
+            {groups.map((g) => (
+              <button key={g.app} type="button" className={sel === g.app ? 'on' : ''} onClick={() => setSel(g.app)}>
+                <AppIcon name={g.icon} className="wgg-appico" />
+                {g.app}
+              </button>
+            ))}
+          </nav>
+        </aside>
+        <div className="wgg-main">
+          {shown ? (
+            <section>
+              <h3>{shown.app}</h3>
+              <div className="wgg-grid">{shown.ids.map((id) => card(id, true))}</div>
+            </section>
+          ) : (
+            <>
+              {!ql && (
+                <section>
+                  <h3>Suggestions</h3>
+                  <div className="wgg-grid">{suggestions.map((id) => card(id))}</div>
+                </section>
+              )}
+              {groups.map((g) => (
+                <section key={g.app}>
+                  <h3>{g.app}</h3>
+                  <div className="wgg-grid">{g.ids.map((id) => card(id))}</div>
+                </section>
+              ))}
+              {!groups.length && <p className="wgg-empty">No widgets match “{q}”.</p>}
+            </>
+          )}
+        </div>
+        <footer className="wgg-foot">
+          <span>Drag a widget to place it on the desktop or Notification Center…</span>
+          <button type="button" className="btn btn-primary" onClick={onClose}>
+            Done
+          </button>
+        </footer>
+      </div>
+      {drag && (
+        <>
+          <div className={`wgg-ncdrop ${drag.nc ? 'hot' : ''}`} aria-hidden="true">
+            <span>Notification Center</span>
+          </div>
+          <div className={`wgg-drag ${drag.over ? 'over' : ''}`} style={{ left: drag.x, top: drag.y, width: drag.w, height: drag.h }} aria-hidden="true">
+            <WidgetBody id={drag.id} preview />
+          </div>
+        </>
+      )}
+    </>,
+    document.body,
   );
 }
 
@@ -425,13 +613,17 @@ function WeatherWidget() {
       .catch(() => setFailed(true));
     return () => ctrl.abort();
   }, []);
-  const [emoji, label] = w ? (WMO[w.code] ?? ['🌡', 'Weather']) : ['🌤', failed ? 'Weather unavailable' : 'Loading…'];
+  const label = w ? (WMO[w.code] ?? ['', 'Weather'])[1] : failed ? 'Weather unavailable' : 'Loading…';
+  const hr = new Date().getHours();
   return (
     <div className="widget weather" aria-label={`Weather in ${personal.city}`}>
       <div className="wx-city">{personal.city}</div>
       <div className="wx-temp">{w ? `${Math.round(w.t)}°` : '—'}</div>
       <div className="wx-cond">
-        <span aria-hidden="true">{emoji}</span> {label}
+        <span aria-hidden="true" className="wx-glyph">
+          <WxIcon kind={w ? wxKind(w.code, hr >= 6 && hr < 18) : 'pcDay'} size={16} mono={!w} />
+        </span>{' '}
+        {label}
       </div>
       {w && (
         <div className="wx-hl">
@@ -556,7 +748,7 @@ function RemindersWidget() {
     <div className="widget rem-widget">
       <button type="button" className="rw-head" onClick={() => wm.open('reminders')} aria-label={`Open Reminders — ${open.length} left`}>
         <span className="rw-ico" aria-hidden="true">
-          ☰
+          <SysIcon n="list" size={14} />
         </span>
         <b>{open.length}</b>
         <span>Reminders</span>
@@ -575,7 +767,7 @@ function RemindersWidget() {
           ))}
         </ul>
       ) : (
-        <div className="rw-done">All done 🎉</div>
+        <div className="rw-done">All done</div>
       )}
       {open.length > shown.length && <div className="rw-more">+{open.length - shown.length} more</div>}
     </div>

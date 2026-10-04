@@ -1,3 +1,4 @@
+import { eraseDeleted, useDeleted } from '../system/history';
 import { useEffect, useRef, useState, type MouseEvent as RMouseEvent, type PointerEvent as RPointerEvent, type ReactNode } from 'react';
 import { AppIcon, type IconName } from './AppIcons';
 import { APPS, DOCK_PORTFOLIO, DOCK_SYSTEM } from '../system/apps';
@@ -53,16 +54,18 @@ export function Dock() {
   const { removedApps, trash, removeApp, emptyTrash } = useCustomize();
   const badges = useBadges();
   const gone = new Set<string>(removedApps);
-  const trashCount = useRef(trash.length);
+  const deletedItems = useDeleted();
+  const trashN = trash.length + deletedItems.length;
+  const trashCount = useRef(trashN);
   useEffect(() => {
-    if (trash.length > trashCount.current && !motionReduced) {
+    if (trashN > trashCount.current && !motionReduced) {
       dockRef.current?.querySelector<HTMLElement>('[data-dock-id="trash"] .dock-press')?.animate(
         [{ transform: 'scale(1)' }, { transform: 'scale(1.18) translateY(-6px)', offset: 0.35 }, { transform: 'scale(0.94)', offset: 0.7 }, { transform: 'scale(1)' }],
         { duration: 520, easing: 'cubic-bezier(.3,.7,.4,1)' },
       );
     }
-    trashCount.current = trash.length;
-  }, [trash.length, motionReduced]);
+    trashCount.current = trashN;
+  }, [trashN, motionReduced]);
 
   const running = new Set(wm.windows.map((w) => w.id));
   const minimized = wm.windows.filter((w) => w.phase === 'minimized' || w.phase === 'minimizing' || (w.phase === 'restoring' && w.fromMin));
@@ -334,15 +337,15 @@ export function Dock() {
       y: e.clientY,
       items: [
         { label: 'Open', action: () => wm.open('finder', { folder: 'trash' }) },
-        { label: 'Empty Trash', action: emptyTrash, disabled: !trash.length },
+        { label: 'Empty Trash', action: () => (emptyTrash(), eraseDeleted()), disabled: !trashN },
       ],
     });
   };
 
   // A plain render function (not a component) so Dock items keep their DOM
   // identity across renders — the spring state is keyed by element.
-  const item = ({ id, label, icon, onClick, running: isOn, badge, onContext }: { id: string; label: string; icon: IconName; onClick: () => void; running?: boolean; badge?: ReactNode; onContext?: (e: RMouseEvent) => void }) => (
-    <button key={id} type="button" className="dock-item" data-dock-id={id} aria-label={label} onClick={onClick} onContextMenu={onContext}>
+  const item = ({ id, label, icon, onClick, running: isOn, badge, onContext, min }: { id: string; label: string; icon: IconName; onClick: () => void; running?: boolean; badge?: ReactNode; onContext?: (e: RMouseEvent) => void; min?: boolean }) => (
+    <button key={id} type="button" className={`dock-item ${min ? 'is-min' : ''}`} data-dock-id={id} aria-label={label} onClick={onClick} onContextMenu={onContext}>
       <span className="dock-lift">
         <span className="dock-bounce">
           <span className="dock-press">
@@ -477,11 +480,18 @@ export function Dock() {
             label: `${APPS[w.id].title} (minimized)`,
             icon: APPS[w.id].icon,
             onClick: () => wm.open(w.id),
-            badge: <span className="dock-min-badge" aria-hidden="true" />,
+            min: true,
+            badge: (
+              <span className="dock-min-win" aria-hidden="true">
+                <i />
+                <i />
+                <i />
+              </span>
+            ),
           }),
         )}
         {item({ id: 'downloads', label: 'Downloads', icon: 'downloads', onClick: () => setStackOpen((o) => !o) })}
-        {item({ id: 'trash', label: trash.length ? `Trash — ${trash.length} item${trash.length === 1 ? '' : 's'}` : 'Trash', icon: trash.length ? 'trashfull' : 'trash', onClick: () => wm.open('finder', { folder: 'trash' }), onContext: trashMenu })}
+        {item({ id: 'trash', label: trashN ? `Trash — ${trashN} item${trashN === 1 ? '' : 's'}` : 'Trash', icon: trashN ? 'trashfull' : 'trash', onClick: () => wm.open('finder', { folder: 'trash' }), onContext: trashMenu })}
       </div>
     </div>
   );

@@ -1688,7 +1688,7 @@
 }
 
 /* ═════════════ Activity Monitor ═════════════ */
-.am {
+.amon {
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -1696,7 +1696,7 @@
   background: var(--win-solid);
   font-size: 12.5px;
 }
-.am-bar {
+.amon-bar {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -1704,44 +1704,44 @@
   border-bottom: 0.5px solid var(--sep);
   flex-wrap: wrap;
 }
-.am-quit {
+.amon-quit {
   height: 26px;
   padding: 0 10px;
   border-radius: 7px;
   color: var(--text);
   background: var(--hover);
 }
-.am-quit:disabled {
+.amon-quit:disabled {
   opacity: 0.4;
 }
-.am-tabs {
+.amon-tabs {
   display: flex;
   margin: 0 auto;
   padding: 2px;
   border-radius: 8px;
   background: var(--hover);
 }
-.am-tabs button {
+.amon-tabs button {
   height: 24px;
   padding: 0 14px;
   border-radius: 6px;
   color: var(--text);
 }
-.am-tabs button.on {
+.amon-tabs button.on {
   background: var(--win-solid);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
-.am-table {
+.amon-table {
   flex: 1;
   min-height: 0;
   display: flex;
   flex-direction: column;
 }
-.am-body {
+.amon-body {
   flex: 1;
   overflow: auto;
 }
-.am-row {
+.amon-row {
   display: grid;
   grid-template-columns: minmax(160px, 2fr) repeat(3, minmax(70px, 1fr));
   align-items: center;
@@ -1751,20 +1751,20 @@
   text-align: left;
   color: var(--text);
 }
-.am-row:nth-child(even) {
+.amon-row:nth-child(even) {
   background: color-mix(in srgb, var(--hover) 50%, transparent);
 }
-.am-row.sel {
+.amon-row.sel {
   background: var(--accent);
   color: #fff;
 }
-.am-head {
+.amon-head {
   font-size: 11px;
   font-weight: 600;
   color: var(--text-2);
   border-bottom: 0.5px solid var(--sep);
 }
-.am-name {
+.amon-name {
   display: flex;
   align-items: center;
   gap: 7px;
@@ -1773,17 +1773,17 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.am-ico {
+.amon-ico {
   width: 18px;
   height: 18px;
   flex: none;
 }
-.am-empty {
+.amon-empty {
   padding: 30px;
   text-align: center;
   color: var(--text-3);
 }
-.am-foot {
+.amon-foot {
   display: flex;
   flex-wrap: wrap;
   gap: 14px;
@@ -1792,7 +1792,7 @@
   border-top: 0.5px solid var(--sep);
   background: color-mix(in srgb, var(--hover) 50%, transparent);
 }
-.am-stats {
+.amon-stats {
   flex: 1;
   min-width: 220px;
   display: grid;
@@ -1801,20 +1801,20 @@
   font-size: 11.5px;
   color: var(--text-2);
 }
-.am-stats b {
+.amon-stats b {
   color: var(--text);
   margin-left: 4px;
 }
-.am-graph {
+.amon-graph {
   width: 260px;
   max-width: 100%;
 }
-.am-graph small {
+.amon-graph small {
   font-size: 9.5px;
   font-weight: 700;
   color: var(--text-3);
 }
-.am-graph svg {
+.amon-graph svg {
   display: block;
   width: 100%;
   height: 60px;
@@ -2475,3 +2475,30 @@
     padding-left: 12px !important;
   }
 }
+
+/* v10.3 — Translate: sizes and states for the v10 additions (icons, errors, notes, saved list) */
+.trn svg { width: 18px; height: 18px; flex: none; }
+.trn-swap { display: grid; place-items: center; }
+.trn-tools button { display: grid; place-items: center; }
+.trn-tools button.on { color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }
+.trn-tools button.star.on { color: #ff9f0a; }
+.trn-pane textarea.rtl, .trn-out[dir='rtl'] { text-align: right; }
+.trn-err { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; font-size: 14px; line-height: 1.45; white-space: normal; }
+.trn-err p { margin: 0; color: var(--text-2); }
+.trn-err-ic { color: #ff9f0a; }
+.trn-err-ic svg { width: 26px; height: 26px; }
+.trn-retry { padding: 5px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; color: #fff; background: var(--accent); cursor: pointer; }
+.trn-loading { animation: trn-pulse 1.2s ease-in-out infinite; }
+@keyframes trn-pulse { 50% { opacity: 0.45; } }
+.trn-stale { opacity: 0.55; }
+.trn-note {
+  min-height: 0; height: 0; overflow: hidden; display: flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--text-2);
+  opacity: 0; transition: opacity 0.2s, height 0.2s;
+}
+.trn-note.show { height: 22px; opacity: 1; }
+.trn-note.ok svg { color: #34c759; }
+.trn-note.warn svg, .trn-note.error svg { color: #ff9f0a; }
+.trn-note svg { width: 15px; height: 15px; }
+.trn-recent-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.trn-link { font-size: 12px; color: var(--accent); cursor: pointer; padding: 2px 4px; border-radius: 6px; }
+.trn-link:hover { background: var(--hover); }

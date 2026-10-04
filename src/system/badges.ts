@@ -7,6 +7,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { readStore, writeStore } from './storage';
 import { useReminders } from './reminders';
+import { useSettings } from './SettingsContext';
 
 const KEY = 'mra-badges-v8';
 const EVT = 'mra-badges-change';
@@ -51,7 +52,19 @@ export function useBadges(): Record<string, number> {
     return () => window.removeEventListener(EVT, on);
   }, []);
   const pending = reminders.filter((r) => !r.done).length;
-  return useMemo(() => ({ ...b, reminders: pending }), [b, pending]);
+  const { settings } = useSettings();
+  const apps = settings.notifApps;
+  return useMemo(() => {
+    const all: Record<string, number> = { ...b, reminders: pending };
+    // v10.1 — Settings → Notifications → (app) → Badges
+    if (apps)
+      Object.entries(apps).forEach(([label, p]) => {
+        if (p.badges !== false) return;
+        const id = label.toLowerCase().replace(/[^a-z]/g, '');
+        if (id in all) all[id] = 0;
+      });
+    return all;
+  }, [b, pending, apps]);
 }
 
 export function badgeText(n: number): string {

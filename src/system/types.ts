@@ -55,10 +55,26 @@ export type AppId =
   | 'sysprefs'
   | 'activity'
   | 'stickies'
+  | 'timemachine'
+  | 'mirroring'
+  | 'learning'
+  | 'whatsnew'
+  | 'flashcards'
+  | 'focusplanner'
+  | 'goals'
+  | 'bizplanner'
+  | 'playground'
+  | 'documents'
+  | 'guidebook'
   | 'translate'
   | 'fontbook'
   | 'grapher'
-  | 'colormeter';
+  | 'colormeter'
+  /* v10 */
+  | 'phone'
+  | 'shortcuts'
+  | 'chess'
+  | 'textedit';
 
 export type WindowPhase = 'opening' | 'open' | 'closing' | 'minimizing' | 'minimized' | 'restoring';
 
@@ -149,6 +165,7 @@ export interface Settings {
   dockAnimateOpen: boolean;
   minimizeToAppIcon: boolean;
   dockRecents: boolean;
+  arrivalAnim: 'soft' | 'full' | 'off';
   menubarAutohide: 'never' | 'fullscreen' | 'always';
   menubarBg: boolean;
   naturalScroll: boolean;
@@ -173,6 +190,135 @@ export interface Settings {
   /** v9 — custom wallpaper image (data URL) chosen from Photos or uploaded */
   customWallpaper: string;
   customTone: 'light' | 'dark';
+  /* ───────── v10 ───────── */
+  /** which shell to show: Automatic (by screen), Mac, iPhone or iPad */
+  viewAs: 'auto' | 'mac' | 'iphone' | 'ipad';
+  /** trackpad pinch / Ctrl+scroll — never zooms the page */
+  pinchAction: 'missioncontrol' | 'launchpad' | 'off';
+  /** two-finger horizontal swipe on the desktop switches Desktops (Spaces) */
+  swipeSpaces: boolean;
+  /** wallpaper follows the pointer slightly */
+  parallax: boolean;
+  /** Performance: auto lowers blur/effects when the frame rate drops */
+  perfMode: 'auto' | 'quality' | 'speed';
+  /** Mac notch with Dynamic Island */
+  macNotch: boolean;
+  /** Liquid Glass light edge on panels and the Dock */
+  glassEdge: boolean;
+  /** Notification sound: an original tone, or the visitor's own uploaded file */
+  notifTone: string;
+  /** Ringtone for incoming demo calls, alarms and timers */
+  ringtone: string;
+  /** iPhone: what a long press on an empty Home Screen area does */
+  iosLongPress: 'switcher' | 'edit';
+  /** iPhone/iPad Home Screen look */
+  iosIconLook: 'default' | 'dark' | 'clear' | 'tinted';
+  iosIconMode: 'light' | 'dark' | 'auto';
+  iosTint: string;
+  iosLabels: boolean;
+  iosLargeIcons: boolean;
+  iosLockFont: 'rounded' | 'serif' | 'mono' | 'thin';
+  iosLockColor: string;
+  iosDepth: boolean;
+  /** three-finger gestures on touch devices */
+  threeFinger: boolean;
+  /** AssistiveTouch */
+  atOn: boolean;
+  atIcons: string[];
+  atSingle: string;
+  atDouble: string;
+  atLong: string;
+  atOpacity: number;
+  /** v10 — AssistiveTouch custom gestures (x, y as 0–1 of the screen, t in ms) */
+  atGestures?: { name: string; pts: [number, number, number][] }[];
+  /** Delete safety */
+  askBeforeDelete: boolean;
+  trashAutoEmpty: 0 | 7 | 30;
+  undoLimit: number;
+  /** StandBy when an iPhone is landscape and charging */
+  standBy: boolean;
+  alwaysOn: boolean;
+  focusMode: 'off' | 'dnd' | 'work' | 'sleep' | 'personal';
+  /** v10.3 — 24-hour time in the menu bar, status bar and Lock Screen (undefined = follow the device) */
+  clock24?: boolean;
+  /** Login: optional user picker */
+  userPicker: boolean;
+  /** iPad Stage Manager */
+  ipadStage: boolean;
+  /* ───────── v10.1 ───────── */
+  /** iPhone Dock: exactly four apps (launch item ids) */
+  dockApps: string[];
+  showPageDots: boolean;
+  appLibrary: boolean;
+  /** v10.3 — iPad: what the Dock's app button opens ('library' = App Library page, 'launchpad' = custom Launchpad-style grid) */
+  ipadAppBrowser?: 'library' | 'launchpad';
+  showBadges: boolean;
+  homeSearch: boolean;
+  /** where newly added apps go */
+  newApps: 'home' | 'library';
+  lockTorchBtn: boolean;
+  lockCameraBtn: boolean;
+  notifStyle: 'count' | 'stack' | 'list';
+  showPreviews: 'always' | 'unlocked' | 'never';
+  /** per-app notification switches (app label → allowed) */
+  notifApps: Record<string, { banners: boolean; sounds: boolean; badges: boolean }>;
+  scheduledSummary: boolean;
+  summaryTime: string;
+  backTapDouble: string;
+  backTapTriple: string;
+  siriSuggestions: boolean;
+  /** which live activities the Dynamic Island shows */
+  diShow: { music: boolean; timer: boolean; call: boolean; rec: boolean; torch: boolean; notif: boolean };
+  /** Control Centre controls that are hidden */
+  ccHidden: string[];
+  displayZoom: 'standard' | 'larger';
+  keyClicks: boolean;
+  lockSound: boolean;
+  /** Screen Time: minutes per day per app (0 = no limit) */
+  appLimits: Record<string, number>;
+  downtime: { on: boolean; from: string; to: string };
+  /** Mac desktop */
+  iconSize: number;
+  iconSpacing: number;
+  iconSort: 'none' | 'name' | 'kind';
+  desktopStacks: boolean;
+  mouseSpeed: number;
+  mouseNatural: boolean;
+  /** Mac & all */
+  appSwitcherCorner: boolean;
+  dictation: boolean;
+  weatherFx: boolean;
+  helloScreen: boolean;
+  achievements: boolean;
+  /* ───────── v10.2 ───────── */
+  /** Control Centre layout (Favourites and Portfolio groups) */
+  ccLayout: { fav: CCItem[]; work: CCItem[] };
+  /** iPad Dock favourites */
+  ipadDockApps: string[];
+  /** device wallpapers ('' = that device's default); the Mac uses `wallpaper` */
+  wallIphone: string;
+  wallIpad: string;
+  /** Lock Screen wallpaper per device ('' = same as Home Screen / Desktop) */
+  lockWall: { mac: string; ipad: string; iphone: string };
+  /** saved Lock Screens (iPhone / iPad): switch between them from the Lock Screen */
+  lockScreens: { id: string; wall: string; font: string; color: string }[];
+  lockScreenId: string;
+  /** app-icon tint follows the wallpaper's colours */
+  iosTintAuto: boolean;
+  /** blur the Home Screen wallpaper (0–20 px) */
+  wallBlur: number;
+  /** live wallpapers move (off = still frame) */
+  wallMotion: boolean;
+  /** Recruiter / Client / Developer / Presentation (or free exploring) */
+  portfolioMode: PortfolioMode;
+  presentStep: number;
 }
 
-export type HotCornerAction = 'none' | 'mc' | 'desktop' | 'nc' | 'launchpad' | 'lock' | 'cc' | 'sleep' | 'screensaver' | 'hireme';
+export type PortfolioMode = 'explore' | 'recruiter' | 'client' | 'developer' | 'presentation';
+export type CCSize = 's' | 'm' | 't' | 'l';
+export interface CCItem {
+  id: string;
+  s: CCSize;
+}
+
+export type HotCornerAction = 'none' | 'mc' | 'desktop' | 'nc' | 'launchpad' | 'lock' | 'cc' | 'sleep' | 'screensaver' | 'hireme' | 'switcher';

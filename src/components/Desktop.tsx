@@ -1,5 +1,6 @@
-import { lazy, Suspense, useEffect, useRef, useState, type ComponentType, type LazyExoticComponent, type MouseEvent as RMouseEvent } from 'react';
+import { Suspense, useEffect, useRef, useState, type MouseEvent as RMouseEvent } from 'react';
 import { MenuBar } from './MenuBar';
+import { APP_COMPONENTS } from './appRegistry';
 import { Dock } from './Dock';
 import { Window } from './Window';
 import { Wallpaper } from './Wallpaper';
@@ -29,74 +30,19 @@ import { wallpapers } from '../data/media';
 import { LAUNCH_ITEMS } from '../system/launch';
 import { useDeskApps, useIconPositions, useWidgetPositions } from '../system/desk';
 import { SystemV9 } from './SystemV9';
+import { SystemV10 } from './SystemV10';
+import { useRestoreEpoch } from '../system/history';
+import { AppBoundary } from './AppBoundary';
+import { WeatherFx } from './WeatherFx';
+import { LimitGate } from './LimitGate';
+import { APPS } from '../system/apps';
+import { assignWindow, forgetWindow, getSpaces, spaceWallpaper, switchSpace, useSpaces, windowSpace } from '../system/spaces';
 import type { AppId, WindowState } from '../system/types';
 
 export interface AppProps {
   win: WindowState;
 }
 
-/* Applications are code-split and loaded on first launch. */
-const APP_COMPONENTS: Record<AppId, LazyExoticComponent<ComponentType<AppProps>>> = {
-  about: lazy(() => import('../apps/AboutApp')),
-  safari: lazy(() => import('../apps/SafariApp')),
-  notes: lazy(() => import('../apps/NotesApp')),
-  slides: lazy(() => import('../apps/SlidesApp')),
-  xcode: lazy(() => import('../apps/XcodeApp')),
-  mail: lazy(() => import('../apps/MailApp')),
-  settings: lazy(() => import('../apps/SettingsApp')),
-  terminal: lazy(() => import('../apps/TerminalApp')),
-  finder: lazy(() => import('../apps/FinderApp')),
-  preview: lazy(() => import('../apps/PreviewApp')),
-  photos: lazy(() => import('../apps/PhotosApp')),
-  messages: lazy(() => import('../apps/MessagesApp')),
-  calendar: lazy(() => import('../apps/CalendarApp')),
-  music: lazy(() => import('../apps/MusicApp')),
-  reminders: lazy(() => import('../apps/RemindersApp')),
-  maps: lazy(() => import('../apps/MapsApp')),
-  google: lazy(() => import('../apps/GoogleApp')),
-  calculator: lazy(() => import('../apps/CalculatorApp')),
-  clock: lazy(() => import('../apps/ClockApp')),
-  contacts: lazy(() => import('../apps/ContactsApp')),
-  facetime: lazy(() => import('../apps/FaceTimeApp')),
-  podcasts: lazy(() => import('../apps/PodcastsApp')),
-  tv: lazy(() => import('../apps/TVApp')),
-  books: lazy(() => import('../apps/BooksApp')),
-  stocks: lazy(() => import('../apps/StocksApp')),
-  journal: lazy(() => import('../apps/JournalApp')),
-  freeform: lazy(() => import('../apps/FreeformApp')),
-  siri: lazy(() => import('../apps/SiriApp')),
-  passwords: lazy(() => import('../apps/PasswordsApp')),
-  dictionary: lazy(() => import('../apps/DictionaryApp')),
-  gamecenter: lazy(() => import('../apps/GameCenterApp')),
-  webapp: lazy(() => import('../apps/WebAppApp')),
-  camera: lazy(() => import('../apps/CameraApp')),
-  voicememos: lazy(() => import('../apps/VoiceMemosApp')),
-  measure: lazy(() => import('../apps/MeasureApp')),
-  findmy: lazy(() => import('../apps/FindMyApp')),
-  home: lazy(() => import('../apps/HomeApp')),
-  weather: lazy(() => import('../apps/WeatherApp')),
-  pages: lazy(() => import('../apps/PagesApp')),
-  numbers: lazy(() => import('../apps/NumbersApp')),
-  appstore: lazy(() => import('../apps/AppStoreApp')),
-  tips: lazy(() => import('../apps/TipsApp')),
-  hireme: lazy(() => import('../apps/HireMeApp')),
-  casestudies: lazy(() => import('../apps/CaseStudiesApp')),
-  askai: lazy(() => import('../apps/AskAIApp')),
-  guestbook: lazy(() => import('../apps/GuestbookApp')),
-  wallet: lazy(() => import('../apps/WalletApp')),
-  whatsapp: lazy(() => import('../apps/WhatsAppApp')),
-  telegram: lazy(() => import('../apps/TelegramApp')),
-  xapp: lazy(() => import('../apps/XApp')),
-  yahoomail: lazy(() => import('../apps/YahooMailApp')),
-  services: lazy(() => import('../apps/ServicesApp')),
-  sysprefs: lazy(() => import('../apps/SysPrefsApp')),
-  activity: lazy(() => import('../apps/ActivityApp')),
-  stickies: lazy(() => import('../apps/StickiesApp')),
-  translate: lazy(() => import('../apps/TranslateApp')),
-  fontbook: lazy(() => import('../apps/FontBookApp')),
-  grapher: lazy(() => import('../apps/GrapherApp')),
-  colormeter: lazy(() => import('../apps/ColorMeterApp')),
-};
 
 function useViewport() {
   const [, setV] = useState(0);
@@ -267,8 +213,26 @@ export function Desktop() {
     seenRef.current = ids;
   }, [wm.windows]);
 
+  // v10 — Desktops (Spaces): new windows join the current desktop; focusing a window on another desktop switches to it
+  const spaces = useSpaces();
+  const epoch = useRestoreEpoch();
+  useEffect(() => {
+    const ids = new Set(wm.windows.map((w) => w.id));
+    wm.windows.forEach((w) => assignWindow(w.id));
+    Object.keys(getSpaces().win).forEach((id) => !ids.has(id as AppId) && forgetWindow(id as AppId));
+  }, [wm.windows]);
+  const lastFocus = useRef<AppId | null>(null);
+  useEffect(() => {
+    const f = wm.focusedId;
+    if (f && f !== lastFocus.current && windowSpace(f) !== getSpaces().current) switchSpace(windowSpace(f));
+    lastFocus.current = f;
+  }, [wm.focusedId]);
+  const spaceWall = compact ? settings.wallpaper : spaceWallpaper(spaces.current, settings.wallpaper);
+
   const appActive = wm.windows.some((w) => w.phase !== 'minimized' && w.phase !== 'closing');
-  const phaseClass = sys.phase === 'shutdown' ? 'outro' : sys.phase === 'boot' || sys.phase === 'off' ? 'hidden-desk' : intro ? 'intro' : '';
+  // v10 — after unlocking, the desktop is already in place: a soft fade instead of the staged build-up (Settings → Lock Screen)
+  const arrival = settings.arrivalAnim ?? 'soft';
+  const phaseClass = sys.phase === 'shutdown' ? 'outro' : sys.phase === 'boot' || sys.phase === 'off' ? 'hidden-desk' : intro && arrival !== 'off' ? (arrival === 'full' ? 'intro' : 'intro-soft') : '';
 
   return (
     <div
@@ -277,7 +241,8 @@ export function Desktop() {
       onPointerDown={() => setSelected(null)}
       onContextMenu={onDesktopContext}
     >
-      <Wallpaper id={settings.wallpaper} tint={settings.appearance === 'dark' && settings.darkWallpaperTint} custom={settings.customWallpaper} />
+      <Wallpaper id={spaceWall} tint={settings.appearance === 'dark' && settings.darkWallpaperTint} custom={spaces.current === 0 || compact ? settings.customWallpaper : ''} />
+      {!compact && <WeatherFx />}
       <a className="skip-link" href="#dock" onClick={(e) => (e.preventDefault(), document.querySelector<HTMLElement>('.dock .dock-item')?.focus())}>
         Skip to Dock
       </a>
@@ -291,7 +256,7 @@ export function Desktop() {
         {wm.windows.map((w) => {
           const App = APP_COMPONENTS[w.id];
           return (
-            <Window key={w.id} win={w} focused={wm.focusedId === w.id} compact={compact}>
+            <Window key={w.id} win={w} focused={wm.focusedId === w.id} compact={compact} offSpace={!compact && windowSpace(w.id) !== spaces.current}>
               <Suspense
                 fallback={
                   <div className="app-loading">
@@ -299,7 +264,10 @@ export function Desktop() {
                   </div>
                 }
               >
-                <App win={w} />
+                <AppBoundary name={APPS[w.id].menuName} onClose={() => wm.close(w.id)}>
+                  <App key={epoch} win={w} />
+                  <LimitGate id={w.id} />
+                </AppBoundary>
               </Suspense>
             </Window>
           );
@@ -322,6 +290,7 @@ export function Desktop() {
       <ForceQuit />
       <SystemExtras />
       <SystemV9 />
+      <SystemV10 />
       <ShareSheet />
       <SignInSheet />
       <LockScreen />

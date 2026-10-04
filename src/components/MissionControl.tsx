@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { WallImage } from './Wallpaper';
 import { AppIcon } from './AppIcons';
 import { useSystem } from '../system/SystemContext';
 import { useSettings } from '../system/SettingsContext';
@@ -6,6 +7,7 @@ import { dockReserve, MENUBAR_H, useWM } from '../system/WindowManager';
 import { APPS } from '../system/apps';
 import { wallpaperById } from '../data/media';
 import type { AppId } from '../system/types';
+import { MAX_SPACES, setSpaceCount, spaceWallpaper, switchSpace, useSpaces, windowSpace } from '../system/spaces';
 
 interface Saved {
   /** untransformed layout box of the window (viewport px) */
@@ -84,7 +86,23 @@ export function MissionControl() {
   const exitTimer = useRef(0);
   const dur = motionReduced ? 1 : 480;
 
-  const visible = wm.windows.filter((w) => w.phase !== 'minimized' && w.phase !== 'minimizing' && w.phase !== 'closing');
+  const spaces = useSpaces();
+  // v10 — App Exposé: only one app's windows (pinch over a window, or Dock → Show All Windows)
+  const [only, setOnly] = useState<AppId | null>(null);
+  useEffect(() => {
+    const on = (e: Event) => setOnly(((e as CustomEvent).detail as AppId) ?? null);
+    window.addEventListener('mra-mc-filter', on);
+    return () => window.removeEventListener('mra-mc-filter', on);
+  }, []);
+  useEffect(() => {
+    if (!open) {
+      const t = window.setTimeout(() => setOnly(null), 520);
+      return () => window.clearTimeout(t);
+    }
+  }, [open]);
+  const visible = wm.windows.filter(
+    (w) => w.phase !== 'minimized' && w.phase !== 'minimizing' && w.phase !== 'closing' && windowSpace(w.id) === spaces.current && (!only || w.id === only),
+  );
   const visibleKey = visible
     .map((w) => w.id)
     .sort()
@@ -210,12 +228,48 @@ export function MissionControl() {
         }}
       >
         <div className="mc-spaces" onClick={(e) => e.target === e.currentTarget && exit()}>
-          <button type="button" className="mc-space" onClick={exit} aria-label="Desktop 1 — show desktop" style={{ ['--mc-ratio' as string]: ratio }}>
-            <span className="mc-space-img">
-              <img src={wp.thumb} alt="" draggable={false} />
+          {only ? (
+            <span className="mc-expose-title">
+              <AppIcon name={APPS[only].icon} /> App Exposé · {APPS[only].title}
             </span>
-            <span className="mc-space-label">Desktop 1</span>
-          </button>
+          ) : (
+            <>
+              {Array.from({ length: spaces.count }, (_, i) => {
+                const swp = i === 0 ? wp : wallpaperById(spaceWallpaper(i, settings.wallpaper));
+                const n = wm.windows.filter((w) => windowSpace(w.id) === i && w.phase !== 'minimized').length;
+                return (
+                  <div key={i} className={`mc-space-wrap ${i === spaces.current ? 'cur' : ''}`}>
+                    <button
+                      type="button"
+                      className="mc-space"
+                      onClick={() => {
+                        switchSpace(i);
+                        exit();
+                      }}
+                      aria-label={`Desktop ${i + 1}${n ? ` — ${n} window${n === 1 ? '' : 's'}` : ''}`}
+                      style={{ ['--mc-ratio' as string]: ratio }}
+                    >
+                      <span className="mc-space-img">
+                        {i === 0 && settings.customWallpaper && settings.wallpaper === 'custom' ? <img src={settings.customWallpaper} alt="" draggable={false} /> : <WallImage id={swp.id} thumb />}
+                        {n > 0 && <i className="mc-space-n">{n}</i>}
+                      </span>
+                      <span className="mc-space-label">Desktop {i + 1}</span>
+                    </button>
+                    {spaces.count > 1 && i === spaces.count - 1 && (
+                      <button type="button" className="mc-space-x" aria-label={`Remove Desktop ${i + 1}`} onClick={() => setSpaceCount(spaces.count - 1)}>
+                        ×
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+              {spaces.count < MAX_SPACES && (
+                <button type="button" className="mc-space-add" aria-label="Add a desktop" onClick={() => setSpaceCount(spaces.count + 1)}>
+                  +
+                </button>
+              )}
+            </>
+          )}
         </div>
         {open && !visible.length && <div className="mc-empty">No open windows</div>}
         {thumbs.map((t, i) => {

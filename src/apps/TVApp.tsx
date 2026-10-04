@@ -191,6 +191,11 @@ export default function TVApp() {
               <G d={P.close} size={15} />
             </button>
             <b>{playing.v.title}</b>
+            {typeof document !== 'undefined' && document.pictureInPictureEnabled && !failed && (
+              <button type="button" className="tv-x tv-pip" aria-label="Picture in Picture" title="Picture in Picture" onPointerDown={(e) => e.stopPropagation()} onClick={() => void vidRef.current?.requestPictureInPicture().catch(() => undefined)}>
+                ⧉
+              </button>
+            )}
           </DragBar>
           <div className="tv-player-stage">
             {failed ? (

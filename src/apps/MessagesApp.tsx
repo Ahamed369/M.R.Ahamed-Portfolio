@@ -1,3 +1,4 @@
+import { islandPing } from '../system/island';
 import { useEffect, useMemo, useRef, useState, type MouseEvent as RMouseEvent } from 'react';
 import { usePersisted } from '../system/useStore';
 import { useSystem } from '../system/SystemContext';
@@ -164,6 +165,8 @@ export default function MessagesApp() {
     if (attach) out.push(mk({ from: 'you', image: attach, via: conv === 'ahamed' ? via : undefined }));
     if (body) out.push(mk({ from: 'you', text: body, via: conv === 'ahamed' ? via : undefined }));
     push(conv, out);
+    // honest status: real delivery happens in your own Messages / WhatsApp app
+    if (conv !== 'bot') islandPing({ icon: '↗', title: via === 'whatsapp' && conv === 'ahamed' ? 'Opening WhatsApp' : 'Opening Messages', sub: 'Press Send there', tint: '#34c759', ms: 1600 });
     setText('');
     setEmoji(false);
     const hadImage = !!attach;
@@ -172,7 +175,7 @@ export default function MessagesApp() {
     if (meta) {
       if (body && meta.number) {
         window.location.href = `sms:${meta.number.replace(/\s/g, '')}?&body=${encodeURIComponent(body)}`;
-        notify({ app: 'Messages', icon: 'messages', title: `Opening Messages for ${meta.name}`, body: 'Your device’s messaging app will open with this text.' });
+        notify({ app: 'Messages', icon: 'messages', title: `Opening Messages for ${meta.name}`, body: 'Your device’s messaging app will open with this text.', island: true });
       }
       return;
     }
@@ -191,7 +194,7 @@ export default function MessagesApp() {
       } else {
         // "?&body=" works on iOS and Android messaging apps
         window.location.href = `sms:${NUMBER}?&body=${encodeURIComponent(body)}`;
-        notify({ app: 'Messages', icon: 'messages', title: 'Opening Messages', body: 'Your device’s messaging app will open with this text.' });
+        notify({ app: 'Messages', icon: 'messages', title: 'Opening Messages', body: 'Your device’s messaging app will open with this text.', island: true });
       }
     }
     window.setTimeout(

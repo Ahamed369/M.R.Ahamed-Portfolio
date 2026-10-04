@@ -74,15 +74,16 @@ export function useScheduledNotifications() {
     at('welcome', 8000, () =>
       notify({
         app: 'Portfolio',
-        icon: 'xcode',
+        icon: 'guidebook',
         key: 'welcome',
         title: t('welcomeTitle'),
         body: t('welcomeBody'),
-        onClick: () => wmRef.current.open('about'),
+        onClick: () => wmRef.current.open('guidebook'),
         actions: [
-          { label: t('takeTour'), primary: true, run: () => wmRef.current.open('about') },
-          { label: t('hireMe'), run: () => wmRef.current.open('hireme') },
+          { label: t('openGuide'), primary: true, run: () => wmRef.current.open('guidebook') },
+          { label: t('takeTour'), run: () => window.dispatchEvent(new Event('mra-onboarding')) },
         ],
+        duration: 12000,
       }),
     );
 

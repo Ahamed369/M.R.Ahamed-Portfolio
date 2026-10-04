@@ -60,7 +60,7 @@
 .brightness-layer {
   position: fixed;
   inset: 0;
-  z-index: 180000;
+  z-index: var(--z-brightness-layer, 180000);
   pointer-events: none;
   background: #000;
   opacity: var(--dim);
@@ -94,7 +94,7 @@
 .power-off {
   position: fixed;
   inset: 0;
-  z-index: 200000;
+  z-index: var(--z-power-off, 200000);
   background: #000;
   display: flex;
   flex-direction: column;
@@ -220,7 +220,7 @@
   position: fixed;
   inset: 0;
   background: #000;
-  z-index: 170000;
+  z-index: var(--z-outro, 170000);
   animation: outro-dark 1.4s ease forwards;
 }
 @keyframes outro-dark {
@@ -461,7 +461,7 @@
   max-width: calc(100vw - 16px);
   max-height: calc(100vh - var(--menubar-h) - 16px);
   overflow: auto;
-  z-index: 110000;
+  z-index: var(--z-control-center, 110000);
   padding: 10px;
   border-radius: 18px;
   background: var(--glass);
@@ -870,7 +870,7 @@ button.cc-tile:active {
   position: fixed;
   top: calc(var(--menubar-h) + 10px);
   right: 12px;
-  z-index: 104000;
+  z-index: var(--z-toasts, 104000);
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -942,7 +942,7 @@ button.cc-tile:active {
   bottom: 0;
   width: 370px;
   max-width: 100vw;
-  z-index: 105000;
+  z-index: var(--z-notif-center, 105000);
   padding: 14px 14px 30px;
   overflow-y: auto;
   scroll-behavior: smooth;
@@ -1131,7 +1131,7 @@ button.cc-tile:active {
 .launchpad {
   position: fixed;
   inset: 0;
-  z-index: 95000;
+  z-index: var(--z-launchpad, 95000);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1285,7 +1285,7 @@ button.cc-tile:active {
 .spotlight-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 130000;
+  z-index: var(--z-spotlight-backdrop, 130000);
   display: flex;
   justify-content: center;
   align-items: flex-start;
@@ -1388,7 +1388,7 @@ button.cc-tile:active {
 .ql-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 140000;
+  z-index: var(--z-ql-backdrop, 140000);
   display: grid;
   place-items: center;
   padding: 40px 16px;
@@ -1541,7 +1541,7 @@ button.cc-tile:active {
 /* ─────────────────────────── Context menu ─────────────────────────── */
 .ctx-menu {
   position: fixed;
-  z-index: 150000;
+  z-index: var(--z-ctx-menu, 150000);
   min-width: 210px;
   padding: 5px;
   border-radius: 9px;
@@ -1896,7 +1896,7 @@ button:disabled {
 /* Night Shift — warm overlay above everything, click-through */
 .nightshift-layer {
   position: fixed;
-  z-index: 179999;
+  z-index: var(--z-nightshift-layer, 179999);
   inset: 0;
   pointer-events: none;
   background: rgba(255, 140, 30, 0.16);

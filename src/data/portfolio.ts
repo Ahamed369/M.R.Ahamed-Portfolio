@@ -49,6 +49,8 @@ export const socials = {
   threads: 'https://www.threads.net/@__mr.ahamed__',
   /** WhatsApp click-to-chat — built from the phone number on the CV */
   whatsapp: 'https://wa.me/94763539501',
+  /** v10 — portfolio address printed on the CV */
+  portfolio: 'https://m-r-ahamed-portfolio.vercel.app',
 } as const;
 
 /**
@@ -63,6 +65,14 @@ export interface Integrations {
   siteUrl: string;
   demoUser: string;
   demoPassword: string;
+  /** v10 — Ask Me AI: URL of your own AI proxy (e.g. '/api/ask' on Vercel with ANTHROPIC_API_KEY set). Empty = on-device answers only. */
+  aiEndpoint: string;
+  /** v10 — analytics hook: a script URL (e.g. Plausible/Umami) loaded only when set. Empty = no analytics. */
+  analyticsScript: string;
+  /** v10 — the domain passed to the analytics script (data-domain / data-website-id) */
+  analyticsId: string;
+  /** v10.3 — Guestbook owner email via /api/guestbook-notify (needs RESEND_API_KEY + GUESTBOOK_NOTIFY_TO on Vercel). false = no email is ever sent. */
+  guestbookNotify: boolean;
 }
 export const integrations: Integrations = {
   /** Google Identity Services OAuth Client ID (…apps.googleusercontent.com) — enables "Sign in with Google" */
@@ -73,10 +83,14 @@ export const integrations: Integrations = {
   /** Calendly (or any booking page) link for "Book a Call" */
   bookingUrl: '',
   /** Public URL of the deployed portfolio (used by Share) — empty = current page address */
-  siteUrl: '',
+  siteUrl: 'https://m-r-ahamed-portfolio.vercel.app',
   /** Demo login shown on the Wallet / Passwords lock screens */
   demoUser: 'guest',
   demoPassword: 'portfolio2026',
+  aiEndpoint: '',
+  analyticsScript: '',
+  analyticsId: '',
+  guestbookNotify: false,
 };
 
 export const cv = {
@@ -125,35 +139,36 @@ export const skillNotes: SkillNote[] = [
     emoji: '💻',
     title: 'Programming',
     subtitle: 'Java · JavaScript · Python · SQL',
-    tags: ['Java', 'JavaScript', 'Python', 'SQL', 'C++', 'PHP'],
+    tags: ['Java', 'JavaScript', 'Python', 'SQL', 'C++'],
     profile: ['TypeScript', 'Kotlin', 'C#', 'C', 'Rust', 'Ruby', 'Swift', 'Bash', 'Julia'],
     paragraphs: [
-      'Java is the language behind my Android application (Student Expense Tracker) and my Java Swing desktop application (MediCarePlus). Python powers my offline Restaurant POS System built with Tkinter and SQLite.',
-      'JavaScript powers my React and Node.js / Express.js work — including the Fidenz Weather App and the NDI Registration System — while PHP drives the City Walk, HealthForge and Student Record System web applications. SQL is used throughout for relational database work.',
+      'Java is the language behind my Android application (Student Expense Tracker). Python powers my offline Ember Restaurant POS System built with Tkinter and SQLite.',
+      'JavaScript powers my React.js and Node.js / Express.js work — including the Fidenz Weather App and the High Street Car Sale vehicle marketplace. SQL is used throughout for relational database work, and C++ is part of my programming foundation.',
     ],
   },
   {
     id: 'web',
     emoji: '🌐',
     title: 'Web & Backend',
-    subtitle: 'React · Node.js · Express · PHP',
-    tags: ['React', 'Three.js', 'HTML', 'CSS', 'AJAX', 'Bootstrap', 'jQuery', 'Node.js', 'Express.js', 'PHP', 'Spring Boot', 'Vite', 'Axios'],
+    subtitle: 'React.js · Node.js · Express · PHP',
+    tags: ['React.js', 'HTML5', 'CSS3', 'Bootstrap', 'Three.js', 'Responsive Web Design', 'Node.js', 'Express.js', 'PHP', 'Spring Boot', 'Vite'],
     profile: ['Next.js', 'Angular', 'Redux', 'Sass', 'MUI', 'Radix UI', 'Chart.js', 'Webpack', 'Preact', 'Lit', 'Astro', 'Django', 'NestJS', 'FastAPI', 'Fastify', 'Strapi', 'GraphQL'],
     paragraphs: [
-      'On the frontend I build responsive interfaces with React, HTML, CSS, JavaScript and Bootstrap, with Three.js used for interactive 3D content.',
+      'On the frontend I build responsive interfaces with React.js, HTML5, CSS3, JavaScript and Bootstrap, with Three.js used for interactive 3D content.',
       'On the backend I work with Node.js, Express.js, PHP and Spring Boot to build RESTful APIs, session-based and token-based authentication, admin dashboards and database-connected features.',
     ],
   },
   {
     id: 'apis',
     emoji: '🔐',
-    title: 'APIs & Security',
-    subtitle: 'REST · JWT · RBAC · Pen-testing',
-    tags: ['RESTful APIs', 'JWT', 'Role-Based Access Control', 'Auth0', 'Kali Linux', 'Penetration Testing', 'Vulnerability Assessment'],
+    title: 'APIs, Integration & Security',
+    subtitle: 'REST · JSON · WebSockets · JWT · RBAC',
+    tags: ['REST APIs', 'JSON', 'WebSockets', 'JWT', 'RBAC', 'Auth0', 'Vulnerability Assessment'],
     profile: ['Authentication', 'Authorisation', 'OAuth 2.0 (Auth0)', 'Hack The Box', 'Bugcrowd'],
     paragraphs: [
       'I design RESTful endpoints and protect them with JWT authentication and role-based access control. The Fidenz Weather App uses Auth0 on the React client and express-oauth2-jwt-bearer on the API.',
-      'I participated in an authorised group security assessment in a controlled academic environment, using Kali Linux to evaluate application and firewall security and identify potential vulnerabilities.',
+      'WebSockets power real-time user communication in the High Street Car Sale marketplace, and JSON is the data format across my REST integrations.',
+      'I participated in an authorised group security assessment in a controlled academic environment to evaluate application and firewall security and identify potential vulnerabilities.',
     ],
   },
   {
@@ -161,44 +176,44 @@ export const skillNotes: SkillNote[] = [
     emoji: '🗄️',
     title: 'Databases',
     subtitle: 'MySQL · MongoDB · SQLite',
-    tags: ['MySQL', 'MongoDB', 'Mongoose', 'SQLite', 'JSON', 'Database Design'],
+    tags: ['MySQL', 'MongoDB', 'SQLite', 'Database Design'],
     profile: ['PostgreSQL', 'Redis', 'MariaDB', 'DynamoDB', 'Firebase', 'Cassandra', 'Microsoft SQL Server'],
     paragraphs: [
-      'Relational design and integration with MySQL (City Walk, HealthForge, Medicare Plus), document storage with MongoDB and Mongoose (NDI Registration System) and on-device persistence with SQLite (Student Expense Tracker).',
+      'Relational design and integration with MySQL (High Street Car Sale, HealthForge Fitness, City Walk), document storage with MongoDB, and local persistence with SQLite (Student Expense Tracker, Ember Restaurant POS).',
     ],
   },
   {
     id: 'mobile',
     emoji: '📱',
     title: 'Mobile & Desktop',
-    subtitle: 'Android · Java Swing',
-    tags: ['Android Studio', 'Android SDK', 'XML Layouts', 'Retrofit', 'MPAndroidChart', 'Java Swing', 'JDBC', 'Tkinter'],
+    subtitle: 'Android · Tkinter',
+    tags: ['Android Studio', 'Android SDK', 'XML', 'MPAndroidChart', 'Tkinter'],
     profile: ['Flutter', 'React Native', 'Ionic', 'Kotlin', 'Xamarin', 'iOS'],
     paragraphs: [
-      'Native Android development in Java with XML layouts, SQLite, Retrofit networking and MPAndroidChart visualisations.',
-      'Desktop development with Java Swing (MediCarePlus) and Python Tkinter with SQLite (Restaurant POS System).',
+      'Native Android development in Java with XML layouts, SQLite, a currency-conversion REST API and MPAndroidChart visualisations (Student Expense Tracker).',
+      'Desktop development with Python Tkinter and SQLite (Ember Restaurant POS System).',
     ],
   },
   {
     id: 'tools',
     emoji: '🛠️',
-    title: 'Tools & DevOps',
-    subtitle: 'Git · GitHub Actions · Postman',
-    tags: ['Git', 'GitHub', 'GitHub Actions', 'npm', 'Ubuntu', 'Postman', 'XAMPP', 'VS Code'],
+    title: 'Tools & Technologies',
+    subtitle: 'Git · GitHub · Postman · Katalon',
+    tags: ['Git', 'GitHub', 'Postman', 'Katalon Studio', 'Tkinter', 'Stripe', 'XAMPP'],
     profile: ['GitLab', 'Linux', 'Neovim', 'Notion', 'Obsidian', 'Discord', 'pnpm'],
     paragraphs: [
-      'Version control with Git and GitHub, automation with GitHub Actions, package management with npm, API testing with Postman and local PHP/MySQL environments with XAMPP on Ubuntu and Windows.',
+      'Version control with Git and GitHub, API testing with Postman, test automation with Katalon Studio, payment integration with Stripe and local PHP/MySQL environments with XAMPP.',
     ],
   },
   {
     id: 'engineering',
     emoji: '🧠',
-    title: 'Software Engineering',
-    subtitle: 'OOP · DSA · MVC · Agile',
-    tags: ['Object-Oriented Programming', 'Data Structures & Algorithms', 'MVC Architecture', 'Agile / Scrum'],
+    title: 'Core Concepts',
+    subtitle: 'OOP · DSA · MVC · Testing · Agile',
+    tags: ['OOP', 'DSA', 'MVC', 'Database Design', 'Software Testing', 'Agile & Scrum'],
     profile: ['Requirements Analysis', 'System Design'],
     paragraphs: [
-      'Grounded in object-oriented programming, data structures and algorithms, MVC architecture and Agile/Scrum practices through my degree coursework and project work.',
+      'Grounded in object-oriented programming, data structures and algorithms, MVC architecture, database design, software testing and Agile & Scrum practices through my degree coursework and project work.',
     ],
   },
   {
@@ -217,11 +232,11 @@ export const skillNotes: SkillNote[] = [
     emoji: '☁️',
     title: 'Cloud & DevOps',
     subtitle: 'Docker · CI/CD · Cloud platforms',
-    tags: ['GitHub Actions', 'Git', 'npm'],
+    tags: ['Git', 'GitHub'],
     profile: ['Docker', 'Kubernetes', 'AWS', 'Google Cloud', 'Azure', 'Terraform', 'Cloudflare', 'Render', 'Vault'],
     paragraphs: [
       'My GitHub profile lists cloud and DevOps as a focus area — cloud-ready applications, containerised systems, CI/CD automation, scalable architectures and reliable deployment workflows.',
-      'GitHub Actions and Git-based workflows are part of my day-to-day development; the wider cloud tooling below is listed on my GitHub profile as technologies I am exploring.',
+      'Git-based workflows are part of my day-to-day development; the wider cloud tooling below is listed on my GitHub profile as technologies I am exploring.',
     ],
   },
   {
@@ -252,10 +267,10 @@ export const skillNotes: SkillNote[] = [
     emoji: '🧪',
     title: 'Testing & QA',
     subtitle: 'Unit · E2E · API testing',
-    tags: ['node:test', 'Postman', 'Vulnerability Assessment'],
+    tags: ['Software Testing', 'Unit Testing', 'Katalon Studio', 'Postman', 'Vulnerability Assessment'],
     profile: ['Jest', 'Vitest', 'Playwright', 'Cypress', 'Testing Library'],
     paragraphs: [
-      'The Fidenz Weather App ships unit tests for its Comfort Index engine using Node’s built-in test runner, and I use Postman to exercise REST APIs.',
+      'The Fidenz Weather App ships unit tests for its core functionality, I use Postman to exercise REST APIs and Katalon Studio for test automation.',
     ],
   },
   {
@@ -308,6 +323,10 @@ export interface Project {
   /** Date of the latest push to the GitHub repository (from the GitHub API) */
   updated?: string;
   repo?: string;
+  /** Team / organisation repository linked from the CV (not owned by Ahamed369) */
+  teamRepo?: string;
+  /** v10 — listed on the current CV (order = CV order) */
+  cvOrder?: number;
   demo?: string;
   preview: {
     kind: PreviewKind;
@@ -334,6 +353,7 @@ export const projects: Project[] = [
     group: 'GitHub',
     category: 'Full-Stack Web Application & Security Assessment',
     period: 'Jul 2026 – Present',
+    cvOrder: 3,
     description:
       'A full-stack fitness and health e-commerce web application with authentication, product management, shopping cart, checkout, order management and a complete admin dashboard.',
     overview:
@@ -348,16 +368,16 @@ export const projects: Project[] = [
       'Password hashing for stored credentials',
     ],
     responsibilities: [
-      'Developed the complete website — responsive frontend, backend functionality and database-connected features.',
-      'Designed and implemented the administrative dashboard and Stripe payment gateway integration.',
-      'Took part in an authorised group security assessment in a controlled academic environment to evaluate application and firewall security.',
+      'Develop the complete fitness website using HTML, CSS, JavaScript and PHP, including its responsive frontend interface, backend functionality and database-connected features.',
+      'Design and implement the administrative dashboard and Stripe payment gateway integration while managing essential user, content and transaction-related functions.',
+      'Participated in an authorised group security assessment within a controlled academic environment to evaluate application and firewall security and identify potential vulnerabilities.',
     ],
     stack: {
       frontend: ['HTML', 'CSS', 'JavaScript', 'Bootstrap'],
       backend: ['PHP'],
       database: ['MySQL'],
       apis: ['Stripe'],
-      security: ['Session authentication', 'Password hashing', 'Kali Linux assessment'],
+      security: ['Session authentication', 'Password hashing', 'Academic security assessment'],
       tools: ['XAMPP', 'Git', 'GitHub'],
     },
     architecture: 'PHP MVC-style models (User, Product, Cart, Order) with separate auth, cart, orders and admin modules over MySQL.',
@@ -380,6 +400,7 @@ export const projects: Project[] = [
     group: 'GitHub',
     category: 'Android Mobile Application',
     period: 'Feb 2026 – Jun 2026',
+    cvOrder: 4,
     description:
       'A native Android expense-management app for students with expense tracking, budget management, financial analytics and currency conversion.',
     overview:
@@ -393,15 +414,15 @@ export const projects: Project[] = [
       'Bottom-navigation, fragment-based UI',
     ],
     responsibilities: [
-      'Designed the application structure, screen layouts and user interface.',
-      'Implemented expense management with SQLite for storing, retrieving and managing financial records.',
-      'Integrated an external currency-conversion API and MPAndroidChart visualisations.',
+      'Designed and developed the Android application structure, screen layouts and user interface for recording expenses, managing monthly budgets and displaying overspending alerts.',
+      'Implemented expense-management functionality with SQLite database integration for securely storing, retrieving and managing financial records.',
+      'Integrated an external currency-conversion API and MPAndroidChart pie and bar charts to visualise category-based spending patterns and support financial analysis.',
     ],
     stack: {
       mobile: ['Android Studio', 'Android SDK (min 24 / target 34)', 'XML layouts', 'Material Components'],
       backend: ['Java'],
       database: ['SQLite'],
-      apis: ['Retrofit 2', 'Gson', 'ExchangeRate-API', 'REST Countries API'],
+      apis: ['RESTful API', 'JSON', 'Retrofit 2', 'Gson', 'ExchangeRate-API', 'REST Countries API'],
       tools: ['MPAndroidChart', 'Gradle', 'Git'],
     },
     architecture: 'Single-activity app with fragments (Expense, Budget, Analytics, Currency), a SQLite DatabaseHelper, adapters and a Retrofit API client.',
@@ -423,7 +444,6 @@ export const projects: Project[] = [
     lang: 'js',
     group: 'GitHub',
     category: 'RESTful API & Backend Platform',
-    period: 'Jul 2025 – Dec 2025',
     description:
       'A full-stack National Digital Identity registration system built with Node.js, Express.js, MongoDB and a REST API for secure citizen registration and identity data management.',
     overview:
@@ -436,17 +456,12 @@ export const projects: Project[] = [
       'Environment-based configuration',
       'Modular routes / models architecture',
     ],
-    responsibilities: [
-      'Developed backend API endpoints for registration, identity verification and validation.',
-      'Established the MongoDB connection and implemented database operations, validation and error handling.',
-      'Integrated JWT authentication and role-based access control.',
-    ],
     stack: {
       frontend: ['HTML', 'CSS', 'JavaScript'],
       backend: ['Node.js', 'Express.js'],
       database: ['MongoDB', 'Mongoose'],
       apis: ['RESTful API', 'JSON'],
-      security: ['JWT', 'Role-Based Access Control', 'dotenv'],
+      security: ['Request validation', 'dotenv'],
       tools: ['Postman', 'nodemon', 'Git'],
     },
     architecture: 'Client JS → REST API → Express routes → Mongoose model → MongoDB.',
@@ -468,6 +483,8 @@ export const projects: Project[] = [
     lang: 'jsx',
     group: 'GitHub',
     category: 'Full-Stack Weather Web Application',
+    period: 'Aug 2026 – Nov 2026',
+    cvOrder: 2,
     description:
       'A modern weather web application providing real-time weather information, forecasts and a custom Comfort Index through a responsive React dashboard.',
     overview:
@@ -480,10 +497,15 @@ export const projects: Project[] = [
       'Server-side response caching',
       'Unit tests for the Comfort Index (node:test)',
     ],
+    responsibilities: [
+      'Developed a responsive full-stack weather intelligence application using React.js with a Node.js and Express.js backend for real-time weather information, forecasts, and location-based insights.',
+      'Integrated external weather services and a custom Comfort Index engine to process environmental data and present meaningful weather insights through an interactive dashboard.',
+      'Implemented Auth0-based authentication and authorization, backend caching, environment-based configuration, modular application architecture, and unit testing for core functionality.',
+    ],
     stack: {
-      frontend: ['React', 'Vite', 'Axios'],
+      frontend: ['React.js', 'Vite', 'Axios', 'HTML', 'CSS'],
       backend: ['Node.js', 'Express.js'],
-      apis: ['OpenWeatherMap API', 'REST'],
+      apis: ['REST APIs', 'OpenWeatherMap API'],
       security: ['Auth0', 'express-oauth2-jwt-bearer', 'CORS', 'dotenv'],
       tools: ['node:test', 'npm', 'Git'],
     },
@@ -582,6 +604,8 @@ export const projects: Project[] = [
     group: 'Resume',
     category: 'Full-Stack Web Application',
     period: 'Jul 2026 – Present',
+    cvOrder: 1,
+    teamRepo: 'https://github.com/MohomedAmri05/Team-Xcelerate',
     description:
       'A responsive full-stack vehicle marketplace with advanced search and filtering, image galleries and dedicated dashboards for buyers and sellers.',
     overview:
@@ -593,6 +617,11 @@ export const projects: Project[] = [
       'Listing management & content moderation',
       'Payment workflows',
       'Real-time user communication',
+    ],
+    responsibilities: [
+      'Engineer a responsive full-stack vehicle marketplace featuring advanced vehicle search and filtering, detailed image galleries and dedicated user dashboards for buyers and sellers.',
+      'Develop backend services using Node.js and Express.js with MySQL database integration, JWT-based authentication and secure access controls.',
+      'Build administrative and transaction-management functionality for vehicle listings, content moderation, payment workflows and real-time user communication.',
     ],
     stack: {
       frontend: ['HTML', 'CSS', 'JavaScript', 'Three.js'],
@@ -617,7 +646,6 @@ export const projects: Project[] = [
     lang: 'java',
     group: 'GitHub',
     category: 'Patient Management Desktop Application',
-    period: 'Jul 2025 – Dec 2025',
     description:
       'A Java Swing-based patient management system for managing patients, doctors, appointments, reports, notifications and persistent healthcare records.',
     overview:
@@ -631,15 +659,10 @@ export const projects: Project[] = [
       'Appointment notifications',
       'Input validation & persistent file storage',
     ],
-    responsibilities: [
-      'Built the complete appointment-scheduling module — Swing interface, backend processing and data management.',
-      'Applied LocalDate and LocalDateTime to detect timing conflicts and handle rescheduling or delays reliably.',
-      'Produced monthly reports consolidating activity summaries, timetables and doctor-wise statistics.',
-    ],
     stack: {
       frontend: ['Java Swing', 'AWT events'],
       backend: ['Java', 'Java Time API', 'OOP', 'MVC Architecture'],
-      database: ['Text-file persistence (public repo)', 'MySQL via JDBC (CV)'],
+      database: ['Text-file persistence'],
       tools: ['Git', 'GitHub'],
     },
     architecture: 'Swing GUI → patient / doctor / appointment management → application logic & validation → file handler (patients.txt, doctors.txt, appointments.txt).',
@@ -661,6 +684,8 @@ export const projects: Project[] = [
     lang: 'py',
     group: 'GitHub',
     category: 'Offline Desktop Point-of-Sale System',
+    period: 'Sep 2026 – Nov 2026',
+    cvOrder: 5,
     description:
       'A complete offline Restaurant Point of Sale system built with Python, Tkinter and SQLite — orders, kitchen workflow, inventory, customers, staff roles, payments, receipts and sales reporting.',
     overview:
@@ -676,12 +701,17 @@ export const projects: Project[] = [
       'Sales dashboard & date-based reports',
       'Automatic database backup',
     ],
+    responsibilities: [
+      'Developed an offline restaurant Point of Sale system using Python, Tkinter, and SQLite to manage orders, kitchen workflows, menus, inventory, customers, and daily operations.',
+      'Implemented secure staff authentication with PBKDF2 password hashing and role-based access control, alongside payment processing, receipt generation, and customer loyalty functionality.',
+      'Created sales reporting, CSV data export, stock monitoring, low-stock alerts, order-status tracking, and local database backup functionality to support operational management.',
+    ],
     stack: {
       frontend: ['Tkinter'],
       backend: ['Python'],
       database: ['SQLite'],
-      security: ['Role-based login (Admin · Manager · Cashier)', 'PBKDF2 password hashing'],
-      tools: ['CSV export', 'Windows batch launcher', 'Git'],
+      security: ['Role-Based Access Control (RBAC)', 'Role-based login (Admin · Manager · Cashier)', 'PBKDF2 password hashing'],
+      tools: ['CSV', 'Windows batch launcher', 'Git'],
     },
     architecture: 'Tkinter GUI (app.py) → business logic → database layer (database.py) → local SQLite with automatic backups.',
     status: 'Completed',
@@ -1010,6 +1040,19 @@ export const leadership: { role: string; org: string; period: string }[] = [
   { role: 'School Sports Representative — Cricket, Football, Badminton & Rugby', org: 'Zahira College', period: '2015 – 2020' },
 ];
 
+/** v10 — "Technical Skills" exactly as printed on the current CV. */
+export const cvSkills: { label: string; items: string[] }[] = [
+  { label: 'Programming Languages', items: ['Java', 'JavaScript', 'Python', 'SQL', 'C++'] },
+  { label: 'Frontend Development', items: ['React.js', 'HTML5', 'CSS3', 'Bootstrap', 'Three.js', 'Responsive Web Design'] },
+  { label: 'Backend & Frameworks', items: ['Node.js', 'Express.js', 'PHP', 'Spring Boot'] },
+  { label: 'APIs & Integration', items: ['REST APIs', 'JSON', 'WebSockets'] },
+  { label: 'Mobile Development', items: ['Android Studio', 'Android SDK', 'XML'] },
+  { label: 'Databases', items: ['MySQL', 'MongoDB', 'SQLite'] },
+  { label: 'Security & Authentication', items: ['JWT', 'RBAC', 'Vulnerability Assessment'] },
+  { label: 'Tools & Technologies', items: ['Git', 'GitHub', 'Postman', 'Katalon Studio', 'Tkinter', 'Stripe'] },
+  { label: 'Core Concepts', items: ['OOP', 'DSA', 'MVC', 'Database Design', 'Software Testing', 'Agile & Scrum'] },
+];
+
 export const spokenLanguages = [
   { name: 'English', level: 'Professional Working Proficiency' },
   { name: 'Sinhala', level: 'Professional Working Proficiency' },
@@ -1159,3 +1202,6 @@ export function projectsUsing(skill: string): Project[] {
     return all.some((x) => names.some((n) => x === n || x.startsWith(`${n} `) || x.startsWith(`${n} (`)));
   });
 }
+
+/** v10 — the projects listed on the current CV, in CV order. */
+export const cvProjects = (): Project[] => projects.filter((p) => p.cvOrder).sort((a, b) => (a.cvOrder ?? 99) - (b.cvOrder ?? 99));

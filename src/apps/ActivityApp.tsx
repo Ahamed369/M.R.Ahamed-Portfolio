@@ -78,12 +78,12 @@ export default function ActivityApp(_: AppProps) {
           : ['Process Name', 'Status', 'Open for', ''];
 
   return (
-    <div className="am">
-      <div className="am-bar">
-        <button type="button" className="am-quit" disabled={!sel} onClick={() => sel && (wm.close(sel), setSel(null))} title="Quit the selected process">
+    <div className="amon">
+      <div className="amon-bar">
+        <button type="button" className="amon-quit" disabled={!sel} onClick={() => sel && (wm.close(sel), setSel(null))} title="Quit the selected process">
           ⊗ Quit
         </button>
-        <div className="am-tabs" role="tablist">
+        <div className="amon-tabs" role="tablist">
           {(['cpu', 'memory', 'energy', 'network'] as Tab[]).map((t) => (
             <button key={t} type="button" role="tab" aria-selected={tab === t} className={tab === t ? 'on' : ''} onClick={() => setTab(t)}>
               {t === 'cpu' ? 'CPU' : t[0].toUpperCase() + t.slice(1)}
@@ -91,17 +91,17 @@ export default function ActivityApp(_: AppProps) {
           ))}
         </div>
       </div>
-      <div className="am-table">
-        <div className="am-row am-head">
+      <div className="amon-table">
+        <div className="amon-row amon-head">
           {cols.map((c) => (
             <span key={c}>{c}</span>
           ))}
         </div>
-        <div className="am-body">
+        <div className="amon-body">
           {procs.map((p) => (
-            <button key={p.id} type="button" className={`am-row ${sel === p.id ? 'sel' : ''}`} onClick={() => setSel(p.id)} onDoubleClick={() => wm.open(p.id)}>
-              <span className="am-name">
-                <AppIcon name={APPS[p.id].icon} className="am-ico" />
+            <button key={p.id} type="button" className={`amon-row ${sel === p.id ? 'sel' : ''}`} onClick={() => setSel(p.id)} onDoubleClick={() => wm.open(p.id)}>
+              <span className="amon-name">
+                <AppIcon name={APPS[p.id].icon} className="amon-ico" />
                 {APPS[p.id].title}
               </span>
               {tab === 'cpu' && (
@@ -134,13 +134,13 @@ export default function ActivityApp(_: AppProps) {
               )}
             </button>
           ))}
-          {!procs.length && <p className="am-empty">No apps are open.</p>}
+          {!procs.length && <p className="amon-empty">No apps are open.</p>}
         </div>
       </div>
-      <div className="am-foot">
+      <div className="amon-foot">
         {tab === 'cpu' && (
           <>
-            <div className="am-stats">
+            <div className="amon-stats">
               <span>
                 Frame rate <b>{cur ? `${cur.fps} fps` : '…'}</b>
               </span>
@@ -159,7 +159,7 @@ export default function ActivityApp(_: AppProps) {
         )}
         {tab === 'memory' && (
           <>
-            <div className="am-stats">
+            <div className="amon-stats">
               <span>
                 JS heap <b>{cur?.heap ? fmtB(cur.heap) : 'Not reported'}</b>
               </span>
@@ -175,7 +175,7 @@ export default function ActivityApp(_: AppProps) {
         )}
         {tab === 'energy' && (
           <>
-            <div className="am-stats">
+            <div className="amon-stats">
               <span>
                 Frame rate <b>{cur ? `${cur.fps} fps` : '…'}</b>
               </span>
@@ -188,7 +188,7 @@ export default function ActivityApp(_: AppProps) {
         )}
         {tab === 'network' && (
           <>
-            <div className="am-stats">
+            <div className="amon-stats">
               <span>
                 Data received <b>{fmtB(bytes)}</b>
               </span>
@@ -212,7 +212,7 @@ function Graph({ values, max, label, color }: { values: number[]; max: number; l
   const h = 60;
   const pts = values.map((v, i) => `${(i / 59) * w},${h - (Math.min(v, max) / max) * h}`).join(' ');
   return (
-    <div className="am-graph">
+    <div className="amon-graph">
       <small>{label}</small>
       <svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none">
         {values.length > 1 && (

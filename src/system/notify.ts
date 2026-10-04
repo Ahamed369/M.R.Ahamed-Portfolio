@@ -35,6 +35,8 @@ export interface NotifyInput {
   duration?: number;
   /** No sound for this one */
   silent?: boolean;
+  /** v10 — the Scheduled Summary itself */
+  summary?: boolean;
   /** Stable key — a notification with the same key replaces the older one */
   key?: string;
   body?: string;
@@ -44,6 +46,8 @@ export interface NotifyInput {
   icon?: string;
   /** Critical notifications still show while Focus is on */
   critical?: boolean;
+  /** v10.3 — on iPhone, show this one in the Dynamic Island instead of a banner (still kept in Notification Centre) */
+  island?: boolean;
 }
 
 type Listener = (n: NotifyInput) => void;
@@ -72,4 +76,15 @@ export function openExternal(url: string, n?: Omit<NotifyInput, 'app'> & { app?:
   if (n) notify({ app: n.app ?? 'Safari', ...n });
   if (url.startsWith('http')) window.open(url, '_blank', 'noopener,noreferrer');
   else window.location.href = url;
+}
+
+/**
+ * v10.3 — open an app (and section) from code that has no window manager at hand,
+ * e.g. a notification or Dynamic Island tap. Both the Mac and iOS shells already
+ * follow "#/app/<id>?k=v" deep links.
+ */
+export function openAppLink(app: string, args?: Record<string, string>): void {
+  const q = args && Object.keys(args).length ? `?${new URLSearchParams(args).toString()}` : '';
+  history.replaceState(null, '', location.pathname + location.search);
+  location.hash = `#/app/${app}${q}`;
 }

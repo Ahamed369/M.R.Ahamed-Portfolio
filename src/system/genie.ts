@@ -33,6 +33,7 @@ const easeIn = (t: number) => t * t * (1.6 - 0.6 * t);
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
 export type DockSide = 'bottom' | 'left' | 'right';
+import { cachedSnapshot, lastSnapshot, snapshot, type Snapshot } from './snapshot';
 
 function copyCanvases(src: HTMLElement, dst: HTMLElement) {
   const a = src.querySelectorAll('canvas');
@@ -70,7 +71,7 @@ function copyMedia(src: HTMLElement, dst: HTMLElement) {
  * @param dir     'min' (window → dock) or 'restore' (dock → window)
  * @param side    which screen edge the Dock sits on
  */
-export function genie(el: HTMLElement, from: GenieRect, target: GenieRect, dir: 'min' | 'restore', duration = 640, side: DockSide = 'bottom'): Promise<void> {
+function genieDom(el: HTMLElement, from: GenieRect, target: GenieRect, dir: 'min' | 'restore', duration: number, side: DockSide, onReady?: () => void): Promise<void> {
   return new Promise((resolve) => {
     const layer = document.createElement('div');
     layer.className = 'genie-layer';
@@ -174,6 +175,7 @@ export function genie(el: HTMLElement, from: GenieRect, target: GenieRect, dir: 
     };
 
     frame(dir === 'min' ? 0 : 1);
+    onReady?.();
     // the clock starts on the first painted frame, so cloning/layout time never eats into the motion
     let start = -1;
     const step = (now: number) => {
@@ -188,4 +190,152 @@ export function genie(el: HTMLElement, from: GenieRect, target: GenieRect, dir: 
     };
     requestAnimationFrame(step);
   });
+}
+
+
+/* ═══════════════════════ v10 — single-bitmap canvas Genie ═══════════════════════ */
+
+/** Shared geometry: for progress p, calls back once per slice with its along/across edges. */
+function makeGeometry(from: GenieRect, target: GenieRect, side: DockSide) {
+  const vertical = side === 'bottom';
+  const alongLen = vertical ? from.h : from.w;
+  const A = (x: number, y: number) => (side === 'bottom' ? y : side === 'right' ? x : -x);
+  const winFar = side === 'bottom' ? A(0, from.y) : side === 'right' ? A(from.x, 0) : A(from.x + from.w, 0);
+  const winNear = winFar + alongLen;
+  const winC0 = vertical ? from.x : from.y;
+  const winC1 = vertical ? from.x + from.w : from.y + from.h;
+  const tNear = side === 'bottom' ? A(0, target.y + target.h * 0.12) : side === 'right' ? A(target.x + target.w * 0.12, 0) : A(target.x + target.w * 0.88, 0);
+  const pad = (vertical ? target.w : target.h) * 0.12;
+  const tC0 = (vertical ? target.x : target.y) + pad;
+  const tC1 = (vertical ? target.x + target.w : target.y + target.h) - pad;
+  const span = Math.max(1, tNear - winFar);
+  const curve = (a: number) => {
+    const f = smooth(clamp01((a - winFar) / span));
+    return [lerp(winC0, tC0, f), lerp(winC1, tC1, f)] as const;
+  };
+  return {
+    vertical,
+    alongLen,
+    each(p: number, N: number, cb: (i: number, a0: number, a1: number, s0: number, s1: number, e0: number, e1: number) => void) {
+      const p1 = easeInOut(clamp01(p / 0.42));
+      const p2 = easeIn(clamp01((p - 0.3) / 0.7));
+      const far = lerp(winFar, tNear, p2);
+      const near = lerp(winNear, tNear, p1);
+      const len = Math.max(0.0001, near - far);
+      const edges = (a: number) => {
+        const [c0, c1] = curve(a);
+        return [lerp(winC0, c0, p1), lerp(winC1, c1, p1)] as const;
+      };
+      for (let i = 0; i < N; i++) {
+        const a0 = far + (i / N) * len;
+        const a1 = far + ((i + 1) / N) * len;
+        const [s0, e0] = edges(a0);
+        const [s1, e1] = edges(a1);
+        cb(i, a0, a1, s0, s1, e0, e1);
+      }
+    },
+  };
+}
+
+function genieCanvas(snap: Snapshot, from: GenieRect, target: GenieRect, dir: 'min' | 'restore', duration: number, side: DockSide, onReady?: () => void): Promise<void> {
+  return new Promise((resolve) => {
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const cv = document.createElement('canvas');
+    cv.className = 'genie-canvas';
+    cv.setAttribute('aria-hidden', 'true');
+    cv.width = Math.round(window.innerWidth * dpr);
+    cv.height = Math.round(window.innerHeight * dpr);
+    const ctx = cv.getContext('2d');
+    if (!ctx) {
+      resolve();
+      return;
+    }
+    ctx.imageSmoothingQuality = 'high';
+    document.body.appendChild(cv);
+    const g = makeGeometry(from, target, side);
+    const N = Math.max(40, Math.min(120, Math.round(g.alongLen / 6)));
+    const sl = g.alongLen / N; // slice thickness in window px
+    const img = snap.canvas;
+    const sc = snap.scale * (snap.w ? snap.w / from.w : 1); // snapshot px per window px
+    const scY = snap.scale * (snap.h ? snap.h / from.h : 1);
+    const ov = 1.2; // overlap (px) to hide seams
+
+    const frame = (p: number) => {
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, cv.width, cv.height);
+      ctx.globalAlpha = p > 0.94 ? (1 - p) / 0.06 : 1;
+      g.each(p, N, (i, a0, a1, s0, s1, e0, e1) => {
+        const wid = Math.max(0.5, (e0 - s0 + (e1 - s1)) / 2);
+        const la = Math.max(0.01, a1 - a0);
+        const k = (s1 - s0) / la;
+        if (side === 'bottom') {
+          const sx = wid / from.w;
+          const sy = la / sl;
+          // skewX: x' = s0 + sx*x + k*(sy*y)
+          ctx.setTransform(dpr * sx, 0, dpr * k * sy, dpr * sy, dpr * s0, dpr * a0);
+          ctx.drawImage(img, 0, i * sl * scY, from.w * sc, (sl + ov) * scY, 0, 0, from.w, sl + ov);
+        } else if (side === 'right') {
+          const sx = la / sl;
+          const sy = wid / from.h;
+          ctx.setTransform(dpr * sx, dpr * k * sx, 0, dpr * sy, dpr * a0, dpr * s0);
+          ctx.drawImage(img, i * sl * sc, 0, (sl + ov) * sc, from.h * scY, 0, 0, sl + ov, from.h);
+        } else {
+          const sx = la / sl;
+          const sy = wid / from.h;
+          ctx.setTransform(dpr * sx, dpr * -k * sx, 0, dpr * sy, dpr * -a1, dpr * s1);
+          const srcX = Math.max(0, from.w - (i + 1) * sl - ov);
+          ctx.drawImage(img, srcX * sc, 0, (sl + ov) * sc, from.h * scY, 0, 0, sl + ov, from.h);
+        }
+      });
+    };
+
+    frame(dir === 'min' ? 0 : 1);
+    onReady?.();
+    let start = -1;
+    const step = (now: number) => {
+      if (start < 0) start = now;
+      const t = clamp01((now - start) / (duration * ((window as unknown as { __genieSlow?: number }).__genieSlow ?? 1)));
+      frame(dir === 'min' ? t : 1 - t);
+      if (t < 1) requestAnimationFrame(step);
+      else {
+        cv.remove();
+        resolve();
+      }
+    };
+    requestAnimationFrame(step);
+  });
+}
+
+/** Pre-render the window bitmap (called when the pointer reaches the minimise button). */
+export function primeGenie(el: HTMLElement) {
+  const r = el.getBoundingClientRect();
+  if (cachedSnapshot(el, 800)) return;
+  void snapshot(el, Math.round(r.width), Math.round(r.height));
+}
+
+/**
+ * Runs the genie animation.
+ * Uses a single pre-rendered bitmap bent on one canvas (smooth everywhere); falls
+ * back to DOM strips if the window can't be rasterised quickly.
+ * `onReady` fires right before the first frame, so the caller can hide the real window
+ * without a gap.
+ */
+export async function genie(el: HTMLElement, from: GenieRect, target: GenieRect, dir: 'min' | 'restore', duration = 640, side: DockSide = 'bottom', onReady?: () => void): Promise<void> {
+  const mode = document.documentElement.dataset.genieMode ?? 'auto';
+  let snap: Snapshot | null = null;
+  if (mode !== 'dom') {
+    if (dir === 'min') {
+      snap = cachedSnapshot(el);
+      if (!snap) {
+        const w = Math.round(from.w);
+        const h = Math.round(from.h);
+        snap = await Promise.race([snapshot(el, w, h), new Promise<null>((r) => window.setTimeout(() => r(null), 280))]);
+      }
+    } else {
+      snap = lastSnapshot(el);
+    }
+    if (snap && (Math.abs(snap.w - from.w) > 2 || Math.abs(snap.h - from.h) > 2)) snap = dir === 'min' ? null : snap;
+  }
+  if (snap) return genieCanvas(snap, from, target, dir, duration, side, onReady);
+  return genieDom(el, from, target, dir, duration, side, onReady);
 }

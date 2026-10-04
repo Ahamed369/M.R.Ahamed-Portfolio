@@ -1,7 +1,7 @@
 {
   "name": "mr-ahamed-portfolio",
   "private": true,
-  "version": "1.0.0",
+  "version": "10.0.0",
   "type": "module",
   "description": "Desktop-style interactive portfolio of M.R. Ahamed — Computer Science Undergraduate & Full-Stack Developer",
   "scripts": {

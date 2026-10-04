@@ -1,9 +1,13 @@
 import { t } from '../system/i18n';
+import { WallImage } from './Wallpaper';
+import { lockWallFor } from '../system/wallpaperCycle';
 import { useEffect, useRef, useState, type PointerEvent as RPointerEvent } from 'react';
 import { useSystem } from '../system/SystemContext';
 import { useSettings } from '../system/SettingsContext';
-import { wallpaperById } from '../data/media';
 import { personal } from '../data/portfolio';
+import { SysIcon } from './SysIcons';
+import { usePrefChoice } from '../system/prefs';
+import { lockClockStyle } from '../system/lockStyle';
 
 /**
  * Lock screen & display sleep.
@@ -23,6 +27,8 @@ export function LockScreen() {
   const leavingRef = useRef(false);
   const shownAt = useRef(0);
   const { locked, asleep, unlock, wake, lockReason } = sys;
+  const lockFont = usePrefChoice('lock-font', 'classic');
+  const lockColor = usePrefChoice('lock-color', 'white');
 
   // live clock while locked
   useEffect(() => {
@@ -90,10 +96,10 @@ export function LockScreen() {
 
   if (sys.phase !== 'ready') return null;
 
-  const wp = wallpaperById(settings.wallpaper);
   const loggedOut = lockReason === 'logout';
   const date = now.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' });
-  const time = now.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }).replace(/\s?[AP]M$/i, '');
+  const time = now.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', hour12: !settings.clock24 }).replace(/\s?[AP]M$/i, '');
+  const clockStyle = lockClockStyle(lockFont, lockColor);
 
   return (
     <>
@@ -132,18 +138,57 @@ export function LockScreen() {
           }}
           style={drag ? { transform: `translateY(${drag * 0.6}px)`, opacity: Math.max(0.35, 1 + drag / 500), transition: 'none' } : undefined}
         >
-          <img className="v5-lock-wall" src={wp.src} alt="" draggable={false} />
+          <div className="v5-lock-wall">
+            <WallImage id={lockWallFor(settings, 'mac')} live />
+          </div>
           <div className="v5-lock-shade" />
           <div className="v5-lock-top">
-            <div className="v5-lock-date">{date}</div>
-            <div className="v5-lock-time">{time}</div>
+            <div className="v5-lock-date" style={{ color: clockStyle.color }}>{date}</div>
+            <div className="v5-lock-time" style={clockStyle}>{time}</div>
             {loggedOut && <div className="v5-lock-badge">Logged out</div>}
             {lockReason === 'login' && <div className="v5-lock-welcome">Welcome to {personal.name}’s portfolio</div>}
           </div>
           <div className="v5-lock-bottom">
             {settings.lockMessage && <p className="v5-lock-msg">{settings.lockMessage}</p>}
-            <img className="v5-lock-avatar" src={personal.avatar} alt="" draggable={false} />
-            <div className="v5-lock-name">{personal.name}</div>
+            {settings.userPicker && (lockReason === 'login' || loggedOut) ? (
+              <div className="lock10-users" role="radiogroup" aria-label="Choose a user" onClick={(e) => e.stopPropagation()}>
+                {(
+                  [
+                    ['owner', personal.name, personal.avatar],
+                    ['recruiter', 'Recruiter', ''],
+                    ['guest', 'Guest', ''],
+                  ] as const
+                ).map(([id, name, img]) => (
+                  <button
+                    key={id}
+                    type="button"
+                    role="radio"
+                    aria-checked={false}
+                    className="lock10-user"
+                    onClick={() => {
+                      try {
+                        sessionStorage.setItem('mra-visitor-role', id);
+                      } catch {
+                        /* ignore */
+                      }
+                      if (id === 'recruiter') window.setTimeout(() => window.dispatchEvent(new Event('mra-recruiter-start')), 900);
+                      shownAt.current = 0;
+                      doUnlock();
+                    }}
+                  >
+                    {img ? <img src={img} alt="" draggable={false} /> : <span className="lock10-ph">
+                        <SysIcon n={id === 'recruiter' ? 'briefcase' : 'person'} size={34} />
+                      </span>}
+                    <b>{name}</b>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <>
+                <img className="v5-lock-avatar" src={personal.avatar} alt="" draggable={false} />
+                <div className="v5-lock-name">{personal.name}</div>
+              </>
+            )}
             <button
               ref={btnRef}
               type="button"

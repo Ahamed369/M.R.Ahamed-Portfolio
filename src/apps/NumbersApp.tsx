@@ -1,3 +1,4 @@
+import { doubleClick } from '../system/input';
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent as RKeyboardEvent } from 'react';
 import { allSkills, education, projects, projectsUsing, type Project } from '../data/portfolio';
 import { readStore, writeStore } from '../system/storage';
@@ -420,7 +421,7 @@ export default function NumbersApp() {
                 </tbody>
               </table>
             </div>
-            <p className="nm-hint">Double-click or press Return to edit · arrows to move · formulas: =SUM(), =AVERAGE(), =COUNT(), =MIN(), =MAX()</p>
+            <p className="nm-hint">{doubleClick()} or press Return to edit · arrows to move · formulas: =SUM(), =AVERAGE(), =COUNT(), =MIN(), =MAX()</p>
           </section>
 
         </div>

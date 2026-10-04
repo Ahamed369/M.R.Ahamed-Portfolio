@@ -72,7 +72,29 @@ interface State {
   order: string[];
   widgets: WidgetId[];
   trash: TrashItem[];
+  /** v10.3 — widgets the visitor placed in Notification Center */
+  ncWidgets?: WidgetId[];
 }
+
+/** v10.3 — which app each desktop widget belongs to (the widget gallery's sidebar) */
+export const WIDGET_GROUPS: { app: string; icon: IconName; ids: WidgetId[] }[] = [
+  { app: 'Batteries', icon: 'battery', ids: ['battery'] },
+  { app: 'Calendar', icon: 'calendar', ids: ['calendar'] },
+  { app: 'Clock', icon: 'clock', ids: ['clocks', 'digital'] },
+  { app: 'Contacts', icon: 'contacts', ids: ['contact'] },
+  { app: 'Focus Timer', icon: 'screentime', ids: ['pomodoro'] },
+  { app: 'GitHub', icon: 'github', ids: ['github'] },
+  { app: 'Music', icon: 'music', ids: ['music'] },
+  { app: 'My Services', icon: 'services', ids: ['services'] },
+  { app: 'Notes', icon: 'stickies', ids: ['quicknote'] },
+  { app: 'Photos', icon: 'photos', ids: ['photoframe'] },
+  { app: 'Projects', icon: 'xcode', ids: ['current'] },
+  { app: 'Reminders', icon: 'reminders', ids: ['reminders'] },
+  { app: 'Screen Time', icon: 'screentime', ids: ['screentime'] },
+  { app: 'Skills', icon: 'star', ids: ['skills'] },
+  { app: 'System', icon: 'activity', ids: ['sysinfo'] },
+  { app: 'Weather', icon: 'weather', ids: ['weather'] },
+];
 
 const KEY = 'mra-customize-v1';
 const EVT = 'mra-customize';
@@ -83,7 +105,7 @@ const load = (): State => {
   if (!cache) {
     const s = readStore<State>(KEY, FALLBACK);
     const known = new Set<string>(WIDGETS.map((w) => w.id));
-    cache = { ...s, widgets: (s.widgets ?? DEFAULT_WIDGETS).filter((w) => known.has(w)) };
+    cache = { ...s, widgets: (s.widgets ?? DEFAULT_WIDGETS).filter((w) => known.has(w)), ncWidgets: (Array.isArray(s.ncWidgets) ? s.ncWidgets : []).filter((w) => known.has(w)) };
   }
   return cache;
 };
@@ -139,9 +161,22 @@ export function useCustomize() {
     playUi();
   }, []);
 
+  /** v10.3 — Notification Center widgets */
+  const addNcWidget = useCallback((id: WidgetId) => {
+    const s = load();
+    const nc = s.ncWidgets ?? [];
+    if (nc.includes(id)) return;
+    save({ ...s, ncWidgets: [...nc, id] });
+    notify({ app: 'Widgets', icon: 'calendar', title: 'Added to Notification Center', body: WIDGETS.find((w) => w.id === id)?.label, silent: true });
+  }, []);
+  const removeNcWidget = useCallback((id: WidgetId) => {
+    const s = load();
+    save({ ...s, ncWidgets: (s.ncWidgets ?? []).filter((x) => x !== id) });
+  }, []);
+
   const setOrder = useCallback((order: string[]) => save({ ...load(), order }), []);
   const setWidgets = useCallback((widgets: WidgetId[]) => save({ ...load(), widgets }), []);
   const restoreDefaults = useCallback(() => save({ ...FALLBACK }), []);
 
-  return { ...st, removeApp, removeWidget, addWidget, putBack, emptyTrash, setOrder, setWidgets, restoreDefaults };
+  return { ...st, ncWidgets: st.ncWidgets ?? [], removeApp, removeWidget, addWidget, addNcWidget, removeNcWidget, putBack, emptyTrash, setOrder, setWidgets, restoreDefaults };
 }

@@ -1,6 +1,8 @@
 import { createContext, useCallback, useContext, useMemo, useReducer, type ReactNode } from 'react';
 import type { AppId, Rect, WindowState } from './types';
 import { APPS } from './apps';
+import { getFlag } from './prefs';
+import { readStore, writeStore } from './storage';
 
 export const MENUBAR_H = 26;
 
@@ -45,6 +47,13 @@ export function clampRect(r: Rect): Rect {
 const PRESET_POS: Partial<Record<AppId, (w: number, h: number) => { x: number; y: number }>> = {
   about: () => ({ x: 28, y: MENUBAR_H + 18 }),
 };
+
+/** v10.3 — the last frame each app's window had (used when windows reopen where they were) */
+const lastRects = new Map<string, Rect>(Object.entries(readStore<Record<string, Rect>>('mra-last-rects-v10', {})));
+function rememberRect(id: string, r: Rect) {
+  lastRects.set(id, r);
+  writeStore('mra-last-rects-v10', Object.fromEntries(lastRects));
+}
 
 function initialRect(id: AppId, cascade: number): Rect {
   const vw = window.innerWidth;
@@ -103,9 +112,11 @@ function reducer(state: State, action: Action): State {
           ),
         };
       }
+      // v10.3 — Settings → Desktop & Dock → "Close windows when quitting an application" off = reopen where it was
+      const last = !getFlag('win-close-quit', true) ? lastRects.get(action.id) : undefined;
       const win: WindowState = {
         id: action.id,
-        rect: initialRect(action.id, state.opened),
+        rect: last ? clampRect(last) : initialRect(action.id, state.opened),
         z: topZ,
         phase: 'opening',
         maximized: false,
@@ -122,8 +133,11 @@ function reducer(state: State, action: Action): State {
     }
     case 'phase':
       return { ...state, windows: state.windows.map((w) => (w.id === action.id ? { ...w, phase: action.phase, fromMin: action.phase === 'restoring' ? w.fromMin : false } : w)) };
-    case 'remove':
+    case 'remove': {
+      const gone = state.windows.find((w) => w.id === action.id);
+      if (gone && !gone.maximized) rememberRect(gone.id, gone.rect);
       return { ...state, windows: state.windows.filter((w) => w.id !== action.id) };
+    }
     case 'rect':
       return {
         ...state,

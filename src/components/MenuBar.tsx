@@ -1,3 +1,6 @@
+import { chooseView } from '../system/ios';
+import { canRedo, canUndo, doRedo, doUndo, redoLabel, undoLabel } from '../system/history';
+import { editCmd } from '../system/clipboard';
 import { tileRect, type TileZone } from './SystemExtras';
 import { sharePortfolio } from '../system/share';
 import { t, LANGS } from '../system/i18n';
@@ -13,6 +16,7 @@ import { useScreenTime } from '../system/screenTime';
 import { readStore, writeStore } from '../system/storage';
 import { AppIcon, type IconName } from './AppIcons';
 import type { AppId } from '../system/types';
+import { usePrefFlag } from '../system/prefs';
 
 type Item =
   | { sep: true }
@@ -746,6 +750,7 @@ export function MenuBar({ onShowTips }: { onShowTips: () => void }) {
   const barRef = useRef<HTMLElement>(null);
   const now = useClock();
   const battery = useBattery();
+  const showBat = usePrefFlag('cc-battery', true); // Settings → Control Center → Battery
 
   const focused = wm.focusedId;
   const appName = focused ? APPS[focused].menuName : 'Finder';
@@ -922,6 +927,21 @@ export function MenuBar({ onShowTips }: { onShowTips: () => void }) {
         { label: 'Open CV…', action: go('preview') },
         { label: t('downloadCv'), href: cv.url },
         { label: 'Share Portfolio…', action: () => void sharePortfolio() },
+        { label: 'Quick View (Classic Site)', action: () => window.dispatchEvent(new Event('mra-classic')) },
+        {
+          label: 'Portfolio Mode',
+          submenu: (
+            [
+              ['explore', 'Explore Freely'],
+              ['recruiter', 'Recruiter'],
+              ['client', 'Client / Business'],
+              ['developer', 'Developer'],
+              ['presentation', 'Presentation'],
+            ] as const
+          ).map(([k, l]) => ({ label: l, checked: (settings.portfolioMode ?? 'explore') === k, action: () => update({ portfolioMode: k, presentStep: 0 }) })),
+        },
+        { label: 'View as iPhone', action: () => chooseView(update, 'iphone') },
+        { label: 'View as iPad', action: () => chooseView(update, 'ipad') },
         { label: 'GitHub Profile', href: socials.github },
         { label: 'LinkedIn Profile', href: socials.linkedin },
         { sep: true },
@@ -994,6 +1014,17 @@ export function MenuBar({ onShowTips }: { onShowTips: () => void }) {
       id: 'edit',
       label: t('mEdit'),
       items: [
+        { label: canUndo() ? `Undo ${undoLabel()}` : 'Undo', action: () => doUndo(), disabled: !canUndo(), shortcut: '⌘Z' },
+        { label: canRedo() ? `Redo ${redoLabel()}` : 'Redo', action: () => doRedo(), disabled: !canRedo(), shortcut: '⇧⌘Z' },
+        { label: '', sep: true },
+        { label: 'Cut', action: () => editCmd('cut'), shortcut: '⌘X' },
+        { label: 'Copy', action: () => editCmd('copy'), shortcut: '⌘C' },
+        { label: 'Paste', action: () => editCmd('paste'), shortcut: '⌘V' },
+        { label: 'Select All', action: () => editCmd('selectAll'), shortcut: '⌘A' },
+        { label: 'Duplicate', action: () => window.dispatchEvent(new CustomEvent('mra-duplicate', { detail: focused })), disabled: !focused || !['notes', 'finder'].includes(focused), shortcut: '⌘D' },
+        { label: '', sep: true },
+        { label: 'Emoji & Symbols', action: () => window.dispatchEvent(new Event('mra-emoji')), shortcut: '⌃⌘Space' },
+        { label: '', sep: true },
         { label: copied ? 'Copied ✓' : 'Copy Email Address', action: () => void copyEmail(), keepOpen: true },
         { label: 'Copy Phone Number', action: () => void navigator.clipboard?.writeText(personal.phone).catch(() => undefined), keepOpen: true },
       ],
@@ -1056,6 +1087,10 @@ export function MenuBar({ onShowTips }: { onShowTips: () => void }) {
       id: 'help',
       label: t('mHelp'),
       items: [
+        { label: 'Guidebook (A–Z)', action: go('guidebook') },
+        { label: 'Welcome Guide', action: () => window.dispatchEvent(new Event('mra-onboarding')) },
+        { label: 'What’s New in the Portfolio', action: go('whatsnew') },
+        { label: 'Learning Hub', action: go('learning') },
         { label: 'Show Tips', action: onShowTips },
         { label: 'Keyboard Shortcuts', action: () => window.dispatchEvent(new Event('mra-shortcuts')), shortcut: '⌃/' },
         { label: 'Ask Me AI', action: go('askai') },
@@ -1078,7 +1113,7 @@ export function MenuBar({ onShowTips }: { onShowTips: () => void }) {
   };
 
   const dateStr = now.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
-  const timeStr = now.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+  const timeStr = now.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', hour12: settings.clock24 === undefined ? undefined : !settings.clock24 });
   const kind = connectionKind();
   const pill = kind === 'secure' ? 'OK' : kind === 'local' ? 'Local' : 'HTTP';
   const batPct = battery ? Math.round(battery.level * 100) : null;
@@ -1207,7 +1242,7 @@ export function MenuBar({ onShowTips }: { onShowTips: () => void }) {
               )}
             </svg>
           </button>
-          <span
+          {showBat && <span
             className="mb-status hide-xs v5-bat"
             role="img"
             aria-label={batPct !== null ? `Battery ${batPct}%${battery?.charging ? ', charging' : ''}` : 'Battery level not available in this browser'}
@@ -1220,7 +1255,7 @@ export function MenuBar({ onShowTips }: { onShowTips: () => void }) {
               <rect x="23.5" y="4.2" width="1.8" height="4.6" rx=".9" opacity=".55" />
               {battery?.charging && <path d="M12.6 1.8 8.4 7h3l-1 4.3L14.6 6h-3Z" className="v5-bat-bolt" />}
             </svg>
-          </span>
+          </span>}
           <span className={`mb-status hide-xs ${sys.wifi ? '' : 'off'}`} aria-hidden="true">
             <svg viewBox="0 0 18 13">
               <path d="M9 12.4 11.2 10a3.2 3.2 0 0 0-4.4 0Z" />

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { DragBar, Lights } from '../components/Window';
 import { AppIcon } from '../components/AppIcons';
-import { allSkills, cv, education, leadership, personal, projects, projectsUsing, socials, spokenLanguages, ventures, type Project } from '../data/portfolio';
+import { integrations, cvSkills, cvProjects, allSkills, cv, education, leadership, personal, projects, projectsUsing, socials, spokenLanguages, ventures, type Project } from '../data/portfolio';
 import { caseStudyById } from '../data/caseStudies';
 import { useWM } from '../system/WindowManager';
 import { usePersisted, uid } from '../system/useStore';
@@ -152,6 +152,42 @@ function Rich({ text }: { text: string }) {
   );
 }
 
+/** v10 — the facts an optional AI model may use (from the CV only) */
+function facts(): string {
+  return [
+    `${personal.name} — ${personal.headline}. ${personal.location}. ${personal.status}.`,
+    personal.summary,
+    personal.objective,
+    `Skills: ${cvSkills.map((s) => `${s.label}: ${s.items.join(', ')}`).join(' | ')}`,
+    `Projects: ${cvProjects()
+      .map((p) => `${p.name} (${p.period ?? p.category}) — ${p.description}`)
+      .join(' | ')}`,
+    `Education: ${education.map((e) => `${e.qualification}, ${e.institution} (${e.period})`).join(' | ')}`,
+    `Contact: ${personal.email}, ${socials.linkedin}, ${socials.github}`,
+  ].join('\n');
+}
+
+/** v10 — ask the owner's own AI proxy when one is configured; null = use the on-device answer */
+async function remote(question: string, history: Msg[]): Promise<string | null> {
+  if (!integrations.aiEndpoint) return null;
+  try {
+    const ctrl = new AbortController();
+    const t = window.setTimeout(() => ctrl.abort(), 15000);
+    const r = await fetch(integrations.aiEndpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question, facts: facts(), history: history.slice(-6).map((m) => ({ role: m.from === 'me' ? 'user' : 'assistant', text: m.text })) }),
+      signal: ctrl.signal,
+    });
+    window.clearTimeout(t);
+    if (!r.ok) return null;
+    const d = (await r.json()) as { answer?: string };
+    return d.answer?.trim() || null;
+  } catch {
+    return null;
+  }
+}
+
 const WELCOME: Msg = { id: 'w', from: 'ai', t: 0, text: `Hi! I’m **Ask Me AI** — I answer questions about ${personal.name} using his portfolio data. What would you like to know?` };
 
 export default function AskAIApp() {
@@ -168,10 +204,13 @@ export default function AskAIApp() {
     if (!v || typing !== null) return;
     setQ('');
     setMsgs((m) => [...m, { id: uid('m'), from: 'me', text: v, t: Date.now() }]);
-    const a = answer(v);
+    const local = answer(v);
+    setTyping('');
+    void remote(v, msgs).then((txt) => reveal(txt ? { text: txt, actions: local.actions } : local));
+  };
+  const reveal = (a: Omit<Msg, 'id' | 't' | 'from'>) => {
     // typewriter reveal
     let i = 0;
-    setTyping('');
     const step = () => {
       i = Math.min(a.text.length, i + Math.max(2, Math.round(a.text.length / 60)));
       setTyping(a.text.slice(0, i));

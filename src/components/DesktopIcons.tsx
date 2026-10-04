@@ -1,4 +1,4 @@
-import { useState, type KeyboardEvent, type MouseEvent as RMouseEvent, type PointerEvent as RPointerEvent } from 'react';
+import { Fragment, useState, type KeyboardEvent, type MouseEvent as RMouseEvent, type PointerEvent as RPointerEvent } from 'react';
 import { AppIcon, type IconName } from './AppIcons';
 import { useWM } from '../system/WindowManager';
 import { useSystem, type QuickLookState } from '../system/SystemContext';
@@ -9,6 +9,7 @@ import { ALL_SERVICES } from '../data/services';
 import { useDeskApps, useFreeDrag, useIconPositions, type Pos } from '../system/desk';
 import { LAUNCH_ITEMS } from '../system/launch';
 import { useLaunch } from '../system/useLaunch';
+import { useSettings } from '../system/SettingsContext';
 
 export interface DeskItem {
   id: string;
@@ -88,6 +89,8 @@ export function DesktopIcons({ selected, onSelect }: { selected: string | null; 
   const launch = useLaunch();
   const [pos, setPos] = useIconPositions();
   const [deskApps, setDeskApps] = useDeskApps();
+  const { settings: dset } = useSettings();
+  const [openStack, setOpenStack] = useState<string | null>(null);
   const shortcuts = deskApps.map((id) => LAUNCH_ITEMS.find((l) => l.id === id)).filter((x): x is (typeof LAUNCH_ITEMS)[number] => !!x);
   const open = (it: DeskItem) => {
     if (it.id.startsWith('app:')) {
@@ -170,22 +173,58 @@ export function DesktopIcons({ selected, onSelect }: { selected: string | null; 
     });
   };
 
+  /* v10.1 — icon size, grid spacing, sort order and Stacks (Settings → Desktop & Dock) */
+  const sorted = (() => {
+    const by = dset.iconSort ?? 'none';
+    if (by === 'none') return items;
+    return [...items].sort((a, b) => (by === 'kind' ? a.kind.localeCompare(b.kind) || a.label.localeCompare(b.label) : a.label.localeCompare(b.label)));
+  })();
+  const stackOf = (it: DeskItem) => (it.id.startsWith('app:') ? 'Applications' : it.icon === 'folder' ? 'Folders' : 'Documents');
+  const stackIcon: Record<string, IconName> = { Applications: 'launchpad' as IconName, Folders: 'folder', Documents: 'pages' };
+  const slot = (it: DeskItem, i: number, extra = '') => (
+    <DeskIconSlot
+      key={it.id}
+      it={it}
+      i={i}
+      extra={extra}
+      pos={dset.desktopStacks ? undefined : pos[it.id]}
+      selected={selected === it.id}
+      onSelect={onSelect}
+      onPlace={(p) => setPos((m) => ({ ...m, [it.id]: p }))}
+      onPointerUp={onPointerUp}
+      onKey={onKey}
+      onContext={onContext}
+    />
+  );
+  const style = { ['--di-img' as string]: `${Math.max(36, (dset.iconSize ?? 64) - 8)}px`, ['--di-cell' as string]: `${dset.iconSpacing ?? 92}px` };
+  if (dset.desktopStacks) {
+    const groups = ['Folders', 'Documents', 'Applications'].map((g) => [g, sorted.filter((it) => stackOf(it) === g)] as const).filter(([, l]) => l.length);
+    let n = 0;
+    return (
+      <div className="desk-icons desk-stacks" role="list" aria-label="Desktop (Stacks)" style={style}>
+        {groups.map(([g, list]) => (
+          <Fragment key={g}>
+            <div role="listitem" style={{ ['--i' as string]: n++ }}>
+              <button type="button" className={`desk-icon desk-stack ${openStack === g ? 'selected' : ''}`} aria-expanded={openStack === g} aria-label={`${g} stack, ${list.length} items`} onClick={() => setOpenStack((o) => (o === g ? null : g))}>
+                <span className="desk-icon-img desk-stack-img">
+                  <i />
+                  <i />
+                  <AppIcon name={stackIcon[g]} />
+                </span>
+                <span className="desk-icon-label">
+                  {g} <small>({list.length})</small>
+                </span>
+              </button>
+            </div>
+            {openStack === g && list.map((it) => slot(it, n++, 'in-stack'))}
+          </Fragment>
+        ))}
+      </div>
+    );
+  }
   return (
-    <div className="desk-icons" role="list" aria-label="Desktop">
-      {items.map((it, i) => (
-        <DeskIconSlot
-          key={it.id}
-          it={it}
-          i={i}
-          pos={pos[it.id]}
-          selected={selected === it.id}
-          onSelect={onSelect}
-          onPlace={(p) => setPos((m) => ({ ...m, [it.id]: p }))}
-          onPointerUp={onPointerUp}
-          onKey={onKey}
-          onContext={onContext}
-        />
-      ))}
+    <div className="desk-icons" role="list" aria-label="Desktop" style={style}>
+      {sorted.map((it, i) => slot(it, i))}
     </div>
   );
 }
@@ -193,6 +232,7 @@ export function DesktopIcons({ selected, onSelect }: { selected: string | null; 
 function DeskIconSlot({
   it,
   i,
+  extra = '',
   pos,
   selected,
   onSelect,
@@ -203,6 +243,7 @@ function DeskIconSlot({
 }: {
   it: DeskItem;
   i: number;
+  extra?: string;
   pos?: Pos;
   selected: boolean;
   onSelect: (id: string | null) => void;
@@ -213,7 +254,7 @@ function DeskIconSlot({
 }) {
   const drag = useFreeDrag({ enabled: window.innerWidth >= 700, onDrop: onPlace });
   return (
-    <div role="listitem" className={pos ? 'desk-placed' : ''} style={pos ? { left: pos.x, top: pos.y, ['--i' as string]: i } : { ['--i' as string]: i }} onPointerDown={(e) => (drag.onPointerDown(e), e.stopPropagation())}>
+    <div role="listitem" className={`${pos ? 'desk-placed' : ''} ${extra}`} style={pos ? { left: pos.x, top: pos.y, ['--i' as string]: i } : { ['--i' as string]: i }} onPointerDown={(e) => (drag.onPointerDown(e), e.stopPropagation())}>
       <button
         type="button"
         className={`desk-icon ${selected ? 'selected' : ''}`}

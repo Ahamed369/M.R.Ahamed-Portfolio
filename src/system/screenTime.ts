@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { trackOpen } from './achievements';
 import { readStore, writeStore } from './storage';
 import type { AppId } from './types';
 
@@ -94,6 +95,7 @@ export function recordOpen(id: AppId) {
   data.opens += 1;
   data.recent = [id, ...data.recent.filter((x) => x !== id)].slice(0, 10);
   commit(true);
+  trackOpen(id);
 }
 
 export function getScreenTime(): ScreenTimeData {

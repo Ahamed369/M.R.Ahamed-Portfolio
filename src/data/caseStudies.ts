@@ -26,7 +26,7 @@ export const caseStudies: CaseStudy[] = [
     process: [
       { step: 'Model', detail: 'Designed MySQL tables and PHP model classes — User, Product, Cart, Order — accessed through PDO.' },
       { step: 'Modules', detail: 'Separated the code into auth, products, cart, orders and admin folders so each feature can grow independently.' },
-      { step: 'Security', detail: 'Hashed stored passwords, used session-based authentication and reviewed the app against a firewall / penetration-testing exercise on Kali Linux.' },
+      { step: 'Security', detail: 'Hashed stored passwords, used session-based authentication and took part in an authorised group security assessment of the application and firewall in a controlled academic environment.' },
       { step: 'Admin', detail: 'Built CRUD screens for users, products (with image uploads), orders and FAQs.' },
     ],
     challenges: [
@@ -59,11 +59,11 @@ export const caseStudies: CaseStudy[] = [
     id: 'ndi',
     problem: 'Identity registration processes need reliable validation and a clean way to create, find, update and remove citizen records without inconsistent data.',
     goals: ['A REST API for the full registration lifecycle', 'Validation and centralised error handling', 'Search and filtering over identity records'],
-    role: 'Backend developer — built the Express API endpoints, MongoDB connection and data operations, validation, error handling, JWT authentication and role-based access control.',
+    role: 'Backend developer — built the Express API endpoints, MongoDB connection and data operations, request validation and centralised error handling.',
     process: [
       { step: 'API design', detail: 'Resource-oriented routes for registration and records, returning JSON.' },
       { step: 'Persistence', detail: 'Mongoose models over MongoDB with schema validation.' },
-      { step: 'Security', detail: 'JWT authentication, role-based access control and environment-based configuration with dotenv.' },
+      { step: 'Configuration', detail: 'Environment-based configuration with dotenv, keeping secrets out of the code.' },
       { step: 'Testing', detail: 'Endpoints exercised with Postman during development (nodemon for hot reload).' },
     ],
     challenges: [
@@ -137,11 +137,11 @@ export const caseStudies: CaseStudy[] = [
     id: 'medicare',
     problem: 'Clinics juggling patients, doctors and appointments by hand run into double bookings and lost records.',
     goals: ['Patient and doctor management', 'Conflict-free appointment scheduling', 'Reports and notifications'],
-    role: 'Built the complete appointment-scheduling module — Swing interface, processing and data management — and the monthly reports.',
+    role: 'Developer — built the Java Swing desktop application published on GitHub: patient, doctor and appointment management with scheduling and reports.',
     process: [
       { step: 'GUI', detail: 'Java Swing screens with AWT event handling.' },
       { step: 'Scheduling', detail: 'LocalDate / LocalDateTime logic to detect timing conflicts and handle rescheduling or delays.' },
-      { step: 'Persistence', detail: 'File handler writing patients.txt, doctors.txt and appointments.txt (the CV version uses MySQL via JDBC).' },
+      { step: 'Persistence', detail: 'File handler writing patients.txt, doctors.txt and appointments.txt.' },
       { step: 'Reports', detail: 'Monthly summaries, timetables and doctor-wise statistics.' },
     ],
     challenges: [{ challenge: 'Double-booked doctors', solution: 'Conflict detection with the Java Time API before an appointment is saved.' }],

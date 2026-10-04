@@ -1,3 +1,4 @@
+import { islandRecording } from '../system/island';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent as RPointerEvent } from 'react';
 import { AppIcon } from '../components/AppIcons';
 import { notify } from '../system/notify';
@@ -137,6 +138,7 @@ export default function VoiceMemosApp() {
   const teardown = useCallback(() => {
     cancelAnimationFrame(raf.current);
     streamRef.current?.getTracks().forEach((t) => t.stop());
+    islandRecording(false);
     streamRef.current = null;
     void audioCtx.current?.close().catch(() => undefined);
     audioCtx.current = null;
@@ -295,6 +297,7 @@ export default function VoiceMemosApp() {
     acc.current = { base: 0, since: performance.now() };
     setElapsed(0);
     setRec('recording');
+    islandRecording(true);
     cancelAnimationFrame(raf.current);
     raf.current = requestAnimationFrame(draw);
   };

@@ -1,3 +1,4 @@
+import { rightClick } from '../../system/input';
 import { startCall } from '../../system/call';
 import { socials } from '../../data/portfolio';
 import { useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent as RKeyboardEvent, type MouseEvent as RMouseEvent } from 'react';
@@ -300,7 +301,7 @@ export function ChatClient({ theme }: { theme: ChatTheme }) {
                 </button>
               ))
             ) : (
-              <p className="chat-empty">No starred messages — right-click a message and choose Star.</p>
+              <p className="chat-empty">No starred messages — {rightClick(true)} a message and choose Star.</p>
             )
           ) : (
             list.map((c) => {
@@ -340,7 +341,7 @@ export function ChatClient({ theme }: { theme: ChatTheme }) {
           )}
           {!starredView && list.length === 0 && <p className="chat-empty">{showArchived ? 'No archived chats.' : 'No chats found.'}</p>}
         </div>
-        <p className="chat-tip">Right-click a chat or message for more options.</p>
+        <p className="chat-tip">{rightClick()} a chat or message for more options.</p>
       </aside>
 
       <section className="chat-main">
@@ -425,7 +426,7 @@ export function ChatClient({ theme }: { theme: ChatTheme }) {
               <div ref={endRef} />
             </div>
             {chat.readonly ? (
-              <div className="chat-ro">This channel is read-only. Right-click a post to star, copy or forward it.</div>
+              <div className="chat-ro">This channel is read-only. {rightClick()} a post to star, copy or forward it.</div>
             ) : (
               <form className="chat-compose" onSubmit={send}>
                 {(reply || edit) && (

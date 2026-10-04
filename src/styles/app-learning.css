@@ -1,0 +1,55 @@
+/* v10.3 — Learning Hub: section icons, quizzes, practice-app links */
+.lh { container-type: inline-size; }
+.lh-sico { flex: none; display: inline-grid; place-items: center; border-radius: 7px; box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.25); }
+.lh-side button .lh-sico { border-radius: 6px; }
+.lh-side button.on .lh-sico { box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.85); }
+.lh-placeholder .lh-sico { border-radius: 14px; margin-bottom: 6px; }
+.lh-placeholder { opacity: 1; }
+.lh-placeholder b { font-size: 17px; }
+.lh-placeholder small { opacity: 0.6; max-width: 280px; line-height: 1.4; }
+.lh-qs { font-style: normal; font-size: 11px; font-weight: 600; color: #5e5ce6; }
+
+.lh-apps { display: flex; flex-wrap: wrap; gap: 8px; }
+.lh-apps button { display: inline-flex; align-items: center; gap: 8px; border: 0; border-radius: 10px; padding: 6px 12px 6px 6px; background: var(--hover, rgba(127, 127, 127, 0.12)); color: inherit; font: inherit; font-size: 13px; cursor: pointer; }
+.lh-apps button:hover { background: rgba(10, 132, 255, 0.14); }
+.lh-apps .lh-appico { width: 24px; height: 24px; flex: none; }
+.lh-apps .lh-appico svg { width: 100%; height: 100%; }
+
+.lh-quiz { margin-top: 20px; padding: 14px 16px 16px; border-radius: 14px; background: var(--hover, rgba(127, 127, 127, 0.08)); }
+.lh-quiz h4 { margin: 0 0 10px; display: flex; align-items: center; gap: 10px; }
+.lh-best { margin-left: auto; text-transform: none; letter-spacing: 0; font-weight: 600; color: #30a14e; opacity: 1; }
+.lh-q { border: 0; margin: 0 0 14px; padding: 0; min-width: 0; }
+.lh-q legend { font-weight: 600; font-size: 14px; line-height: 1.4; margin-bottom: 6px; padding: 0; }
+.lh-opt { display: flex; align-items: flex-start; gap: 9px; padding: 8px 10px; margin: 4px 0; border-radius: 10px; background: var(--win-solid, #fff); box-shadow: inset 0 0 0 1px var(--sep, rgba(0, 0, 0, 0.08)); cursor: pointer; font-size: 13.5px; line-height: 1.35; }
+.lh-opt input { margin: 2px 0 0; accent-color: #0a84ff; flex: none; }
+.lh-opt.picked { box-shadow: inset 0 0 0 1.5px #0a84ff; }
+.lh-opt.right { box-shadow: inset 0 0 0 1.5px #30d158; background: rgba(48, 209, 88, 0.12); }
+.lh-opt.wrong { box-shadow: inset 0 0 0 1.5px #ff453a; background: rgba(255, 69, 58, 0.1); }
+.lh-opt:has(input:disabled) { cursor: default; }
+.lh-why { margin: 6px 2px 0; font-size: 12.5px; line-height: 1.4; }
+.lh-why.ok { color: #248a3d; }
+.lh-why.no { color: #c9342b; }
+:root[data-theme='dark'] .lh-why.ok { color: #63e08a; }
+:root[data-theme='dark'] .lh-why.no { color: #ff7b72; }
+.lh-qbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.lh-qbar button { border: 0; border-radius: 9px; padding: 7px 14px; background: var(--hover, rgba(127, 127, 127, 0.16)); color: inherit; font: inherit; font-size: 13px; cursor: pointer; }
+.lh-qbar button.primary { background: #0a84ff; color: #fff; }
+.lh-qbar small { color: #c9342b; font-size: 12px; }
+.lh-score { font-size: 18px; }
+
+/* narrow windows (iPhone, small Mac windows, iPad split) */
+@container (max-width: 700px) {
+  .lh-body { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+  .lh-side { flex-direction: row; overflow-x: auto; border-right: 0; border-bottom: 0.5px solid var(--sep, rgba(0, 0, 0, 0.1)); }
+  .lh-side button { flex: none; }
+  .lh-side button small { display: none; }
+  .lh-detail { display: none; }
+  .lh.detail .lh-list { display: none; }
+  .lh.detail .lh-detail { display: block; }
+  .lh-back { display: block; }
+  .lh-bar input { width: 40%; }
+  .lh-progress { display: none; }
+}
+@container (min-width: 701px) and (max-width: 900px) {
+  .lh-body { grid-template-columns: 170px minmax(0, 1fr) minmax(0, 1.3fr); }
+}

@@ -1,3 +1,6 @@
+import { DesktopV10, DevicesPane, SoundsV10, TrashPane } from './settings/PanesV10';
+import { WallpaperLibrary } from '../components/WallpaperLibrary';
+import { DynamicIslandV101, MacExtrasV101, NotificationsV101, ScreenTimeLimitsV101 } from './settings/PanesV101';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { useSettings, ACCENTS } from '../system/SettingsContext';
 import { useSystem, type AirDrop } from '../system/SystemContext';
@@ -6,7 +9,6 @@ import { useWM } from '../system/WindowManager';
 import { WallpaperThumb } from '../components/Wallpaper';
 import { DragBar, Lights } from '../components/Window';
 import { AppIcon } from '../components/AppIcons';
-import { wallpapers, wallpaperById, type WallpaperCategory } from '../data/media';
 import { personal } from '../data/portfolio';
 import { ALERT_SOUNDS, playAlert, playChime, playNotification } from '../system/sounds';
 import { notificationPermission, notificationsSupported, requestNotificationPermission } from '../system/webNotify';
@@ -21,10 +23,15 @@ import { SPOTLIGHT_CATS, spotOn } from '../system/spotlight';
 import { LAUNCH_ITEMS } from '../system/launch';
 import { APPS } from '../system/apps';
 import { readStore, writeStore } from '../system/storage';
-import { notify } from '../system/notify';
+import { notify, openAppLink } from '../system/notify';
 import type { AppProps } from '../components/Desktop';
 import type { AppId } from '../system/types';
 import { GameCenterPane, InternetAccountsPane, KeyboardPane, MenuBarPane, PrintersPane, SiriPane, TouchIdPane, TrackpadPane, WalletPane } from './settings/PanesV9';
+import { HIGHLIGHTS, LOGIN_APPS } from '../components/PrefEffects';
+import { WallImage } from '../components/Wallpaper';
+import { SETTINGS_ROWS } from '../data/settingsRows';
+import { LOCK_COLORS, LOCK_FONTS, lockClockStyle } from '../system/lockStyle';
+import { flashSettingRow } from '../system/settingsSearch';
 
 /* ═══════════════════════════════ Routes & metadata ═══════════════════════════════ */
 
@@ -57,7 +64,9 @@ type PaneId =
   | 'internet'
   | 'gamecenter'
   | 'wallet'
-  | 'printers';
+  | 'printers'
+  | 'devices'
+  | 'trash';
 type SubId = 'about' | 'update' | 'storage' | 'airdrop' | 'language' | 'datetime' | 'login';
 type Route = PaneId | `general/${SubId}`;
 
@@ -122,30 +131,33 @@ const PANES: PaneMeta[] = [
   { id: 'network', label: 'Network', color: '#0a84ff', glyph: 'network', keys: 'internet connection online offline speed downlink latency', group: 0 },
   { id: 'battery', label: 'Battery', color: '#30c55a', glyph: 'battery', keys: 'power charging energy low power mode level', group: 0 },
   { id: 'general', label: 'General', color: '#8e8e93', glyph: 'gear', keys: 'about software update storage airdrop handoff language region date time login items', group: 1 },
-  { id: 'accessibility', label: 'Accessibility', color: '#0a84ff', glyph: 'accessibility', keys: 'reduce motion contrast text size zoom', group: 1 },
+  { id: 'accessibility', label: 'Accessibility', color: '#0a84ff', glyph: 'accessibility', keys: 'reduce motion contrast text size zoom transparency assistivetouch', group: 1 },
   { id: 'appearance', label: 'Appearance', color: '#1c1c1e', glyph: 'appearance', keys: 'dark mode light mode auto theme accent colour color highlight', group: 1 },
   { id: 'controlcenter', label: 'Control Center', color: '#8e8e93', glyph: 'controlcenter', keys: 'menu bar modules privacy shield battery percentage', group: 1 },
-  { id: 'dock', label: 'Desktop & Dock', color: '#1c1c1e', glyph: 'dock', keys: 'dock size magnification mission control hot corners windows', group: 1 },
+  { id: 'dock', label: 'Desktop & Dock', color: '#1c1c1e', glyph: 'dock', keys: 'dock size magnification mission control hot corners windows desktop icons stacks dynamic island notch multitasking widgets', group: 1 },
   { id: 'display', label: 'Displays', color: '#0a84ff', glyph: 'display', keys: 'brightness night shift resolution full screen monitor refresh', group: 1 },
   { id: 'screensaver', label: 'Screen Saver', color: '#34aadc', glyph: 'screensaver', keys: 'saver idle', group: 1 },
   { id: 'spotlight', label: 'Spotlight', color: '#8e8e93', glyph: 'spotlight', keys: 'search find', group: 1 },
-  { id: 'wallpaper', label: 'Wallpaper', color: '#32ade6', glyph: 'wallpaper', keys: 'background desktop picture image', group: 1 },
-  { id: 'notifications', label: 'Notifications', color: '#ff3b30', glyph: 'bell', keys: 'banners alerts previews', group: 2 },
+  { id: 'wallpaper', label: 'Wallpaper', color: '#32ade6', glyph: 'wallpaper', keys: 'background desktop picture image live wallpaper dynamic wallpaper motion lock screen wallpaper categories', group: 1 },
+  { id: 'notifications', label: 'Notifications', color: '#ff3b30', glyph: 'bell', keys: 'banners alerts previews scheduled summary per app badges', group: 2 },
   { id: 'sound', label: 'Sound', color: '#ff2d55', glyph: 'sound', keys: 'volume alert output input speakers microphone mute startup', group: 2 },
   { id: 'focus', label: 'Focus', color: '#5e5ce6', glyph: 'moon', keys: 'do not disturb dnd silence', group: 2 },
-  { id: 'screentime', label: 'Screen Time', color: '#5e5ce6', glyph: 'hourglass', keys: 'usage apps activity', group: 2 },
+  { id: 'screentime', label: 'Screen Time', color: '#5e5ce6', glyph: 'hourglass', keys: 'usage apps activity limits downtime', group: 2 },
   { id: 'lock', label: 'Lock Screen', color: '#1c1c1e', glyph: 'lock', keys: 'inactivity message lock now password', group: 3 },
   { id: 'privacy', label: 'Privacy & Security', color: '#0a84ff', glyph: 'hand', keys: 'camera microphone location notifications permissions https secure', group: 3 },
   { id: 'users', label: 'Users & Groups', color: '#0a84ff', glyph: 'users', keys: 'account profile name email', group: 3 },
   /* v9 */
-  { id: 'siri', label: 'Intelligence & Siri', color: '#bf5af2', glyph: 'siri', keys: 'siri apple intelligence assistant voice ask ai', group: 1 },
+  { id: 'siri', label: 'Assistant', color: '#bf5af2', glyph: 'siri', keys: 'assistant siri voice ask ai speak shortcut option space', group: 1 },
   { id: 'menubar', label: 'Menu Bar', color: '#0a84ff', glyph: 'menubar', keys: 'menu bar extras autohide background cv now playing language', group: 1 },
-  { id: 'touchid', label: 'Touch ID & Password', color: '#ff375f', glyph: 'fingerprint', keys: 'fingerprint password passkey biometric', group: 3 },
+  { id: 'touchid', label: 'Login & Password', color: '#ff375f', glyph: 'lock', keys: 'password login unlock passkey demo guest touch id fingerprint', group: 3 },
   { id: 'internet', label: 'Internet Accounts', color: '#0a84ff', glyph: 'at', keys: 'google github linkedin accounts sign in', group: 3 },
   { id: 'gamecenter', label: 'Game Center', color: '#ff2d55', glyph: 'gamepad', keys: 'games nickname achievements', group: 3 },
   { id: 'wallet', label: 'Wallet & Pay', color: '#1c1c1e', glyph: 'card', keys: 'wallet passes cards', group: 3 },
   { id: 'keyboard', label: 'Keyboard', color: '#8e8e93', glyph: 'keyboard', keys: 'shortcuts key repeat input', group: 4 },
   { id: 'trackpad', label: 'Trackpad', color: '#8e8e93', glyph: 'trackpad', keys: 'tap to click scroll zoom tracking speed force click secondary natural', group: 4 },
+  /* v10 */
+  { id: 'devices', label: 'Devices & View', color: '#5856d6', glyph: 'laptop', keys: 'view as iphone ipad mac device home screen assistivetouch assistive touch standby always on three finger gestures reset layout', group: 1 },
+  { id: 'trash', label: 'Trash & Undo', color: '#8e8e93', glyph: 'storage', keys: 'trash recently deleted undo redo restore recover delete confirmation', group: 3 },
   { id: 'printers', label: 'Printers & Scanners', color: '#8e8e93', glyph: 'printer', keys: 'print pdf paper', group: 4 },
 ];
 
@@ -750,15 +762,26 @@ export default function SettingsApp({ win }: AppProps) {
   const route = hist.stack[hist.i];
   const [narrow, setNarrow] = useState(false);
   const [detail, setDetail] = useState(!!win.args?.pane);
-  const [q, setQ] = useState('');
-  const [searchFocus, setSearchFocus] = useState(false);
+  const [q, setQ] = useState(win.args?.q ?? '');
+  const [searchFocus, setSearchFocus] = useState(!!win.args?.q);
+  // v10.2 — the Assistant's "find … settings" opens Settings with the search filled in
+  useEffect(() => {
+    if (win.args?.q) {
+      setQ(win.args.q);
+      setSearchFocus(true);
+      window.setTimeout(() => searchRef.current?.focus(), 200);
+    }
+  }, [win.launchKey, win.args?.q]);
   const [hi, setHi] = useState(0);
 
   const [prefs, setPrefsState] = useState<Prefs>(() => {
     const p = readStore(PREFS_KEY, DEFAULT_PREFS);
     return { ...p, flags: { ...p.flags }, choices: { ...p.choices } };
   });
-  useEffect(() => writeStore(PREFS_KEY, prefs), [prefs]);
+  useEffect(() => {
+    writeStore(PREFS_KEY, prefs);
+    window.dispatchEvent(new Event('mra-prefs'));
+  }, [prefs]);
   const prefsApi = useMemo<PrefsApi>(
     () => ({
       prefs,
@@ -811,16 +834,31 @@ export default function SettingsApp({ win }: AppProps) {
     if (!words.length) return [] as { route: Route; label: string; color: string; glyph: GlyphName }[];
     const panes = PANES.filter((p) => matchText(`${p.label} ${p.keys}`)).map((p) => ({ route: p.id as Route, label: p.label, color: p.color, glyph: p.glyph }));
     const subs = SUBS.filter((s) => matchText(`${s.label} ${s.keys}`)).map((s) => ({ route: `general/${s.id}` as Route, label: s.label, color: s.color, glyph: s.glyph }));
+    // v10.3 — individual settings rows (e.g. "keyboard navigation")
+    const rows: { route: Route; label: string; color: string; glyph: GlyphName }[] = [];
+    for (const [rid, labels] of Object.entries(SETTINGS_ROWS)) {
+      const meta = rid.startsWith('general/') ? SUBS.find((s) => `general/${s.id}` === rid) : PANES.find((p) => p.id === rid);
+      if (!meta) continue;
+      for (const l of labels) {
+        if (matchText(`${l} ${meta.label}`) && !matchText(meta.label)) rows.push({ route: rid as Route, label: `${l.replace(/…$/, '')} — ${meta.label}`, color: meta.color, glyph: meta.glyph });
+      }
+    }
     // labels that start with the query first
     const all = [...panes, ...subs];
     all.sort((a, b) => Number(!a.label.toLowerCase().startsWith(words[0])) - Number(!b.label.toLowerCase().startsWith(words[0])));
-    return all.slice(0, 8);
+    const seen = new Set<string>();
+    const rowsU = rows.filter((r) => (seen.has(r.label) ? false : (seen.add(r.label), true)));
+    return [...all.slice(0, 5), ...rowsU].slice(0, 9);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [q]);
   const sideMatch = (p: PaneMeta) => !words.length || matchText(`${p.label} ${p.keys}`) || (p.id === 'general' && SUBS.some((s) => matchText(`${s.label} ${s.keys}`)));
 
-  const pick = (r: Route) => {
+  const pick = (r: Route, label?: string) => {
     go(r);
+    // v10.3 — jump to the exact setting on that page
+    const rowLabel = label && label.includes(' — ') ? label.split(' — ')[0] : '';
+    const w = rowLabel ? rowLabel.toLowerCase().split(/\s+/).filter(Boolean) : [...words];
+    window.setTimeout(() => flashSettingRow(mainRef.current, w), 380);
     setQ('');
     setSearchFocus(false);
     searchRef.current?.blur();
@@ -832,7 +870,7 @@ export default function SettingsApp({ win }: AppProps) {
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
       setHi((h) => Math.max(0, h - 1));
-    } else if (e.key === 'Enter' && suggestions[hi]) pick(suggestions[hi].route);
+    } else if (e.key === 'Enter' && suggestions[hi]) pick(suggestions[hi].route, suggestions[hi].label);
     else if (e.key === 'Escape') {
       setQ('');
       searchRef.current?.blur();
@@ -883,7 +921,7 @@ export default function SettingsApp({ win }: AppProps) {
               <div className="ss-suggest" id="ss-suggest" role="listbox">
                 <div className="ss-suggest-h">{suggestions.length ? 'Suggestions' : 'No Results'}</div>
                 {suggestions.map((s, i) => (
-                  <button key={s.route} type="button" role="option" aria-selected={i === hi} className={i === hi ? 'hi' : ''} onMouseDown={(e) => e.preventDefault()} onMouseEnter={() => setHi(i)} onClick={() => pick(s.route)}>
+                  <button key={s.route + s.label} type="button" role="option" aria-selected={i === hi} className={i === hi ? 'hi' : ''} onMouseDown={(e) => e.preventDefault()} onMouseEnter={() => setHi(i)} onClick={() => pick(s.route, s.label)}>
                     <Glyph name={s.glyph} color={s.color} size={20} />
                     {s.label}
                     {s.route.startsWith('general/') && <small>General</small>}
@@ -1033,6 +1071,10 @@ function PaneView({ route, go }: { route: Route; go: (r: Route) => void }) {
       return <WalletPane />;
     case 'printers':
       return <PrintersPane />;
+    case 'devices':
+      return <DevicesPane />;
+    case 'trash':
+      return <TrashPane />;
     default:
       return null;
   }
@@ -1061,6 +1103,18 @@ function GeneralPane({ go }: { go: (r: Route) => void }) {
         <SubRow id="datetime" go={go} />
         <SubRow id="language" go={go} />
         <SubRow id="login" go={go} />
+      </Section>
+      <Section title="Portfolio Guide">
+        <Row label="Guidebook" sub="An A–Z guide to every app, gesture, widget and feature, with screenshots and Try It buttons">
+          <button type="button" className="ss-btn" onClick={() => openAppLink('guidebook')}>
+            Open
+          </button>
+        </Row>
+        <Row label="Welcome guide" sub="The short first-visit guide">
+          <button type="button" className="ss-btn" onClick={() => window.dispatchEvent(new Event('mra-onboarding'))}>
+            Show Again
+          </button>
+        </Row>
       </Section>
       <SeasonalSection />
     </>
@@ -1250,7 +1304,6 @@ function StoragePane() {
 
 function AirDropPane() {
   const sys = useSystem();
-  const { flag, setFlag } = usePrefs();
   return (
     <>
       <Section sub="AirDrop lets you share instantly with people nearby. You can be discoverable in AirDrop to receive from everyone or only people in your contacts.">
@@ -1267,12 +1320,7 @@ function AirDropPane() {
           />
         </Row>
       </Section>
-      <Section>
-        <Row label="Allow Handoff between this Mac and your iCloud devices" sub={<Sim />}>
-          <Toggle label="Allow Handoff" on={flag('handoff', true)} onChange={(v) => setFlag('handoff', v)} />
-        </Row>
-      </Section>
-      <Note>Browsers can’t send files over AirDrop — this setting is shared with Control Center and is simulated.</Note>
+      <Note>Browsers can’t send files over AirDrop or hand off to other devices — this AirDrop setting only changes the portfolio’s own status (shared with Control Center).</Note>
     </>
   );
 }
@@ -1391,16 +1439,12 @@ function DateTimePane() {
 
 function LoginPane() {
   const { flag, setFlag } = usePrefs();
-  const items: { id: AppId; kind: string }[] = [
-    { id: 'music', kind: 'Widget' },
-    { id: 'reminders', kind: 'Widget' },
-  ];
   return (
     <>
-      <Section title="Open at Login" sub={<>These items open automatically when the portfolio starts. <Sim /></>}>
-        {items.map((it) => (
-          <Row key={it.id} label={APPS[it.id].title} sub={it.kind} glyph={<AppIcon name={APPS[it.id].icon} className="ss-appicon" />}>
-            <Toggle label={`Open ${APPS[it.id].title} at login`} on={flag(`login-${it.id}`, true)} onChange={(v) => setFlag(`login-${it.id}`, v)} />
+      <Section title="Open at Login" sub="Apps you switch on here open automatically after the portfolio starts up and you unlock it (once per visit).">
+        {LOGIN_APPS.map((id) => (
+          <Row key={id} label={APPS[id].title} sub="Application" glyph={<AppIcon name={APPS[id].icon} className="ss-appicon" />}>
+            <Toggle label={`Open ${APPS[id].title} at login`} on={flag(`login-${id}`, false)} onChange={(v) => setFlag(`login-${id}`, v)} />
           </Row>
         ))}
       </Section>
@@ -1417,6 +1461,7 @@ function LoginPane() {
 
 function AppearancePane() {
   const { settings, update } = useSettings();
+  const { choice, setChoice } = usePrefs();
   const mode: 'auto' | 'light' | 'dark' = settings.autoAppearance !== 'off' ? 'auto' : settings.appearance;
   const choose = (m: 'auto' | 'light' | 'dark') => {
     if (m === 'auto') update({ autoAppearance: settings.autoAppearance === 'off' ? 'system' : settings.autoAppearance });
@@ -1474,7 +1519,7 @@ function AppearancePane() {
           </div>
         </Row>
         <Row label="Text highlight color">
-          <PopUp label="Text highlight color" value="auto" swatch={accent.color} options={[['auto', 'Automatic']]} onChange={() => undefined} />
+          <PopUp label="Text highlight color" value={choice('highlight', 'auto')} swatch={HIGHLIGHTS.find((h) => h[0] === choice('highlight', 'auto'))?.[2] || accent.color} options={HIGHLIGHTS.map(([k, l]) => [k, l] as [string, string])} onChange={(v) => setChoice('highlight', v)} />
         </Row>
       </Section>
       <Section title="Icon & widget style">
@@ -1564,32 +1609,13 @@ const FOLDER_COLORS: [string, string][] = [
   ['#8e8e93', 'Graphite'],
 ];
 
-const CATS: (WallpaperCategory | 'All')[] = ['All', 'Colorful', 'Abstract', 'Landscape', 'Dark', 'Light', 'Minimal'];
 
 function WallpaperPane() {
   const { settings, update } = useSettings();
   const wm = useWM();
-  const [cat, setCat] = useState<(typeof CATS)[number]>('All');
-  const cur = wallpaperById(settings.wallpaper);
   return (
     <>
-      <div className="ss-wp-hero">
-        <div className="ss-wp-big">
-          <WallpaperThumb id={cur.id} />
-        </div>
-        <div className="ss-wp-meta">
-          <b>{cur.name}</b>
-          <span>
-            {cur.category} · {cur.tone === 'light' ? 'Light' : 'Dark'}
-          </span>
-          <span className="ss-wp-small">Shown on the desktop and the lock screen</span>
-        </div>
-      </div>
-      <Section>
-        <Row label="Tint wallpaper in Dark Mode">
-          <Toggle label="Tint wallpaper in Dark Mode" on={settings.darkWallpaperTint} onChange={(v) => update({ darkWallpaperTint: v })} />
-        </Row>
-      </Section>
+      <WallpaperLibrary device="mac" />
       <Section title="Your Photos" sub="Use any picture from Photos, or upload one from your device (kept in this browser only).">
         <div className="ss-wp-mine">
           {settings.customWallpaper && (
@@ -1628,25 +1654,6 @@ function WallpaperPane() {
           </label>
         </div>
       </Section>
-      <div className="ss-seg ss-wp-cats" role="tablist" aria-label="Wallpaper categories">
-        {CATS.map((c) => (
-          <button key={c} type="button" role="tab" aria-selected={cat === c} className={cat === c ? 'on' : ''} onClick={() => setCat(c)}>
-            {c}
-          </button>
-        ))}
-      </div>
-      <div className="ss-wp-grid">
-        {wallpapers
-          .filter((w) => cat === 'All' || w.category === cat)
-          .map((w) => (
-            <button key={w.id} type="button" className={`ss-wp-opt ${settings.wallpaper === w.id ? 'on' : ''}`} onClick={() => update({ wallpaper: w.id })} aria-pressed={settings.wallpaper === w.id}>
-              <span className="ss-wp-img">
-                <WallpaperThumb id={w.id} />
-              </span>
-              <span className="ss-wp-name">{w.name}</span>
-            </button>
-          ))}
-      </div>
       <Note>Original wallpapers created for this portfolio, plus some supplied by {personal.name}. Your choice is remembered on this device.</Note>
     </>
   );
@@ -1780,11 +1787,6 @@ function DisplayV9({ hz }: { hz: number | null }) {
     const f = sc ? `left=${sc.left + 40},top=${sc.top + 40},width=${Math.min(1440, sc.width - 80)},height=${Math.min(900, sc.height - 80)}` : 'width=1280,height=800';
     window.open(window.location.href.split('#')[0], '_blank', `popup,${f}`);
   };
-  const rates: [typeof settings.refreshRate, string][] = [
-    ['auto', hz && hz > 75 ? `ProMotion (up to ${hz} Hz)` : 'Automatic'],
-    ['120', '120 Hertz'],
-    ['60', '60 Hertz'],
-  ];
   return (
     <>
       <Section title="Resolution" sub="Scales the content of every window — like choosing a “Looks like” resolution on a Mac.">
@@ -1807,11 +1809,11 @@ function DisplayV9({ hz }: { hz: number | null }) {
         </Row>
       </Section>
       <Section>
-        <Row label="Refresh rate" sub={hz ? `This display is running at ≈ ${hz} Hz` : 'Measuring…'}>
-          <PopUp label="Refresh rate" value={settings.refreshRate ?? 'auto'} options={rates} onChange={(v) => update({ refreshRate: v })} />
+        <Row label="Refresh rate" sub="Measured in this browser. Change it in your computer’s own display settings — a website can’t.">
+          {hz ? `≈ ${hz} Hz${hz > 75 ? ' (ProMotion-class)' : ''}` : 'Measuring…'}
         </Row>
-        <Row label="Rotation" sub="Rotation is controlled by your device">
-          <PopUp label="Rotation" value="0" options={[['0', 'Standard']]} onChange={() => undefined} disabled />
+        <Row label="Rotation" sub="Set by your device">
+          Standard
         </Row>
       </Section>
       <Section title="Extended Displays" sub="Use a second screen: open another portfolio window on it and pick its scaling.">
@@ -1862,6 +1864,7 @@ function HotCornersSheet({ onClose }: { onClose: () => void }) {
     ['cc', 'Control Center'],
     ['launchpad', 'Launchpad'],
     ['hireme', 'Hire Me'],
+    ['switcher', 'App Switcher'],
     ['screensaver', 'Start Screen Saver'],
     ['sleep', 'Put Display to Sleep'],
     ['lock', 'Lock Screen'],
@@ -1993,12 +1996,10 @@ function DockPane() {
         <Row label="Stage Manager" sub="Keeps the front window centred; other apps wait on the left (⌃⌥S)">
           <Toggle label="Stage Manager" on={settings.stageManager} onChange={(v) => update({ stageManager: v })} />
         </Row>
-        {simRow('win-close-quit', 'Close windows when quitting an application', true)}
+        {simRow('win-close-quit', 'Close windows when quitting an application', true, 'When this is off, apps reopen where you last left their window')}
       </Section>
       <Section title="Mission Control" sub="Mission Control shows an overview of your open windows, all arranged in a unified view.">
-        {simRow('mc-rearrange', 'Automatically rearrange Spaces based on most recent use', false)}
-        {simRow('mc-group', 'Group windows by application', true)}
-        {simRow('mc-top', 'Drag windows to top of screen to enter Mission Control', true)}
+        {simRow('mc-top', 'Drag windows to top of screen to enter Mission Control', true, 'Hold a window you are dragging against the top edge of the screen')}
       </Section>
       <div className="ss-btnrow">
         <button type="button" className="ss-btn" onClick={() => sys.setOverlay('missioncontrol')}>
@@ -2011,6 +2012,9 @@ function DockPane() {
           Keyboard Shortcuts…
         </button>
       </div>
+      <DesktopV10 />
+      <MacExtrasV101 />
+      <DynamicIslandV101 />
       <Note>Hover the Dock and sweep across it — icons magnify by cursor proximity with spring physics.</Note>
       {sheet && <HotCornersSheet onClose={() => setSheet(false)} />}
     </>
@@ -2053,7 +2057,7 @@ function ControlCenterPane() {
         </Row>
       </Section>
       <Section title="Other Modules">
-        <Row label="Battery" glyph={<Glyph name="battery" color="#30c55a" />} sub={<Sim />}>
+        <Row label="Battery" glyph={<Glyph name="battery" color="#30c55a" />} sub="Battery status in the menu bar">
           <Toggle label="Show Battery in Menu Bar" on={flag('cc-battery', true)} onChange={(v) => setFlag('cc-battery', v)} />
         </Row>
         <Row label="Show Percentage" sub="Battery percentage next to the menu-bar icon">
@@ -2427,7 +2431,7 @@ function SoundPane() {
         <Row label="Play user interface sound effects">
           <Toggle label="Play user interface sound effects" on={settings.uiSounds} onChange={(v) => update({ uiSounds: v })} />
         </Row>
-        <Row label="Play feedback when volume is changed" sub={<Sim />}>
+        <Row label="Play feedback when volume is changed" sub="A short click when you change the volume"> 
           <Toggle label="Play feedback when volume is changed" on={flag('vol-feedback', false)} onChange={(v) => setFlag('vol-feedback', v)} />
         </Row>
       </Section>
@@ -2488,6 +2492,7 @@ function SoundPane() {
           <Toggle label="Mute" on={music.muted} onChange={() => music.toggleMute()} />
         </Row>
       </Section>
+      <SoundsV10 />
     </>
   );
 }
@@ -2505,38 +2510,37 @@ function SpeakerIcon({ level }: { level: number }) {
 
 /* ═══════════════════════════════ Focus & Notifications ═══════════════════════════════ */
 
+const FOCUS_INFO: Record<'dnd' | 'work' | 'sleep' | 'personal', string> = {
+  dnd: 'all banners are silenced (critical alerts still show)',
+  work: 'only Mail, Messages, Calendar, Reminders and Clock can show banners',
+  personal: 'only Messages, WhatsApp, Phone, Music and Clock can show banners',
+  sleep: 'all banners are silenced (critical alerts still show)',
+};
+
 function FocusPane() {
   const sys = useSystem();
-  const { flag, setFlag } = usePrefs();
+  const { settings, update } = useSettings();
+  const cur = sys.focus ? (settings.focusMode && settings.focusMode !== 'off' ? settings.focusMode : 'dnd') : 'off';
+  // v10.3 — the same Focus modes as iPhone/iPad Control Centre; each really filters banners
+  const set = (mode: 'off' | 'dnd' | 'work' | 'sleep' | 'personal', name: string) => {
+    update({ focusMode: mode });
+    sys.set({ focus: mode !== 'off' });
+    notify({ app: 'Focus', icon: 'settings', title: mode !== 'off' ? `${name} is on` : 'Focus is off', body: mode === 'off' ? 'Notifications will show again.' : FOCUS_INFO[mode], critical: true });
+  };
+  const rows: ['dnd' | 'work' | 'sleep' | 'personal', string, GlyphName, string][] = [
+    ['dnd', 'Do Not Disturb', 'moon', '#5e5ce6'],
+    ['work', 'Work', 'briefcase', '#30b0c7'],
+    ['personal', 'Personal', 'users', '#bf5af2'],
+    ['sleep', 'Sleep', 'moon', '#30d158'],
+  ];
   return (
     <>
       <Section>
-        <Row label="Do Not Disturb" sub={sys.focus ? 'On — portfolio banners are silenced' : 'Off'} glyph={<Glyph name="moon" color="#5e5ce6" size={30} />}>
-          <Toggle
-            label="Do Not Disturb"
-            on={sys.focus}
-            onChange={(v) => {
-              sys.set({ focus: v });
-              notify({ app: 'Focus', icon: 'settings', title: v ? 'Focus is on' : 'Focus is off', body: v ? 'Portfolio notifications are silenced.' : 'Notifications will show again.', critical: true });
-            }}
-          />
-        </Row>
-        <Row label="Gaming" sub={<Sim />} glyph={<Glyph name="gamepad" color="#0a84ff" size={30} />}>
-          <Toggle label="Gaming focus" on={flag('focus-gaming', false)} onChange={(v) => setFlag('focus-gaming', v)} />
-        </Row>
-        <Row label="Work" sub={<Sim />} glyph={<Glyph name="briefcase" color="#30b0c7" size={30} />}>
-          <Toggle label="Work focus" on={flag('focus-work', false)} onChange={(v) => setFlag('focus-work', v)} />
-        </Row>
-      </Section>
-      <div className="ss-btnrow">
-        <button type="button" className="ss-btn" disabled title="Simulated">
-          Add Focus…
-        </button>
-      </div>
-      <Section>
-        <Row label="Share across devices" sub={<>Focus is shared across your devices, and turning one on for this device will turn it on for all of them. <Sim /></>}>
-          <Toggle label="Share across devices" on={flag('focus-share', true)} onChange={(v) => setFlag('focus-share', v)} />
-        </Row>
+        {rows.map(([id, label, glyph, color]) => (
+          <Row key={id} label={label} sub={cur === id ? `On — ${FOCUS_INFO[id]}` : FOCUS_INFO[id]} glyph={<Glyph name={glyph} color={color} size={30} />}>
+            <Toggle label={label} on={cur === id} onChange={(v) => set(v ? id : 'off', label)} />
+          </Row>
+        ))}
       </Section>
       <Section>
         <Row label="Focus status" sub="When you give an app permission, it can share that you have notifications silenced when using Focus.">
@@ -2547,10 +2551,7 @@ function FocusPane() {
   );
 }
 
-const NOTIF_APPS: AppId[] = ['calendar', 'camera', 'mail', 'messages', 'music', 'photos', 'reminders', 'safari', 'settings', 'voicememos'];
-
 function NotificationsPane() {
-  const { flag, setFlag, choice, setChoice } = usePrefs();
   const { settings, update } = useSettings();
   const sys = useSystem();
   const [perm, setPerm] = useState(notificationPermission());
@@ -2603,36 +2604,7 @@ function NotificationsPane() {
           Mark All as Read
         </button>
       </div>
-      <Section title="Notification Center">
-        <Row label="Show previews">
-          <PopUp
-            label="Show previews"
-            value={choice('previews', 'always')}
-            onChange={(v) => setChoice('previews', v)}
-            options={[
-              ['always', 'Always'],
-              ['unlocked', 'When Unlocked'],
-              ['never', 'Never'],
-            ]}
-          />
-        </Row>
-        <Row label="Allow notifications when the display is sleeping" sub={<Sim />}>
-          <Toggle label="Allow when sleeping" on={flag('n-sleep', false)} onChange={(v) => setFlag('n-sleep', v)} />
-        </Row>
-        <Row label="Allow notifications when mirroring or sharing the display" sub={<Sim />}>
-          <Toggle label="Allow when mirroring" on={flag('n-mirror', false)} onChange={(v) => setFlag('n-mirror', v)} />
-        </Row>
-      </Section>
-      <Section title="Application Notifications" sub={<>Banner preferences per app. <Sim /></>}>
-        {NOTIF_APPS.map((id) => {
-          const on = flag(`n-${id}`, true);
-          return (
-            <Row key={id} label={APPS[id].title} sub={on ? 'Banners, Sounds, Badges' : 'Off'} glyph={<AppIcon name={APPS[id].icon} className="ss-appicon" />}>
-              <Toggle label={`${APPS[id].title} notifications`} on={on} onChange={(v) => setFlag(`n-${id}`, v)} />
-            </Row>
-          );
-        })}
-      </Section>
+      <NotificationsV101 />
       <Note>To silence every banner for real, turn on Focus → Do Not Disturb.</Note>
     </>
   );
@@ -2784,6 +2756,7 @@ function ScreenTimePane() {
         )}
       </Section>
       <Note>Stored on this device only. Up to 60 days are kept; earlier days roll off automatically.</Note>
+      <ScreenTimeLimitsV101 />
     </>
   );
 }
@@ -2792,7 +2765,7 @@ function ScreenTimePane() {
 
 function LockPane() {
   const { settings, update } = useSettings();
-  const { prefs, setPrefs } = usePrefs();
+  const { prefs, setPrefs, choice, setChoice } = usePrefs();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(settings.lockMessage);
   const showMsg = settings.lockMessage.trim() !== '';
@@ -2861,6 +2834,26 @@ function LockPane() {
             </button>
           </form>
         )}
+      </Section>
+      <Section title="Clock">
+        <div className="ss-lockclock">
+          <div className="ss-lockclock-prev" style={{ ['--lc' as string]: (LOCK_COLORS.find((c) => c.id === choice('lock-color', 'white')) ?? LOCK_COLORS[0]).color }}>
+            <span style={lockClockStyle(choice('lock-font', 'classic'), choice('lock-color', 'white'))}>{new Date().toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', hour12: !settings.clock24 }).replace(/\s?[AP]M$/i, '')}</span>
+          </div>
+          <div className="ss-lockclock-fonts" role="radiogroup" aria-label="Clock font">
+            {LOCK_FONTS.map((f) => (
+              <button key={f.id} type="button" role="radio" aria-checked={choice('lock-font', 'classic') === f.id} className={choice('lock-font', 'classic') === f.id ? 'on' : ''} onClick={() => setChoice('lock-font', f.id)}>
+                <span style={f.style}>12</span>
+                <small>{f.label}</small>
+              </button>
+            ))}
+          </div>
+          <div className="ss-lockclock-colors" role="radiogroup" aria-label="Clock colour">
+            {LOCK_COLORS.map((c) => (
+              <button key={c.id} type="button" role="radio" aria-checked={choice('lock-color', 'white') === c.id} aria-label={c.label} title={c.label} className={choice('lock-color', 'white') === c.id ? 'on' : ''} style={{ background: c.color }} onClick={() => setChoice('lock-color', c.id)} />
+            ))}
+          </div>
+        </div>
       </Section>
       <div className="ss-btnrow">
         <button type="button" className="ss-btn" onClick={() => window.dispatchEvent(new Event('mra-lock'))}>
@@ -3045,7 +3038,7 @@ function BluetoothPane() {
   return (
     <>
       <Section>
-        <Row label="Bluetooth" glyph={<Glyph name="bluetooth" color="#0a84ff" size={30} />} sub={sys.bluetooth ? `Now discoverable as “${personal.name}’s Portfolio”` : 'Off'}>
+        <Row label="Bluetooth" glyph={<Glyph name="bluetooth" color="#0a84ff" size={30} />} sub={<Sim>{sys.bluetooth ? 'On — simulated switch, no real devices are connected' : 'Off — simulated switch'}</Sim>}>
           <Toggle label="Bluetooth" on={sys.bluetooth} onChange={(v) => sys.set({ bluetooth: v })} />
         </Row>
       </Section>
@@ -3181,13 +3174,15 @@ function SpotlightPane() {
 
 function ScreenSaverPane() {
   const { choice, setChoice } = usePrefs();
-  const kind = choice('saver', 'aurora');
+  const settingsCtx = useSettings();
+  const kind = choice('saver', 'wallpaper');
   return (
     <>
       <div className={`ss-saver ${kind}`} aria-hidden="true">
+        {kind !== 'mono' && <WallImage id={kind === 'aurora' ? 'live-aurora' : kind === 'sunrise' ? 'grad-sunrise' : kind === 'space' ? 'live-space' : settingsCtx.settings.wallpaper} thumb />}
         <span>{personal.name}</span>
       </div>
-      <Section sub="The screen saver shows your wallpaper with a clock. Move the mouse or press a key to return.">
+      <Section sub="The screen saver shows a clock over the style you choose. Move the mouse or press a key to return.">
         <Row label="Start after">
           <PopUp
             label="Start screen saver after"
@@ -3208,7 +3203,9 @@ function ScreenSaverPane() {
             value={kind}
             onChange={(v) => setChoice('saver', v)}
             options={[
-              ['aurora', 'Aurora'],
+              ['wallpaper', 'Your Wallpaper'],
+              ['aurora', 'Aurora (live)'],
+              ['space', 'Space (live)'],
               ['sunrise', 'Sunrise'],
               ['mono', 'Monochrome'],
             ]}

@@ -1,4 +1,6 @@
 import { useMemo, useState, type FormEvent } from 'react';
+import { QRSheet } from '../components/QRCode';
+import { vcard } from '../components/ios/IOSControlCentre';
 import { DragBar, Lights } from '../components/Window';
 import { AppIcon, type IconName } from '../components/AppIcons';
 import { allSkills, cv, education, integrations, personal, projects, socials, spokenLanguages } from '../data/portfolio';
@@ -7,6 +9,7 @@ import { notify, openExternal } from '../system/notify';
 import { deepLink, sharePortfolio } from '../system/share';
 import { t } from '../system/i18n';
 import type { AppProps } from '../components/Desktop';
+import { SysIcon } from '../components/SysIcons';
 
 /* ───────────────────────── Book a Call ─────────────────────────
  * With integrations.bookingUrl set (Calendly etc.) the button opens it.
@@ -40,7 +43,7 @@ export function BookCall({ compact }: { compact?: boolean }) {
       <div className="hm-book">
         <p>Pick a time that suits you on my booking page.</p>
         <button type="button" className="hm-btn primary" onClick={() => openExternal(integrations.bookingUrl, { app: 'Calendar', icon: 'calendar', title: 'Opening booking page' })}>
-          📅 {t('bookCall')}
+          <SysIcon n="calendar" size={15} /> {t('bookCall')}
         </button>
       </div>
     );
@@ -147,13 +150,13 @@ export function BookCall({ compact }: { compact?: boolean }) {
       )}
       <div className="hm-book-actions">
         <button type="submit" className="hm-btn primary">
-          ✉️ Request by Email
+          <SysIcon n="mail" size={15} /> Request by Email
         </button>
         <button type="button" className="hm-btn" onClick={() => send('whatsapp')}>
-          💬 Request on WhatsApp
+          <SysIcon n="message" size={15} /> Request on WhatsApp
         </button>
         <button type="button" className="hm-btn" onClick={() => (validate() ? setErr(validate()) : ics())}>
-          📅 Download invite (.ics)
+          <SysIcon n="download" size={15} /> Download invite (.ics)
         </button>
       </div>
       {sent && <p className="hm-ok">Thanks! I’ll confirm the time as soon as I see your message.</p>}
@@ -168,6 +171,7 @@ const TOP = ['healthforge', 'highstreet', 'ndi', 'fidenz', 'restaurant-pos', 'fr
 export default function HireMeApp({ win }: AppProps) {
   const wm = useWM();
   const [tab, setTab] = useState<'overview' | 'book'>(win.args?.tab === 'book' ? 'book' : 'overview');
+  const [qr, setQr] = useState(false);
   const top = useMemo(() => TOP.map((id) => projects.find((p) => p.id === id)).filter(Boolean) as typeof projects, []);
   const edu = education[0];
   const contact: { icon: IconName; label: string; sub: string; go: () => void }[] = [
@@ -180,6 +184,7 @@ export default function HireMeApp({ win }: AppProps) {
   ];
   return (
     <div className="hm">
+      {qr && <QRSheet title={`${personal.name} — Contact Card`} text={vcard()} caption="Scan with a phone camera to save his phone, email and portfolio link." onClose={() => setQr(false)} />}
       <DragBar className="hm-bar">
         <Lights />
         <div className="hm-seg" role="tablist">
@@ -197,7 +202,9 @@ export default function HireMeApp({ win }: AppProps) {
       <div className="hm-scroll scroll-smooth fade-swap" key={tab}>
         {tab === 'book' ? (
           <section className="hm-sec">
-            <h2>📅 {t('bookCall')}</h2>
+            <h2>
+              <SysIcon n="calendar" size={20} /> {t('bookCall')}
+            </h2>
             <p className="hm-muted">Choose a time (shown in your time zone — I’m in Sri Lanka, UTC+05:30). The request is sent to me by email or WhatsApp.</p>
             <BookCall />
           </section>
@@ -212,20 +219,26 @@ export default function HireMeApp({ win }: AppProps) {
                 <h1>{personal.name}</h1>
                 <p>{personal.headline}</p>
                 <p className="hm-muted">
-                  📍 {personal.location} · 🎓 {edu.qualification} ({edu.period})
+                  <SysIcon n="location" size={13} /> {personal.location} · <SysIcon n="graduation" size={13} /> {edu.qualification} ({edu.period})
                 </p>
                 <div className="hm-cta">
                   <a className="hm-btn primary" href={cv.url} download={cv.fileName}>
-                    ⬇︎ {t('downloadCv')}
+                    <SysIcon n="download" size={15} /> {t('downloadCv')}
                   </a>
                   <button type="button" className="hm-btn" onClick={() => setTab('book')}>
-                    📅 {t('bookCall')}
+                    <SysIcon n="calendar" size={15} /> {t('bookCall')}
                   </button>
                   <button type="button" className="hm-btn" onClick={() => wm.open('mail', { compose: '1' })}>
-                    ✉️ {t('emailMe')}
+                    <SysIcon n="mail" size={15} /> {t('emailMe')}
                   </button>
                   <button type="button" className="hm-btn" onClick={() => wm.open('askai')}>
-                    ✨ Ask Me AI
+                    <SysIcon n="sparkles" size={15} /> Ask Me AI
+                  </button>
+                  <button type="button" className="hm-btn" onClick={() => setQr(true)}>
+                    ▦ Contact QR Code
+                  </button>
+                  <button type="button" className="hm-btn" onClick={() => void navigator.clipboard?.writeText(`${personal.name}\n${personal.email}\n${personal.phone}\n${socials.portfolio}`).then(() => notify({ app: 'Hire Me', icon: 'hireme', title: 'Contact details copied', silent: true })).catch(() => notify({ app: 'Hire Me', icon: 'hireme', title: 'Couldn’t copy', body: 'Your browser blocked the clipboard.' }))}>
+                    ⧉ Copy Contact
                   </button>
                 </div>
               </div>

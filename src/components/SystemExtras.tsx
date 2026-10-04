@@ -9,6 +9,7 @@
  *  • Share links (#/app/<id>?…) and badge clearing
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { WallImage } from './Wallpaper';
 import { AppIcon } from './AppIcons';
 import { APPS } from '../system/apps';
 import { MENUBAR_H, dockReserve, dockSideReserve, maximizedRect, useWM } from '../system/WindowManager';
@@ -22,6 +23,7 @@ import type { AppId, HotCornerAction, Rect } from '../system/types';
 import { wallpaperById } from '../data/media';
 import { personal } from '../data/portfolio';
 import { useMusic } from '../system/MusicContext';
+import { getChoice } from '../system/prefs';
 
 /* ───────────────────────── tiling helpers (shared with Window.tsx) ───────────────────────── */
 export type TileZone = 'left' | 'right' | 'max' | 'tl' | 'tr' | 'bl' | 'br' | 'center';
@@ -326,9 +328,16 @@ function ScreenSaver() {
   }, [on]);
   if (!on) return null;
   const wp = wallpaperById(settings.wallpaper);
+  // v10.3 — Settings → Screen Saver → Style really changes the screen saver
+  const style = getChoice('saver', 'wallpaper');
+  const img = style === 'aurora' ? 'live-aurora' : style === 'sunrise' ? 'grad-sunrise' : style === 'space' ? 'live-space' : wp.id;
   return (
-    <div className="saver8" role="status" aria-label="Screen saver — move the mouse or press a key to return">
-      <img src={wp.src} alt="" className="saver8-img" />
+    <div className={`saver8 saver-${style}`} role="status" aria-label="Screen saver — move the mouse or press a key to return">
+      {style !== 'mono' && (
+        <div className="saver8-img">
+          <WallImage id={img} live />
+        </div>
+      )}
       <div className="saver8-shade" />
       <div className="saver8-clock">
         <b>{now.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }).replace(/\s?[AP]M$/i, '')}</b>
@@ -407,6 +416,9 @@ export function SystemExtras() {
           break;
         case 'hireme':
           wmRef.current.open('hireme');
+          break;
+        case 'switcher':
+          window.dispatchEvent(new Event('mra-app-switcher'));
           break;
         default:
           break;
@@ -487,6 +499,12 @@ export function SystemExtras() {
       }
     };
     const openKb = () => setKb(true);
+    // v10 — App Switcher from a gesture / menu (stays open until a click or Escape)
+    const openSw = () => {
+      const order = [...wmRef.current.windows].sort((a, b) => b.z - a.z).map((w) => w.id);
+      if (order.length) setSwitcher({ list: order, i: order.length > 1 ? 1 : 0 });
+    };
+    window.addEventListener('mra-app-switcher', openSw);
     window.addEventListener('keydown', onKey);
     window.addEventListener('keyup', onUp);
     window.addEventListener('mra-shortcuts', openKb);
@@ -494,6 +512,7 @@ export function SystemExtras() {
       window.removeEventListener('keydown', onKey);
       window.removeEventListener('keyup', onUp);
       window.removeEventListener('mra-shortcuts', openKb);
+      window.removeEventListener('mra-app-switcher', openSw);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sys, settings.stageManager, update]);
@@ -562,6 +581,7 @@ export function SystemExtras() {
           ))}
         </nav>
       )}
+      {switcher && <div className="app-switcher-back" onPointerDown={() => setSwitcher(null)} />}
       {switcher && (
         <div className="app-switcher" role="listbox" aria-label="App Switcher">
           {switcher.list.map((id, i) => (

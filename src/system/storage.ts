@@ -9,9 +9,26 @@ export function readStore<T>(key: string, fallback: T): T {
   }
 }
 
+type WriteHook = (key: string, prevRaw: string | null, nextRaw: string) => void;
+let hook: WriteHook | null = null;
+/** v10 — lets the undo history / Recently Deleted watch visitor-content writes */
+export function setWriteHook(h: WriteHook | null) {
+  hook = h;
+}
+
 export function writeStore(key: string, value: unknown): void {
   try {
-    window.localStorage.setItem(key, JSON.stringify(value));
+    const next = JSON.stringify(value);
+    if (hook) {
+      let prev: string | null = null;
+      try {
+        prev = window.localStorage.getItem(key);
+      } catch {
+        prev = null;
+      }
+      if (prev !== next) hook(key, prev, next);
+    }
+    window.localStorage.setItem(key, next);
   } catch {
     /* storage unavailable — settings stay in memory */
   }

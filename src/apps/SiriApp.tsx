@@ -6,6 +6,10 @@ import { useWM } from '../system/WindowManager';
 import { useSettings } from '../system/SettingsContext';
 import { useMusic } from '../system/MusicContext';
 import { readStore, writeStore } from '../system/storage';
+import { islandAssistant } from '../system/island';
+import { startTimer } from '../system/timer';
+import { nextWallpaper, wallpaperName } from '../system/wallpaperCycle';
+import { usePrefFlag } from '../system/prefs';
 
 interface Msg {
   from: 'you' | 'siri';
@@ -23,33 +27,40 @@ type SR = {
   stop: () => void;
 };
 
-const SUGGESTIONS = ['Who is M.R. Ahamed?', 'What are his skills?', 'Show his projects', 'Tell me about FreshMart', 'How can I contact him?', 'Open Game Center', 'Play music', 'Dark mode'];
+const SUGGESTIONS = ['Who is M.R. Ahamed?', 'What are his skills?', 'Open projects', 'Show contact options', 'Set a timer for 5 minutes', 'Play music', 'Next wallpaper', 'Find Dock settings', 'Dark mode'];
 
-/** Siri-style assistant that answers from the portfolio data only. */
+/** A Siri-style portfolio assistant (not Apple’s Siri) that answers from the portfolio data only. */
 export default function SiriApp() {
   const launch = useLaunch();
   const wm = useWM();
   const { update } = useSettings();
   const music = useMusic();
-  const [msgs, setMsgs] = useState<Msg[]>([{ from: 'siri', text: `Hi, I’m Siri for ${personal.name}’s portfolio. Ask me about his skills, projects, education or how to contact him — or tell me to open an app.` }]);
+  const [msgs, setMsgs] = useState<Msg[]>([{ from: 'siri', text: `Hi, I’m the assistant for ${personal.name}’s portfolio (not Apple’s Siri). Ask about his skills, projects, education or how to reach him — or say “open projects”, “set a timer for 5 minutes”, “next wallpaper” or “find Dock settings”.` }]);
   const [q, setQ] = useState('');
   const [listening, setListening] = useState(false);
   const [speak, setSpeak] = useState<boolean>(() => readStore('mra-siri', { speak: false }).speak);
   const recRef = useRef<SR | null>(null);
+  const [thinking, setThinking] = useState(false);
+  const assistantOn = usePrefFlag('siri-on', true); // Settings → Assistant
   const endRef = useRef<HTMLDivElement>(null);
 
   const Rec = (window as unknown as { SpeechRecognition?: new () => SR; webkitSpeechRecognition?: new () => SR }).SpeechRecognition ?? (window as unknown as { webkitSpeechRecognition?: new () => SR }).webkitSpeechRecognition;
 
-  useEffect(() => endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' }), [msgs]);
+  useEffect(() => endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' }), [msgs, thinking]);
   useEffect(() => () => {
     recRef.current?.stop();
     window.speechSynthesis?.cancel();
   }, []);
 
+  // v10.2 — live state for the Dynamic Island
+  useEffect(() => () => islandAssistant('idle'), []);
   const say = (text: string) => {
     if (!speak || !('speechSynthesis' in window)) return;
     window.speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
+    u.onstart = () => islandAssistant('speaking');
+    u.onend = () => islandAssistant('idle');
+    u.onerror = () => islandAssistant('idle');
     // v9 — voice chosen in System Settings → Intelligence & Siri
     const vn = readStore<{ voice?: string }>('mra-siri', {}).voice;
     const v = vn ? window.speechSynthesis.getVoices().find((x) => x.name === vn) : undefined;
@@ -71,6 +82,35 @@ export default function SiriApp() {
         return { from: 'siri', text: `Opening ${item.label}.` };
       }
     }
+    // v10.2 — more commands
+    const go = (_label: string, run: () => void, text: string): Msg => (run(), { from: 'siri', text });
+    if (/^(open|show)( me)? (my |his )?skills?$/.test(t)) return go('Skills', () => wm.open('notes'), 'Opening Skills.');
+    if (/^(open|show)( me)? (the |his )?education$/.test(t)) return go('Education', () => wm.open('finder', { folder: 'education' }), 'Opening Education.');
+    if (/^(open|show)( me)? (the |his )?experience$/.test(t)) return go('Experience', () => wm.open('finder', { folder: 'all' }), 'Opening Experience.');
+    if (/^(open|show)( me)? (the |his )?projects?$/.test(t)) return go('Projects', () => wm.open('xcode'), 'Opening Projects.');
+    if (/^(open|show)( me)? (the |his )?(cv|resume|résumé)$/.test(t)) return go('CV', () => wm.open('preview'), 'Opening the CV.');
+    if (/(contact options|open contact|how (can|do) i (contact|reach))/.test(t)) return { from: 'siri', text: `Email ${personal.email}, call ${personal.phone}, or message him on WhatsApp.`, action: { label: 'Open Hire Me', run: () => wm.open('hireme') } };
+    if (/^(open|show)( the)? learning( hub)?$/.test(t)) return go('Learning Hub', () => wm.open('learning'), 'Opening the Learning Hub.');
+    const timerM = t.match(/(?:set|start)(?: a)? timer (?:for )?(\d+)\s*(seconds?|secs?|minutes?|mins?|hours?|hrs?)/);
+    if (timerM) {
+      const n = Number(timerM[1]);
+      const unit = timerM[2][0];
+      const ms = n * (unit === 's' ? 1000 : unit === 'h' ? 3600000 : 60000);
+      startTimer(ms);
+      return { from: 'siri', text: `Timer set for ${n} ${unit === 's' ? 'second' : unit === 'h' ? 'hour' : 'minute'}${n === 1 ? '' : 's'}. You’ll see it in the Dynamic Island.`, action: { label: 'Open Clock', run: () => wm.open('clock', { tab: 'timer' }) } };
+    }
+    if (/(next|change|another|new) wallpaper/.test(t)) {
+      const id = nextWallpaper(1);
+      return { from: 'siri', text: `Wallpaper changed to ${wallpaperName(id)}.`, action: { label: 'Wallpaper settings', run: () => wm.open('settings', { pane: 'wallpaper' }) } };
+    }
+    if (/(previous|last) wallpaper/.test(t)) {
+      const id = nextWallpaper(-1);
+      return { from: 'siri', text: `Wallpaper changed to ${wallpaperName(id)}.` };
+    }
+    const findM = t.match(/^(?:find|search|show)(?: the)? (.+?) settings?$/) ?? t.match(/^settings? (?:for )?(.+)$/);
+    if (findM) return go('Settings', () => wm.open('settings', { q: findM[1] }), `Searching Settings for “${findM[1]}”.`);
+    if (has('reduce motion')) return (update({ reduceMotion: true }), { from: 'siri', text: 'Reduce Motion is on.' });
+    if (has('full motion')) return (update({ reduceMotion: false }), { from: 'siri', text: 'Full motion is back on.' });
     if (has('dark mode')) return (update({ appearance: 'dark' }), { from: 'siri', text: 'Dark Mode is on.' });
     if (has('light mode')) return (update({ appearance: 'light' }), { from: 'siri', text: 'Light Mode is on.' });
     if (has('play music', 'play a song', 'play some music')) return (music.play(), { from: 'siri', text: `Playing “${music.track.title}”.` });
@@ -111,13 +151,24 @@ export default function SiriApp() {
     return { from: 'siri', text: 'I can only answer questions about this portfolio. Want me to search the web?', action: { label: `Search “${raw}”`, run: () => window.open(`https://www.google.com/search?q=${encodeURIComponent(raw)}`, '_blank', 'noopener') } };
   };
 
+  // v10.3 — a short "thinking" beat (shown here and in the Dynamic Island) before the answer
+  const thinkT = useRef(0);
+  useEffect(() => () => window.clearTimeout(thinkT.current), []);
   const ask = (text: string) => {
     const v = text.trim();
-    if (!v) return;
-    const a = answer(v);
-    setMsgs((m) => [...m, { from: 'you', text: v }, a]);
-    say(a.text);
+    if (!v || thinking) return;
+    setMsgs((m) => [...m, { from: 'you', text: v }]);
     setQ('');
+    setThinking(true);
+    islandAssistant('thinking');
+    const reduced = document.documentElement.dataset.motion === 'reduced';
+    thinkT.current = window.setTimeout(() => {
+      const a = answer(v);
+      setThinking(false);
+      setMsgs((m) => [...m, a]);
+      if (speak && 'speechSynthesis' in window) say(a.text);
+      else islandAssistant('idle');
+    }, reduced ? 150 : 650);
   };
 
   const listen = () => {
@@ -130,12 +181,37 @@ export default function SiriApp() {
     r.lang = 'en-US';
     r.interimResults = false;
     r.onresult = (e) => ask(e.results[0][0].transcript);
-    r.onend = () => setListening(false);
-    r.onerror = () => setListening(false);
+    r.onend = () => (setListening(false), islandAssistant(window.speechSynthesis?.speaking ? 'speaking' : 'idle'));
+    r.onerror = () => (setListening(false), islandAssistant('idle'));
     recRef.current = r;
     setListening(true);
+    islandAssistant('listening');
     r.start();
   };
+
+  if (!assistantOn)
+    return (
+      <div className="sr sr-off">
+        <div className="sr-orb" aria-hidden="true">
+          <i />
+          <i />
+          <i />
+        </div>
+        <h2>Assistant is turned off</h2>
+        <p>Turn it on in Settings → Assistant to ask about {personal.name}’s skills, projects and contact details.</p>
+        <button
+          type="button"
+          className="sr-act"
+          onClick={() => {
+            const st = readStore<{ flags: Record<string, boolean>; choices: Record<string, string> }>('mra-settings-app-v5', { flags: {}, choices: {} });
+            writeStore('mra-settings-app-v5', { ...st, flags: { ...st.flags, 'siri-on': true } });
+            window.dispatchEvent(new Event('mra-prefs'));
+          }}
+        >
+          Turn On Assistant
+        </button>
+      </div>
+    );
 
   return (
     <div className="sr">
@@ -150,6 +226,15 @@ export default function SiriApp() {
             )}
           </div>
         ))}
+        {thinking && (
+          <div className="sr-msg siri sr-thinking" aria-label="Thinking">
+            <p>
+              <i />
+              <i />
+              <i />
+            </p>
+          </div>
+        )}
         <div ref={endRef} />
       </div>
       <div className="sr-chips">
@@ -171,7 +256,7 @@ export default function SiriApp() {
           ask(q);
         }}
       >
-        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={listening ? 'Listening…' : 'Ask Siri…'} aria-label="Ask Siri" />
+        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={listening ? 'Listening…' : 'Ask the assistant…'} aria-label="Ask the assistant" data-nodictation />
         {Rec && (
           <button type="button" className={`sr-mic ${listening ? 'on' : ''}`} onClick={listen} aria-label={listening ? 'Stop listening' : 'Speak'}>
             <svg viewBox="0 0 24 24" aria-hidden="true">

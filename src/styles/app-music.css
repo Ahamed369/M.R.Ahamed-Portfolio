@@ -1,0 +1,105 @@
+/* v10.3 — Music: languages, genres, moods, playlists, my songs */
+/* the wrapper is the size container, so the narrow layout also applies to .am itself (iPhone / narrow windows) */
+.am-wrap { height: 100%; container-type: inline-size; }
+.am-cover-note { display: grid; place-items: center; color: rgba(255, 255, 255, 0.92); }
+.am-cover-note svg { fill: currentColor; }
+.am-pick .am-pick-note { color: #fff; }
+.am-pick .am-pick-note svg { width: 72px; height: 72px; }
+.am-artist-pic { color: #fff; }
+.am-shelf h3 { display: flex; align-items: center; }
+.am-shelf-more {
+  border: 0; background: none; padding: 0; color: inherit; font: inherit; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.am-shelf-more:hover { color: var(--am-red); }
+.am-sub { margin: 22px 0 10px; font-size: 17px; font-weight: 700; }
+.am-cats { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.am-row:has(> .am-cat) { grid-auto-columns: 168px; }
+.am-row:has(> .am-empty) { display: block; }
+.am-row > .am-empty { margin: 4px 0 8px; }
+.am-cat {
+  position: relative; min-height: 104px; border: 0; border-radius: 12px; padding: 12px 14px;
+  color: #fff; text-align: left; cursor: pointer; display: flex; flex-direction: column; justify-content: flex-end; gap: 2px;
+  box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.18), 0 4px 14px rgba(0, 0, 0, 0.12);
+  transition: transform 0.18s, filter 0.18s; overflow: hidden;
+}
+.am-cat::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 30%, rgba(0, 0, 0, 0.28)); pointer-events: none; }
+.am-cat > * { position: relative; z-index: 1; }
+.am-cat:hover { transform: translateY(-2px); filter: brightness(1.05); }
+.am-cat:focus-visible { outline: 2px solid var(--am-red); outline-offset: 2px; }
+.am-cat b { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
+.am-cat span { font-size: 13px; opacity: 0.92; }
+.am-cat small { font-size: 11px; opacity: 0.8; }
+.am-cat.sm { min-height: 76px; }
+.am-lang-tag {
+  font-style: normal; font-size: 9.5px; font-weight: 600; margin-left: 6px; padding: 1px 5px; border-radius: 4px;
+  background: color-mix(in srgb, var(--am-red) 14%, transparent); color: var(--am-red); vertical-align: 1px;
+}
+.am-acts { position: relative; display: flex; align-items: center; justify-content: flex-end; gap: 2px; }
+.am-tr { grid-template-columns: 32px minmax(0, 2fr) minmax(0, 1fr) 52px 96px !important; }
+.am-tr .am-heart { opacity: 0.55; }
+.am-tr:hover .am-heart, .am-tr .am-heart.on, .am-tr .am-heart[aria-expanded='true'] { opacity: 1; }
+.am-addmenu {
+  position: absolute; right: 0; top: calc(100% + 4px); z-index: 30; min-width: 200px; padding: 6px;
+  display: flex; flex-direction: column; border-radius: 10px;
+  background: var(--menu-bg, color-mix(in srgb, var(--win-solid) 97%, transparent));
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.24), inset 0 0 0 0.5px var(--sep);
+}
+.am-addmenu > b { font-size: 11px; color: var(--text-3); padding: 4px 8px 6px; font-weight: 600; }
+.am-addmenu button {
+  display: flex; align-items: center; gap: 8px; border: 0; background: none; color: var(--text);
+  font: inherit; font-size: 13px; padding: 6px 8px; border-radius: 6px; cursor: pointer; text-align: left;
+}
+.am-addmenu button svg { width: 15px; height: 15px; flex: none; }
+.am-addmenu button:hover:not(:disabled) { background: var(--am-red); color: #fff; }
+.am-addmenu button:disabled { opacity: 0.55; cursor: default; }
+.am-addmenu button > svg:last-child:not(:first-child) { margin-left: auto; }
+.am-addmenu .am-addnew { border-top: 0.5px solid var(--sep); border-radius: 0 0 6px 6px; margin-top: 4px; padding-top: 8px; }
+.am-pill { display: inline-flex; align-items: center; gap: 6px; }
+.am-pill svg { width: 13px; height: 13px; }
+.am-pill:disabled { opacity: 0.5; cursor: default; }
+.am-pill.sm { padding: 5px 11px; font-size: 12px; }
+.am-pill.danger { color: #ff3b30; }
+.am-album-actions { flex-wrap: wrap; }
+.am-stream { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 12px 0; font-size: 12.5px; }
+.am-stream > div { display: flex; flex-wrap: wrap; gap: 6px; }
+.am-radio > svg { width: 18px; height: 18px; color: var(--text-3); flex: none; }
+.am-h1-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.am-sec-row { display: flex; align-items: center; justify-content: space-between; }
+.am-sec-add {
+  width: 20px; height: 20px; border: 0; border-radius: 5px; background: none; color: var(--text-3);
+  display: grid; place-items: center; cursor: pointer; padding: 0;
+}
+.am-sec-add svg { width: 14px; height: 14px; }
+.am-sec-add:hover { background: var(--hover); color: var(--text); }
+.am-upload {
+  padding: 14px 16px; border-radius: 12px; margin-bottom: 14px; display: flex; flex-direction: column; gap: 10px;
+  background: color-mix(in srgb, var(--text) 5%, transparent); box-shadow: inset 0 0 0 0.5px var(--sep);
+}
+.am-upload p { margin: 0; font-size: 13px; line-height: 1.5; color: var(--text-2); }
+.am-upload-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.am-select { display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; }
+.am-select select {
+  font: inherit; font-size: 13px; padding: 5px 26px 5px 10px; border-radius: 7px; color: var(--text);
+  border: 0.5px solid var(--sep); background: var(--win-solid);
+}
+.am-dialog-bg { position: absolute; inset: 0; z-index: 40; display: grid; place-items: center; background: rgba(0, 0, 0, 0.28); }
+.am-dialog {
+  width: min(320px, calc(100% - 32px)); padding: 18px; border-radius: 14px; display: flex; flex-direction: column; gap: 12px;
+  background: var(--win-solid); box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35), inset 0 0 0 0.5px var(--sep);
+}
+.am-dialog b { font-size: 15px; }
+.am-dialog input {
+  font: inherit; font-size: 14px; padding: 8px 10px; border-radius: 8px; color: var(--text);
+  border: 0.5px solid var(--sep); background: color-mix(in srgb, var(--text) 4%, transparent); outline: none;
+}
+.am-dialog input:focus { box-shadow: 0 0 0 3px color-mix(in srgb, var(--am-red) 35%, transparent); }
+.am-dialog > div { display: flex; justify-content: flex-end; gap: 8px; }
+.am-p-btn svg path[fill='none'] { fill: none; }
+.am-p-btn > svg[viewBox] { width: 16px; height: 16px; }
+@container (max-width: 620px) {
+  .am-tr { grid-template-columns: 26px minmax(0, 1fr) 44px 84px !important; }
+  .am-cats { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+  .am-row:has(> .am-cat) { grid-auto-columns: 140px; }
+  .am-addmenu { right: -4px; }
+}

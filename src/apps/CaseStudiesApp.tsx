@@ -225,12 +225,17 @@ export default function CaseStudiesApp({ win }: AppProps) {
             <div className="cs-meta">
               {p.period && <span>🗓 {p.period}</span>}
               <span>● {p.status}</span>
-              <span>{p.group === 'GitHub' ? '🐙 Public repository' : '📄 From my CV'}</span>
+              <span>{p.group === 'GitHub' ? '🐙 Public repository' : p.teamRepo ? '👥 Team repository · on my CV' : '📄 From my CV'}</span>
             </div>
             <div className="cs-actions">
               {p.repo && (
                 <a className="cs-btn primary" href={p.repo} target="_blank" rel="noopener noreferrer">
                   View on GitHub ↗
+                </a>
+              )}
+              {!p.repo && p.teamRepo && (
+                <a className="cs-btn primary" href={p.teamRepo} target="_blank" rel="noopener noreferrer">
+                  Team repository ↗
                 </a>
               )}
               {p.demo && (

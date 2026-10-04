@@ -1,0 +1,124 @@
+/* v10.3 — shared solid system glyphs (SysIcons): alignment wherever they sit beside text */
+.sys-ico { flex: none; display: inline-block; vertical-align: -0.17em; overflow: visible; }
+button .sys-ico, a .sys-ico { pointer-events: none; }
+
+/* buttons that mix an icon and a label */
+.hm-btn, .ph-btn, .mc-compose, .mc-toolbar button, .mc-send, .call9-end-actions button, .px-pickbar button { display: inline-flex; align-items: center; gap: 6px; }
+.call9-ctl { display: inline-flex; flex-direction: column; align-items: center; gap: 4px; }
+.call9-ctl .sys-ico { width: 26px; height: 26px; }
+.call9-app .sys-ico { margin-right: 3px; }
+
+/* Mail */
+.mc-bico { display: inline-grid; place-items: center; width: 20px; color: var(--accent, #0a84ff); }
+.mc-mark { margin-right: 4px; vertical-align: -0.12em; opacity: 0.85; }
+.mc-mark.flag { color: #ff9f0a; opacity: 1; }
+.mc-mark.pin { color: #ff9f0a; opacity: 1; }
+
+/* Finder sidebar */
+.fd-nav-ico { display: inline-grid; place-items: center; width: 20px; color: var(--accent, #0a84ff); }
+.fd-nav.on .fd-nav-ico { color: inherit; }
+
+/* Contacts favourite star */
+.ct-fav { color: #ffcc00; margin-left: 4px; }
+
+/* Lock-screen user picker */
+.lock10-ph { display: grid; place-items: center; color: rgba(255, 255, 255, 0.9); }
+
+/* Notification Centre portfolio widgets */
+.nc-wi { margin-right: 4px; color: var(--accent, #0a84ff); vertical-align: -0.15em; }
+.nc-focus .nc-wi { color: #a78bfa; }
+
+/* iOS widgets */
+.iw-wxi { display: inline-grid; place-items: center; }
+.iw-wx-hours i { display: grid; place-items: center; font-style: normal; }
+.iw-bat-g { color: var(--text, #1d1d1f); }
+.iw-bat-g .sys-ico { overflow: visible; }
+.iw-art, .mp-art { display: grid; place-items: center; color: rgba(255, 255, 255, 0.95); }
+.iw-music-ctl button, .mp-ctl button, .iw-contact-b a, .iw-contact-b button { display: inline-grid; place-items: center; }
+
+/* Mac widgets & Control Center */
+.wx-glyph { display: inline-grid; place-items: center; vertical-align: -0.2em; }
+.cc-art { display: grid; place-items: center; color: rgba(255, 255, 255, 0.95); }
+.cc-wx-emoji { display: grid; place-items: center; }
+.w9-contact-actions span .sys-ico { display: block; }
+.w9-pomo-btns button { display: inline-grid; place-items: center; }
+
+/* Weather app: glyph size follows the text it replaces */
+.wa-wx { width: 1.15em; height: 1.15em; vertical-align: -0.2em; }
+.wa-cap .sys-ico { margin-right: 2px; opacity: 0.8; }
+
+/* iOS status bar Focus moon, Settings rows & sliders */
+.sb-focus { display: inline-grid; place-items: center; }
+.is-ico .sys-ico { color: #fff; display: block; }
+.is-sl-ico { display: inline-grid; place-items: center; opacity: 0.7; }
+
+/* iOS Home quick-action menu */
+.ios-qa button .sys-ico { margin-left: auto; opacity: 0.9; }
+.ios-qa-sizes button { display: inline-grid; place-items: center; }
+.ios-share-glyph { display: inline-grid; place-items: center; vertical-align: -0.2em; font-style: normal; }
+
+/* Markup toolbar & AssistiveTouch menu */
+.ios-mk-tool, .ios-mk-bar > button { display: inline-flex; flex-direction: column; align-items: center; gap: 2px; }
+
+/* volume HUD */
+.vol-ico { display: inline-grid; place-items: center; }
+
+/* Dynamic Island ping glyph */
+.di-ico .sys-ico { display: block; }
+
+/* v10.3 fixes found while checking icons */
+.wa-retry.wa-retry { color: #1c2533; background: #fff; }
+/* iPhone/iPad Settings bottom search: readable over the list (blur can't reach rows inside the scroller) */
+.is-search.is-search { background: rgba(249, 249, 251, 0.94) !important; box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06); }
+:root[data-theme='dark'] .is-search.is-search { background: rgba(44, 44, 46, 0.95) !important; box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4), inset 0 0 0 0.5px rgba(255, 255, 255, 0.08); }
+/* real previous / next glyphs now — no mirrored play icons */
+.xcc-np-ctl button:first-child { transform: none; }
+.xcc-np-ctl button, .di-card-ctl button { display: inline-grid; place-items: center; }
+
+/* v10.3 — notifications: keep the frosted-glass look but always readable.
+   Content behind (widgets, desktop icons) must never show through the text. */
+:root {
+  --nf-glass: rgba(246, 246, 249, 0.985);
+  --nf-glass-hover: rgba(251, 251, 253, 0.99);
+  --nf-edge: rgba(255, 255, 255, 0.78);
+  --nf-sub: rgba(29, 29, 31, 0.8);
+}
+:root[data-theme='dark'] {
+  --nf-glass: rgba(38, 38, 43, 0.98);
+  --nf-glass-hover: rgba(48, 48, 54, 0.985);
+  --nf-edge: rgba(255, 255, 255, 0.14);
+  --nf-sub: rgba(235, 235, 245, 0.8);
+}
+.nf-card.banner, .nf-card.center { -webkit-backdrop-filter: blur(30px) saturate(1.8); backdrop-filter: blur(30px) saturate(1.8); }
+
+/* Dynamic Island: app icon in notification alerts */
+.di-app-ico { display: grid; place-items: center; width: 24px; height: 24px; flex: none; }
+.di-app-ico .app-icon, .di-app-ico svg { width: 24px; height: 24px; display: block; }
+.di.di-ping { cursor: pointer; }
+
+/* Assistant "thinking" bubble */
+.sr-thinking p { display: inline-flex; gap: 5px; align-items: center; min-height: 20px; }
+.sr-thinking i { width: 7px; height: 7px; border-radius: 50%; background: currentColor; opacity: 0.35; animation: sr-dot 1s infinite ease-in-out; }
+.sr-thinking i:nth-child(2) { animation-delay: 0.15s; }
+.sr-thinking i:nth-child(3) { animation-delay: 0.3s; }
+@keyframes sr-dot { 50% { opacity: 0.9; transform: translateY(-2px); } }
+:root[data-motion='reduced'] .sr-thinking i { animation: none; opacity: 0.6; }
+
+/* Settings → Appearance → Text highlight color */
+:root[data-hl] ::selection { background: color-mix(in srgb, var(--hl-color) 38%, transparent); }
+/* Settings → Keyboard → Keyboard navigation: clear focus rings for keyboard users */
+:root[data-kbnav] :focus-visible { outline: 2.5px solid var(--accent, #0a84ff) !important; outline-offset: 2px; }
+
+/* v10.3 — icon & widget labels stay readable on light wallpapers (white text, soft dark halo, like iOS) */
+.ios-icon-label,
+.ios-widget-label { text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45), 0 0 10px rgba(0, 0, 0, 0.28); }
+
+/* v10.3 — Assistant switched off (Settings → Assistant) */
+.sr.sr-off { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 28px; text-align: center; }
+.sr-off .sr-orb { position: relative; inset: auto; width: 74px; height: 74px; filter: grayscale(0.7); opacity: 0.7; }
+.sr-off h2 { margin: 6px 0 0; font-size: 18px; color: #fff; }
+.sr-off p { margin: 0; max-width: 300px; font-size: 13.5px; line-height: 1.45; color: rgba(255, 255, 255, 0.7); }
+.sr-off .sr-act { margin-top: 6px; padding: 8px 18px; border-radius: 999px; font-weight: 600; color: #fff; background: #0a84ff; cursor: pointer; }
+
+/* v10.3 — the Terminal prompt shows its own caret; no focus ring box around it */
+.term-line.live input:focus, .term-line.live input:focus-visible { outline: none !important; box-shadow: none !important; }

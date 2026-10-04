@@ -128,7 +128,7 @@
 /* ───────────── About This Mac ───────────── */
 .v5-about {
   position: fixed;
-  z-index: 160000;
+  z-index: var(--z-v5-about, 160000);
   top: 50%;
   left: 50%;
   width: min(300px, calc(100vw - 32px));
@@ -210,7 +210,7 @@
 .v5-sheet-scrim {
   position: fixed;
   inset: 0;
-  z-index: 165000;
+  z-index: var(--z-v5-sheet-scrim, 165000);
   display: grid;
   place-items: center;
   padding: 16px;
@@ -484,7 +484,7 @@
 .v5-lock {
   position: fixed;
   inset: 0;
-  z-index: 175000;
+  z-index: var(--z-v5-lock, 175000);
   overflow: hidden;
   color: #fff;
   text-shadow: 0 1px 10px rgba(0, 0, 0, 0.3);
@@ -618,7 +618,7 @@
 .v5-sleep {
   position: fixed;
   inset: 0;
-  z-index: 190000;
+  z-index: var(--z-v5-sleep, 190000);
   background: #000;
   cursor: none;
   animation: v5-sleep-in 0.8s ease both;
@@ -633,7 +633,7 @@
 .v5-fq-scrim {
   position: fixed;
   inset: 0;
-  z-index: 165000;
+  z-index: var(--z-v5-fq-scrim, 165000);
   display: grid;
   place-items: center;
   padding: 16px;
@@ -715,7 +715,7 @@
 .v5-shut {
   position: fixed;
   inset: 0;
-  z-index: 200000;
+  z-index: var(--z-v5-shut, 200000);
   display: grid;
   place-items: center;
   pointer-events: none;
@@ -1109,7 +1109,7 @@
   top: calc(var(--menubar-h) + 8px);
   left: 50%;
   transform: translateX(-50%);
-  z-index: 150000;
+  z-index: var(--z-cc-rec-pill, 150000);
   display: inline-flex;
   align-items: center;
   gap: 7px;
@@ -1142,7 +1142,7 @@
 .cf-scrim {
   position: fixed;
   inset: 0;
-  z-index: 170500;
+  z-index: var(--z-cf-scrim-2, 170500);
   display: grid;
   place-items: center;
   padding: 16px;
@@ -1369,7 +1369,7 @@
   left: 50%;
   bottom: calc(var(--dock-size) + 30px);
   transform: translateX(-50%);
-  z-index: 95000;
+  z-index: var(--z-wg-gallery, 95000);
   width: min(760px, calc(100vw - 24px));
   padding: 12px 14px 14px;
   border-radius: 16px;

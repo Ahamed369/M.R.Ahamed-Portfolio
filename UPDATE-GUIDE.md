@@ -327,3 +327,112 @@ Put images in `public/assets/wallpapers/`, add a 400×250 thumbnail as `thumbs/t
 | Custom wallpaper from Photos / upload | `src/system/customWallpaper.ts` |
 
 To add a service, append an entry to the right area in `SERVICE_AREAS`. List any `projects` ids from `portfolio.ts` that demonstrate it, and the service appears in the app, in Spotlight and in the My Services widget.
+
+
+## Version 10 — where things live
+
+| What | File |
+|---|---|
+| CV facts (skills, projects, education, contact) | `src/data/portfolio.ts` (`cvSkills`, `cvProjects()`, `personal`, `socials`) |
+| CV file + page images | `public/cv/M_R_AHAMED_CV.pdf`, `public/cv/page-1.jpg`, `page-2.jpg` |
+| Photos screenshots / videos | `public/assets/screenshots/*.jpg`, `public/assets/videos/*.mp4` (+ `src/data/media.ts`) |
+| Share preview image | `public/og-image.jpg` (1200 × 630) + `index.html` meta tags |
+| Device choice (Mac / iPhone / iPad) | `src/system/ios.ts` → `detectMode()`; override in Settings → Devices & View |
+| iPhone / iPad shell | `src/components/ios/` (`IOSShell`, `IOSHome`, `IOSLock`, `IOSPanels`, `IOSWidgets`, `IOSSettings`) |
+| iPhone Home Screen default layout | `src/system/ios.ts` → `defaultLayout()` (visitors' own layouts are saved in their browser; *Reset Layout* restores this) |
+| Dock apps (iPhone) | `DOCK_APPS` in `src/system/ios.ts` (Phone, Messages, Safari, Music) |
+| Mac gestures, Spaces, notch, performance | `src/components/SystemV10.tsx`, `src/system/spaces.ts` |
+| Dynamic Island | `src/components/DynamicIsland.tsx`, events in `src/system/island.ts` |
+| Undo / Redo / Recently Deleted | `src/system/history.ts` |
+| Cut / Copy / Paste | `src/system/clipboard.ts` |
+| Sounds and ringtones (all original, synthesised) | `src/system/sounds.ts` |
+| New Settings panes | `src/apps/settings/PanesV10.tsx` (Mac) and `src/components/ios/IOSSettings.tsx` (iPhone/iPad) |
+| Quick View / Classic Site | `src/components/ClassicSite.tsx` (`?view=classic`) |
+| Vercel | `vercel.json`, optional AI proxy `api/ask.js`, `public/404.html`, `public/offline.html` |
+
+### Your own notification sound
+The portfolio never ships third-party sounds. Visitors (and you) can pick **Settings → Sound / Sounds & Haptics → Your own sound → Upload…**. The file stays in that browser only (IndexedDB) and is never uploaded.
+
+### Useful links to share
+- Interactive portfolio: `https://m-r-ahamed-portfolio.vercel.app`
+- Quick View (one-page CV): `https://m-r-ahamed-portfolio.vercel.app/?view=classic`
+- Force a device: `?view=mac`, `?view=iphone`, `?view=ipad`
+- Open an app directly: `#/app/casestudies`, `#/app/hireme`, `#/app/preview` (CV)
+
+### Demo-only sign-ins
+Wallet / Passwords use the demo login **guest / portfolio2026**. A Portfolio ID is only a display name kept in the browser. Never enter a real password anywhere in the portfolio.
+
+## v10 update — everything added in the cross-check
+
+**New on every device**
+- **My Files** in Finder (Files on iPhone): drag real files from your computer into the window or click *Add Files…*. Preview images, video, audio, PDF and text; rename, duplicate (⌘D), download, delete, and colour **Tags** (sidebar → Tags). Files stay in this browser's IndexedDB (15 MB each, 80 MB total) and are never uploaded.
+- **Photos → Imports**: drag photos in or press ＋.
+- **Safari**: tabs (⌘-style tab strip on Mac, tab grid on iPhone), **Private Browsing** tabs, and a **Reading List** (☆ on any favourite or repository).
+- **Picture in Picture**: Music (⧉ button — a real floating window in Chrome/Edge, an in-page mini player elsewhere) and the TV app's videos.
+- **Dictation**: a 🎤 button appears beside text fields; uses the browser's own speech recognition.
+- **Screen Time limits & Downtime** (Settings → Screen Time): an hourglass cover with *One More Minute* / *Ignore Limit for Today*.
+- **Per-app notifications** (Settings → Notifications): banners, sounds and badges per app, *Show Previews*, and **Scheduled Summary**. Mute now silences every interface sound.
+- **Time Machine** (Mac): hourly snapshots of everything you created; restore any of them.
+- **iPhone Mirroring** (Mac): the iPhone version in a Mac window.
+- Hidden **achievements** (Settings → Desktop & Dock → More), optional **“hello”** start-up screen, live **rain on the wallpaper** when it rains in Kandy.
+
+**Mac**
+- Desktop icon size, grid spacing, sort by name / kind and **Stacks** (Settings → Desktop & Dock).
+- Finder **tabs** (⌘T / ⌘W), Edit → **Duplicate** (⌘D) for Notes and My Files.
+- App Switcher **hot corner**; Genie switches to Scale automatically on slow devices.
+
+**iPhone / iPad**
+- Settings → Home Screen: choose the **4 Dock apps**, page dots, Search button, App Library, badges, Siri Suggestions.
+- Lock Screen: notifications as Count / Stack / List, torch & camera buttons on/off, lock sound.
+- Control Centre **Edit** (hide controls) and power button; Notification Centre grouped by app.
+- **Back Tap** (Accessibility), **Display Zoom**, keyboard clicks, Dynamic Island options.
+- Screenshot **Markup** (tap the thumbnail), AssistiveTouch **Create New Gesture**.
+- iOS shell text in Sinhala and Tamil.
+- Lock Screen now shows only the wallpaper (the Home Screen is hidden behind it).
+
+**What a website can't do** (left out on purpose): change the phone's own keyboard, change your real mouse speed, or sync data between your devices without a server.
+
+## v10.2 — where things live
+
+| What | File |
+|---|---|
+| Control Centre controls and groups | `src/components/ios/IOSControlCentre.tsx` (`CC_DEFS`), defaults in `src/system/SettingsContext.tsx` (`CC_FAV`, `CC_WORK`) |
+| Dynamic Island | `src/components/DynamicIsland.tsx`, timer in `src/system/timer.ts` |
+| Wallpapers (photo + drawn/live/dynamic) | `src/data/media.ts`, `src/components/ProcWall.tsx`, library UI `src/components/WallpaperLibrary.tsx` |
+| Lock Screen gallery | `src/components/ios/IOSLock.tsx` |
+| Docks | iPhone `DOCK_APPS` / iPad `IPAD_DOCK` in `src/system/ios.ts`; Mac `DOCK_PORTFOLIO` in `src/system/apps.ts` |
+| Portfolio modes and Presentation steps | `src/components/ModeBar.tsx` |
+| Welcome guide | `src/components/Onboarding.tsx` |
+| Learning Hub topics | `src/data/learning.ts` |
+| What's New text | `src/apps/WhatsNewApp.tsx` |
+| QR code | `src/system/qr.ts`, `src/components/QRCode.tsx` |
+
+To replay the Welcome Guide, choose **Help → Welcome Guide**, or go to **Settings → Portfolio → Replay Welcome Guide**.
+
+## v10.3 — where things live
+
+| What | File |
+|---|---|
+| Guidebook app and its screenshots | `src/apps/GuidebookApp.tsx`, `public/assets/guide/*.webp` |
+| Welcome guide + first-time hints | `src/components/Onboarding.tsx`, `src/components/FirstHints.tsx` |
+| Welcome notification | `src/system/useScheduled.ts`, text in `src/system/i18n.ts` |
+| Mac widget gallery, snapping | `src/components/Widgets.tsx`, `src/system/desk.ts`, `src/system/customize.ts` |
+| iPhone / iPad widget gallery, Smart Stacks, folders | `src/components/ios/IOSHome.tsx`, `src/components/ios/IOSWidgets.tsx` |
+| Music tracks, languages, moods | `src/data/media.ts` (`tracks`, `MUSIC_LANGS`), player state `src/system/MusicContext.tsx`, app `src/apps/MusicApp.tsx` |
+| Music generator (to make more originals) | `tools/music-world.py` (`python3 tools/music-world.py public/assets/music`) |
+| Settings ↔ portfolio wiring | `src/system/prefs.ts`, `src/components/PrefEffects.tsx` |
+| Settings search row index | `src/data/settingsRows.ts` (regenerate when you add rows) |
+| Lock Screen clock style | `src/system/lockStyle.ts` |
+| iPad wallpapers | `src/components/ProcWall.tsx`, `src/data/media.ts` |
+| Layer order | `src/styles/zlayers.css` |
+
+### Guestbook owner email (optional)
+1. In Vercel → Settings → Environment Variables add `RESEND_API_KEY` and `GUESTBOOK_NOTIFY_TO` (and optionally `GUESTBOOK_NOTIFY_FROM`).
+2. In `src/data/portfolio.ts` set `integrations.guestbookNotify = true`.
+The visitor's email is only used as the reply-to address of that private message; it is never shown or stored publicly. If sending fails, the guestbook message is still saved.
+
+### Music zip parts
+The music files are split across `…-part2-music.zip` and `…-part3-music.zip` (each under 30 MB). Unzip both into the project so that every file ends up in `public/assets/music/`.
+
+### Tip
+On the Mac, right-click the desktop → **Edit Widgets** to add, move or remove widgets; on iPhone/iPad, touch and hold the Home Screen → **Edit → Add Widget**.

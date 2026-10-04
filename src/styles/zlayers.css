@@ -1,0 +1,86 @@
+/*
+  v10.3 — one z-index scale for the whole portfolio. Every layer above the window stack
+ is named here (lowest first), so the stacking order is visible in one place.
+ Each use keeps its old number as a fallback, so nothing moves.
+*/
+:root {
+  --z-ios-split-div: 8000;
+  --z-pane-slide: 9000;
+  --z-modebar: 9000;
+  --z-fh: 9000;
+  --z-wgg: 9400;
+  --z-wgg-ncdrop: 9500;
+  --z-wgg-drag: 9600;
+  --z-mb-ios: 89000;
+  --z-dock-wrap: 90000;
+  --z-ios-sb: 90000;
+  --z-ios-top-pull: 90100;
+  --z-ios-homebar: 90500;
+  --z-ios-di-wrap: 91000;
+  --z-ios-split-hint: 92000;
+  --z-ipad-multi: 92000;
+  --z-ios-sheet-back: 95000;
+  --z-wg-gallery: 95000;
+  --z-launchpad: 95000;
+  --z-ios-sw: 97000;
+  --z-ios-search: 97500;
+  --z-ios-cc-back: 98000;
+  --z-ios-nc: 98000;
+  --z-xcc-back: 98000;
+  --z-genie-layer: 99990;
+  --z-genie-canvas: 99990;
+  --z-ios-at-dot: 99999;
+  --z-menubar: 100000;
+  --z-mac-notch: 100001;
+  --z-ios-lock: 102000;
+  --z-ios-standby: 102000;
+  --z-lk-sleep: 103000;
+  --z-ios-at: 103000;
+  --z-space-hud: 103000;
+  --z-ios-at-back: 103100;
+  --z-ios-at-rec: 103200;
+  --z-toasts: 104000;
+  --z-emoji-pop: 104500;
+  --z-vol-hud: 104800;
+  --z-app-switcher-back: 104900;
+  --z-call9: 105000;
+  --z-notif-center: 105000;
+  --z-call9-in: 105500;
+  --z-ios-alert-back: 106000;
+  --z-cf-scrim: 106000;
+  --z-app-switcher: 106000;
+  --z-kb-sheet-back: 106500;
+  --z-ios-power: 107000;
+  --z-ios-alarm: 108000;
+  --z-ios-siri-glow: 109000;
+  --z-ios-shot: 109500;
+  --z-ios-mk: 109600;
+  --z-control-center: 110000;
+  --z-spotlight-backdrop: 130000;
+  --z-ql-backdrop: 140000;
+  --z-cc-rec-pill: 150000;
+  --z-share-back: 150000;
+  --z-ctx-menu: 150000;
+  --z-v5-about: 160000;
+  --z-v5-sheet-scrim: 165000;
+  --z-v5-fq-scrim: 165000;
+  --z-ios-torch: 170000;
+  --z-outro: 170000;
+  --z-cf-scrim-2: 170500;
+  --z-v5-lock: 175000;
+  --z-nightshift-layer: 179999;
+  --z-brightness-layer: 180000;
+  --z-saver8: 185000;
+  --z-v5-sleep: 190000;
+  --z-sleep-fade: 190000;
+  --z-boot: 200000;
+  --z-v5-shut: 200000;
+  --z-skip-link: 200000;
+  --z-power-off: 200000;
+  --z-ob-back: 2147481000;
+  --z-mp-float: 2147482000;
+  --z-wl2-pv-back: 2147482400;
+  --z-qr-sheet-back: 2147482500;
+  --z-dict-btn: 2147483000;
+  --z-dict-pill: 2147483000;
+}

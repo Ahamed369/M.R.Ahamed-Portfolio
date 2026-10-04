@@ -20,6 +20,10 @@ import { useSystem } from '../system/SystemContext';
 import { usePersisted } from '../system/useStore';
 import { sharePortfolio } from '../system/share';
 import { LANGS } from '../system/i18n';
+import { currentDevice, deviceWall, nextWallpaper, setDeviceWall, wallpaperName } from '../system/wallpaperCycle';
+import { wallFor, wallpaperById } from '../data/media';
+import { settingsApi } from '../system/SettingsContext';
+import type { AppId, PortfolioMode } from '../system/types';
 
 type Line = { kind: 'in' | 'out' | 'err'; content: ReactNode };
 
@@ -44,7 +48,11 @@ const HELP: [string, string][] = [
   ['linkedin', 'open my LinkedIn'],
   ['resume', 'open my CV'],
   ['contact', 'email / phone / compose'],
-  ['theme', 'toggle light / dark'],
+  ['theme [dark|light]', 'switch appearance'],
+  ['open <section>', 'projects · skills · cv · contact · education · experience · learning…'],
+  ['wallpaper [list|next|previous|dynamic|static|name]', 'change the wallpaper'],
+  ['motion <reduce|full>', 'reduce or restore motion'],
+  ['mode <name>', 'recruiter · client · developer · presentation · explore'],
   ['hire', 'Hire Me — availability, CV, book a call'],
   ['casestudy <name>', 'read a project case study'],
   ['ask <question>', 'ask the portfolio AI (e.g. ask does he know react)'],
@@ -89,6 +97,7 @@ export default function TerminalApp() {
     endRef.current?.scrollIntoView({ block: 'end' });
   }, [lines]);
 
+  const settingsNow = () => settingsApi.get();
   const run = (raw: string): Line[] | 'clear' => {
     const [cmd, ...rest] = raw.trim().split(/\s+/);
     const arg = rest.join(' ');
@@ -140,6 +149,26 @@ export default function TerminalApp() {
         ];
       case 'open':
       case 'cat': {
+        // v10.2 — open sections by name
+        const SECTIONS: Record<string, [AppId, Record<string, string> | undefined, string]> = {
+          projects: ['xcode', undefined, 'Projects'],
+          skills: ['notes', undefined, 'Skills'],
+          cv: ['preview', undefined, 'the CV'],
+          resume: ['preview', undefined, 'the CV'],
+          contact: ['hireme', undefined, 'Contact'],
+          education: ['finder', { folder: 'education' }, 'Education'],
+          experience: ['finder', { folder: 'all' }, 'Experience'],
+          settings: ['settings', undefined, 'Settings'],
+          learning: ['learning', undefined, 'the Learning Hub'],
+          weather: ['weather', undefined, 'Weather'],
+          clock: ['clock', undefined, 'Clock'],
+          notes: ['notes', undefined, 'Notes'],
+        };
+        const sec = SECTIONS[arg.toLowerCase().replace(/^learning hub$/, 'learning')];
+        if (cmd.toLowerCase() === 'open' && sec) {
+          wm.open(sec[0], sec[1]);
+          return [out(`Opening ${sec[2]}…`)];
+        }
         const n = Number(arg);
         const p = Number.isInteger(n) && n >= 1 ? projects[n - 1] : projects.find((x) => x.name.toLowerCase().includes(arg.toLowerCase()) || x.id === arg.toLowerCase());
         if (!arg || !p) return [{ kind: 'err', content: `open: project not found: ${arg || '(none)'} — try "projects"` }];
@@ -199,8 +228,53 @@ export default function TerminalApp() {
         wm.open('mail', { compose: '1' });
         return [out('Opening Mail…')];
       case 'theme':
+        if (arg === 'dark' || arg === 'light') {
+          update({ appearance: arg, autoAppearance: 'off' });
+          return [out(`Appearance: ${arg}.`)];
+        }
         toggleAppearance();
-        return [out('Appearance toggled.')];
+        return [out('Appearance toggled. (theme dark · theme light)')];
+      case 'wallpaper': {
+        const dev = currentDevice();
+        const sub = arg.toLowerCase();
+        if (!sub) return [out(`Current wallpaper: ${wallpaperName(deviceWall(settingsNow(), dev))} (${dev}). Try: wallpaper list · next · previous · dynamic · static · <name>`)];
+        if (sub === 'list')
+          return [
+            out(
+              <div className="term-table">
+                {wallFor(dev).map((w) => (
+                  <div key={w.id}>
+                    <b>{w.id}</b>
+                    <span>
+                      {w.name} · {w.kind ?? 'photo'}
+                    </span>
+                  </div>
+                ))}
+              </div>,
+            ),
+          ];
+        if (sub === 'next' || sub === 'previous' || sub === 'prev') return [out(`Wallpaper: ${wallpaperName(nextWallpaper(sub === 'next' ? 1 : -1))}`)];
+        if (sub === 'dynamic') return [out(`Wallpaper: ${wallpaperName(nextWallpaper(1, (id) => ['dynamic', 'live'].includes(wallpaperById(id).kind ?? '')))}`)];
+        if (sub === 'static') return [out(`Wallpaper: ${wallpaperName(nextWallpaper(1, (id) => ['photo', 'art'].includes(wallpaperById(id).kind ?? 'photo')))}`)];
+        const w = wallFor(dev).find((x) => x.id === sub || x.name.toLowerCase() === sub);
+        if (!w) return [{ kind: 'err', content: `wallpaper: no wallpaper called “${arg}” — try “wallpaper list”` }];
+        setDeviceWall(w.id, dev);
+        return [out(`Wallpaper: ${w.name}`)];
+      }
+      case 'motion':
+        if (arg === 'reduce' || arg === 'full') {
+          update({ reduceMotion: arg === 'reduce' });
+          return [out(arg === 'reduce' ? 'Reduce Motion on — live wallpapers pause, transitions are simpler.' : 'Full motion on.')];
+        }
+        return [out(`Motion: ${settingsNow().reduceMotion ? 'reduced' : 'full'}. Try: motion reduce · motion full`)];
+      case 'mode': {
+        const m = arg.toLowerCase() as PortfolioMode;
+        if (['explore', 'recruiter', 'client', 'developer', 'presentation'].includes(m)) {
+          update({ portfolioMode: m, presentStep: 0 });
+          return [out(`Portfolio mode: ${m}.`)];
+        }
+        return [out(`Mode: ${settingsNow().portfolioMode ?? 'explore'}. Try: mode recruiter · client · developer · presentation · explore`)];
+      }
       case 'clear':
         return 'clear';
       case 'hire':

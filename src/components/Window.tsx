@@ -14,8 +14,10 @@ import { APPS } from '../system/apps';
 import { clampRect, dockReserve, MENUBAR_H, useWM } from '../system/WindowManager';
 import { useSettings } from '../system/SettingsContext';
 import { useSystem } from '../system/SystemContext';
-import { genie } from '../system/genie';
+import { genie, primeGenie } from '../system/genie';
 import { tileRect, type TileZone } from './SystemExtras';
+import { assignWindow, getSpaces, windowSpace } from '../system/spaces';
+import { getFlag } from '../system/prefs';
 
 /** Size a window had before it was tiled — restored when it is dragged out again. */
 const preTile = new Map<string, { w: number; h: number }>();
@@ -41,6 +43,9 @@ interface ChromeCtx {
   active: boolean;
 }
 const Chrome = createContext<ChromeCtx | null>(null);
+/** v10 — the iPhone / iPad shell hosts apps without a Mac window frame */
+export const ChromeProvider = Chrome.Provider;
+export type { ChromeCtx };
 
 export function useChrome(): ChromeCtx {
   const c = useContext(Chrome);
@@ -71,8 +76,9 @@ export function Lights() {
 
 /* ─────────────────────────────── Traffic lights ─────────────────────────────── */
 
-function TrafficLights({ onClose, onMin, onMax, maximized }: { onClose: () => void; onMin: () => void; onMax: () => void; maximized: boolean }) {
+function TrafficLights({ onClose, onMin, onMax, maximized, onMinHover, onMaxHover }: { onClose: () => void; onMin: () => void; onMax: () => void; maximized: boolean; onMinHover?: () => void; onMaxHover?: (r: DOMRect) => void }) {
   const stop = (e: RPointerEvent) => e.stopPropagation();
+  const hoverT = useRef(0);
   return (
     <div className="traffic" onPointerDown={stop} onDoubleClick={(e) => e.stopPropagation()}>
       <button type="button" className="tl tl-close" aria-label="Close window" onClick={onClose}>
@@ -80,12 +86,23 @@ function TrafficLights({ onClose, onMin, onMax, maximized }: { onClose: () => vo
           <path d="M2.5 2.5l5 5M7.5 2.5l-5 5" />
         </svg>
       </button>
-      <button type="button" className="tl tl-min" aria-label="Minimize window" onClick={onMin}>
+      <button type="button" className="tl tl-min" aria-label="Minimize window" onClick={onMin} onPointerEnter={onMinHover}>
         <svg viewBox="0 0 10 10" aria-hidden="true">
           <path d="M2 5h6" />
         </svg>
       </button>
-      <button type="button" className="tl tl-max" aria-label={maximized ? 'Restore window size' : 'Maximize window'} onClick={onMax}>
+      <button
+        type="button"
+        className="tl tl-max"
+        aria-label={maximized ? 'Restore window size' : 'Maximize window'}
+        onClick={() => (window.clearTimeout(hoverT.current), onMax())}
+        onPointerEnter={(e) => {
+          if (!onMaxHover || e.pointerType !== 'mouse') return;
+          const r = e.currentTarget.getBoundingClientRect();
+          hoverT.current = window.setTimeout(() => onMaxHover(r), 650);
+        }}
+        onPointerLeave={() => window.clearTimeout(hoverT.current)}
+      >
         <svg viewBox="0 0 10 10" aria-hidden="true">
           {maximized ? <path className="fill" d="M5 5V1.6L8.4 5ZM5 5v3.4L1.6 5Z" /> : <path className="fill" d="M2.2 2.2h4L2.2 6.2ZM7.8 7.8h-4l4-4Z" />}
         </svg>
@@ -101,6 +118,8 @@ interface Props {
   focused: boolean;
   compact: boolean;
   children: ReactNode;
+  /** v10 — the window lives on another Desktop (Space) */
+  offSpace?: boolean;
 }
 
 const EASE_OUT = 'cubic-bezier(.16,1,.3,1)';
@@ -113,13 +132,13 @@ function peekDock() {
   (peekDock as unknown as { t?: number }).t = window.setTimeout(() => root.classList.remove('dock-peek'), 1100);
 }
 
-export function Window({ win, focused, compact, children }: Props) {
+export function Window({ win, focused, compact, children, offSpace }: Props) {
   const wm = useWM();
   const { motionReduced, settings } = useSettings();
   // v9: the Genie plays unless the portfolio's own "Reduce motion" is on (the
   // operating-system preference alone no longer disables it — on Windows that
   // preference is often switched off globally, which hid the effect).
-  const useGenie = settings.minimizeEffect === 'genie' && !settings.reduceMotion;
+  const useGenie = settings.minimizeEffect === 'genie' && !settings.reduceMotion && document.documentElement.dataset.perf !== 'low'; // v10.1 — Scale on slow devices
   const dockSide = settings.dockPosition ?? 'bottom';
   const toIcon = !!settings.minimizeToAppIcon;
   const meta = APPS[win.id];
@@ -188,8 +207,9 @@ export function Window({ win, focused, compact, children }: Props) {
             const r = live.current;
             const t = target.getBoundingClientRect();
             let cancelled = false;
-            el.style.opacity = '0';
-            void genie(el, { x: r.x, y: r.y, w: r.w, h: r.h }, { x: t.left, y: t.top, w: t.width, h: t.height }, 'min', 640, dockSide).then(() => {
+            void genie(el, { x: r.x, y: r.y, w: r.w, h: r.h }, { x: t.left, y: t.top, w: t.width, h: t.height }, 'min', 640, dockSide, () => {
+              el.style.opacity = '0';
+            }).then(() => {
               el.style.opacity = '';
               if (!cancelled) wm.setPhase(id, 'minimized');
             });
@@ -220,7 +240,9 @@ export function Window({ win, focused, compact, children }: Props) {
             const t = target.getBoundingClientRect();
             let cancelled = false;
             el.style.opacity = '0';
-            void genie(el, { x: r.x, y: r.y, w: r.w, h: r.h }, { x: t.left, y: t.top, w: t.width, h: t.height }, 'restore', 560, dockSide).then(() => {
+            void genie(el, { x: r.x, y: r.y, w: r.w, h: r.h }, { x: t.left, y: t.top, w: t.width, h: t.height }, 'restore', 560, dockSide, () => {
+              el.style.opacity = '0';
+            }).then(() => {
               el.style.opacity = '';
               if (!cancelled) wm.setPhase(id, 'open');
             });
@@ -298,7 +320,19 @@ export function Window({ win, focused, compact, children }: Props) {
         Object.assign(preview.style, { left: `${r.x}px`, top: `${r.y}px`, width: `${r.w}px`, height: `${r.h}px` });
       };
 
+      // v10.3 — hold a dragged window against the very top of the screen → Mission Control
+      let topT = 0;
       const move = (ev: PointerEvent) => {
+        if (ev.clientY <= 1 && getFlag('mc-top', true)) {
+          if (!topT)
+            topT = window.setTimeout(() => {
+              up();
+              sys.setOverlay('missioncontrol');
+            }, 900);
+        } else if (topT) {
+          window.clearTimeout(topT);
+          topT = 0;
+        }
         next = clampRect({ ...start, x: start.x + ev.clientX - start.px, y: start.y + ev.clientY - start.py });
         if (tiling) showZone(zoneAt(ev.clientX, ev.clientY));
         if (!frame)
@@ -313,6 +347,7 @@ export function Window({ win, focused, compact, children }: Props) {
           });
       };
       const up = () => {
+        window.clearTimeout(topT);
         cancelAnimationFrame(frame);
         preview?.remove();
         pos.classList.remove('dragging');
@@ -378,6 +413,41 @@ export function Window({ win, focused, compact, children }: Props) {
     [compact, meta.min.h, meta.min.w, win.id, wm],
   );
 
+  /* v10 — hover the green button: macOS Tahoe tiling menu */
+  const tileMenuRef = useRef<(r: DOMRect) => void>(() => undefined);
+  tileMenuRef.current = (r: DOMRect) => {
+    const tile = (z: TileZone) => () => {
+      const pos = posRef.current;
+      pos?.classList.add('snapping');
+      window.setTimeout(() => pos?.classList.remove('snapping'), 380);
+      if (!preTile.has(win.id)) preTile.set(win.id, { w: live.current.w, h: live.current.h });
+      if (z === 'max') {
+        if (!win.maximized) wm.toggleMaximize(win.id);
+      } else wm.setRect(win.id, tileRect(z));
+    };
+    const n = getSpaces().count;
+    sys.setContextMenu({
+      x: r.left,
+      y: r.bottom + 6,
+      items: [
+        { label: win.maximized ? 'Exit Fill' : 'Fill', action: () => (win.maximized ? wm.toggleMaximize(win.id) : tile('max')()) },
+        { label: 'Center', action: tile('center') },
+        { label: '', sep: true },
+        { label: 'Left Half', action: tile('left') },
+        { label: 'Right Half', action: tile('right') },
+        { label: 'Top Left Quarter', action: tile('tl') },
+        { label: 'Top Right Quarter', action: tile('tr') },
+        { label: 'Bottom Left Quarter', action: tile('bl') },
+        { label: 'Bottom Right Quarter', action: tile('br') },
+        { label: '', sep: true },
+        { label: 'Enter Full Screen', action: () => (sys.toggleFullscreen(), !win.maximized && wm.toggleMaximize(win.id)) },
+        ...(n > 1
+          ? [{ label: 'Move to', submenu: Array.from({ length: n }, (_, i) => ({ label: `Desktop ${i + 1}`, disabled: windowSpace(win.id) === i, action: () => assignWindow(win.id, i) })) }]
+          : []),
+      ],
+    });
+  };
+
   const dblAction = settings.titleBarDoubleClick ?? 'zoom';
   const onToggleMax = useCallback(() => {
     if (dblAction === 'none') return;
@@ -392,9 +462,12 @@ export function Window({ win, focused, compact, children }: Props) {
         onClose={() => wm.close(win.id)}
         onMin={() => wm.minimize(win.id)}
         onMax={() => !compact && wm.toggleMaximize(win.id)}
+        onMinHover={() => useGenie && winRef.current && primeGenie(winRef.current)}
+        onMaxHover={compact ? undefined : (r) => tileMenuRef.current(r)}
       />
     ),
-    [win.maximized, compact, wm, win.id],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [win.maximized, compact, wm, win.id, useGenie],
   );
 
   const sys = useSystem();
@@ -420,6 +493,16 @@ export function Window({ win, focused, compact, children }: Props) {
           { label: 'Tile Right', action: tile('right'), disabled: compact },
           { label: 'Center', action: tile('center'), disabled: compact },
           { label: '', sep: true },
+          {
+            label: 'Move to',
+            disabled: compact || getSpaces().count < 2,
+            submenu: Array.from({ length: getSpaces().count }, (_, i) => ({
+              label: `Desktop ${i + 1}${windowSpace(win.id) === i ? ' ✓' : ''}`,
+              disabled: windowSpace(win.id) === i,
+              action: () => assignWindow(win.id, i),
+            })),
+          },
+          { label: '', sep: true },
           { label: `Close ${meta.menuName}`, action: () => wm.close(win.id) },
         ],
       });
@@ -441,7 +524,7 @@ export function Window({ win, focused, compact, children }: Props) {
     <div
       ref={posRef}
       data-win-id={win.id}
-      className={`win-pos ${win.maximized ? 'is-max' : ''} ${compact ? 'is-compact' : ''}`}
+      className={`win-pos ${win.maximized ? 'is-max' : ''} ${compact ? 'is-compact' : ''} ${offSpace ? 'space-off' : ''}`}
       style={{
         transform: `translate3d(${rect.x}px, ${rect.y}px, 0)`,
         width: rect.w,

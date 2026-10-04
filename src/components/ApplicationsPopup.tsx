@@ -96,7 +96,7 @@ export function ApplicationsPopup({ onClose }: { onClose: () => void }) {
         ))}
         {!items.length && <p className="apps-pop-empty">No applications</p>}
       </div>
-      <footer className="apps-pop-foot">{items.length} apps · single-click the Launchpad icon for the full-screen view</footer>
+      <footer className="apps-pop-foot">{items.length} apps · click Launchpad in the Dock for full screen</footer>
     </div>
   );
 }

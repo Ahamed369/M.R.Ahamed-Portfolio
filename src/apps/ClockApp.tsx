@@ -1,3 +1,5 @@
+import { ring } from '../system/sounds';
+import { cancelTimer, pauseTimer, resumeTimer, startTimer, timerActive, useTimer } from '../system/timer';
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { personal } from '../data/portfolio';
 import { notify } from '../system/notify';
@@ -131,28 +133,9 @@ function fmt(ms: number, centis = true) {
 }
 
 /** Plays a short chime with the Web Audio API (no audio file needed). */
+/** v10 — alarms and timers ring with the ringtone chosen in Settings → Sounds & Haptics. */
 function chime(times = 1) {
-  try {
-    const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-    const ctx = new Ctx();
-    for (let r = 0; r < times; r++)
-      [880, 1175, 1568].forEach((f, i) => {
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
-        o.frequency.value = f;
-        o.type = 'sine';
-        const t = ctx.currentTime + r * 0.9 + i * 0.18;
-        g.gain.setValueAtTime(0.0001, t);
-        g.gain.exponentialRampToValueAtTime(0.25, t + 0.02);
-        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.6);
-        o.connect(g).connect(ctx.destination);
-        o.start(t);
-        o.stop(t + 0.65);
-      });
-    window.setTimeout(() => void ctx.close(), 1500 + times * 900);
-  } catch {
-    /* audio not available */
-  }
+  ring(undefined, 0.7, times > 1 ? 30000 : 8000);
 }
 
 const DAYS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
@@ -357,36 +340,15 @@ export default function ClockApp({ win }: Partial<AppProps>) {
   /* ── timer ── */
   const [tMin, setTMin] = useState(5);
   const [tSec, setTSec] = useState(0);
-  const [tLeft, setTLeft] = useState<number | null>(null);
-  const [tRunning, setTRunning] = useState(false);
-  const tEnd = useRef(0);
   const total = (tMin * 60 + tSec) * 1000;
-  useEffect(() => {
-    if (!tRunning) return;
-    const t = window.setInterval(() => {
-      const left = tEnd.current - Date.now();
-      if (left <= 0) {
-        setTLeft(0);
-        setTRunning(false);
-        chime();
-        notify({ app: 'Clock', icon: 'clock', title: 'Timer done', body: `${tMin} min ${tSec} s timer finished`, critical: true });
-      } else setTLeft(left);
-    }, 100);
-    return () => window.clearInterval(t);
-  }, [tRunning, tMin, tSec]);
-  const tStart = () => {
-    const left = tLeft && tLeft > 0 ? tLeft : total;
-    if (left <= 0) return;
-    tEnd.current = Date.now() + left;
-    setTLeft(left);
-    setTRunning(true);
-  };
-  const tPause = () => setTRunning(false);
-  const tCancel = () => {
-    setTRunning(false);
-    setTLeft(null);
-  };
-  const progress = tLeft !== null && total ? tLeft / total : 1;
+  // v10.2 — the timer itself runs in system/timer.ts (survives closing Clock; Dynamic Island controls it)
+  const timer = useTimer();
+  const tRunning = timer.end !== null;
+  const tLeft: number | null = timerActive(timer) ? timer.left : null;
+  const tStart = () => (timer.paused !== null ? resumeTimer() : startTimer(total));
+  const tPause = () => pauseTimer();
+  const tCancel = () => cancelTimer();
+  const progress = tLeft !== null && timer.total ? tLeft / timer.total : 1;
 
   const plus = tab === 'world' ? () => setPicker(true) : tab === 'alarm' ? newAlarm : null;
 

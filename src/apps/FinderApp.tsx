@@ -1,6 +1,8 @@
 import { useCustomize } from '../system/customize';
+import { daysLeft, eraseDeleted, restoreDeleted, useDeleted } from '../system/history';
+import { useSettings } from '../system/SettingsContext';
 import { ConfirmDialog } from '../components/ConfirmDialog';
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { AppIcon, type IconName } from '../components/AppIcons';
 import { cv, education, experience, projects, projectsUsing, timeline, type ExperienceCategory, type ExperienceEntry } from '../data/portfolio';
 import { useWM } from '../system/WindowManager';
@@ -8,20 +10,24 @@ import { useSystem } from '../system/SystemContext';
 import { openExternal } from '../system/notify';
 import { fmtMonth } from '../components/NotificationCenter';
 import type { AppProps } from '../components/Desktop';
+import { addFiles, duplicateFile, fileUrl, fmtSize, kindOf, removeFile, renameFile, setFileTags, TAGS, useMyFiles, type MyFile } from '../system/myFiles';
+import { SysIcon } from '../components/SysIcons';
 
-type Folder = 'all' | 'entrepreneurial' | 'technology' | 'business' | 'leadership' | 'university' | 'education' | 'projects' | 'timeline' | 'trash';
+type Folder = 'all' | 'entrepreneurial' | 'technology' | 'business' | 'leadership' | 'university' | 'education' | 'projects' | 'timeline' | 'myfiles' | 'trash' | `tag-${string}`;
 
-const FOLDERS: { id: Folder; label: string; glyph: string; section: 'Experience' | 'Portfolio' | 'Locations'; cat?: ExperienceCategory }[] = [
-  { id: 'all', label: 'All Experience', glyph: '💼', section: 'Experience' },
-  { id: 'entrepreneurial', label: 'Entrepreneurial', glyph: '🚀', section: 'Experience', cat: 'Entrepreneurial' },
-  { id: 'technology', label: 'Technology', glyph: '📱', section: 'Experience', cat: 'Technology' },
-  { id: 'business', label: 'Business', glyph: '📈', section: 'Experience', cat: 'Business' },
-  { id: 'leadership', label: 'Leadership', glyph: '⭐️', section: 'Experience', cat: 'Leadership' },
-  { id: 'university', label: 'University', glyph: '🏛', section: 'Experience', cat: 'University' },
-  { id: 'education', label: 'Education', glyph: '🎓', section: 'Portfolio' },
-  { id: 'projects', label: 'Projects', glyph: '🧩', section: 'Portfolio' },
-  { id: 'timeline', label: 'Timeline', glyph: '🕒', section: 'Portfolio' },
-  { id: 'trash', label: 'Trash', glyph: '🗑', section: 'Locations' },
+const FOLDERS: { id: Folder; label: string; glyph: string; section: 'Experience' | 'Portfolio' | 'Locations'; cat?: ExperienceCategory; color?: string }[] = [
+  { id: 'all', label: 'All Experience', glyph: 'briefcase', section: 'Experience' },
+  { id: 'entrepreneurial', label: 'Entrepreneurial', glyph: 'sparkles', section: 'Experience', cat: 'Entrepreneurial' },
+  { id: 'technology', label: 'Technology', glyph: 'device', section: 'Experience', cat: 'Technology' },
+  { id: 'business', label: 'Business', glyph: 'bars', section: 'Experience', cat: 'Business' },
+  { id: 'leadership', label: 'Leadership', glyph: 'starFill', section: 'Experience', cat: 'Leadership' },
+  { id: 'university', label: 'University', glyph: 'graduation', section: 'Experience', cat: 'University' },
+  { id: 'education', label: 'Education', glyph: 'graduation', section: 'Portfolio' },
+  { id: 'projects', label: 'Projects', glyph: 'code', section: 'Portfolio' },
+  { id: 'timeline', label: 'Timeline', glyph: 'timer', section: 'Portfolio' },
+  { id: 'myfiles', label: 'My Files', glyph: 'folder', section: 'Locations' },
+  { id: 'trash', label: 'Trash', glyph: 'trash', section: 'Locations' },
+  ...TAGS.map((t) => ({ id: `tag-${t.id}` as Folder, label: t.label, glyph: '●', section: 'Locations' as const, color: t.color })),
 ];
 
 interface Entry {
@@ -147,13 +153,138 @@ function ExperienceDetail({ e }: { e: ExperienceEntry }) {
   );
 }
 
+const fileIcon = (t: string): IconName => (t.startsWith('image/') ? 'photos' : t.startsWith('video/') ? 'tv' : t.startsWith('audio/') ? 'music' : t === 'application/pdf' ? 'pdf' : 'textedit') as IconName;
+
+function MyFileDetail({ f, onDelete }: { f: MyFile; onDelete: () => void }) {
+  const [url, setUrl] = useState<string | null>(null);
+  const [text, setText] = useState<string | null>(null);
+  const [name, setName] = useState(f.name);
+  useEffect(() => {
+    let live = true;
+    void fileUrl(f.id).then((u) => {
+      if (!live) return;
+      setUrl(u);
+      if (u && (f.type.startsWith('text/') || /\.(md|txt|json|csv|js|ts|css|html)$/i.test(f.name)) && f.size < 200000)
+        void fetch(u)
+          .then((r) => r.text())
+          .then((t) => live && setText(t.slice(0, 4000)));
+    });
+    setName(f.name);
+    return () => {
+      live = false;
+    };
+  }, [f.id, f.name, f.type, f.size]);
+  return (
+    <>
+      <h3>{f.name}</h3>
+      <div className="fd-sub">
+        {kindOf(f.type)} · {fmtSize(f.size)} · added {new Date(f.added).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}
+      </div>
+      <div className="fd-file-prev">
+        {url && f.type.startsWith('image/') && <img src={url} alt={f.name} />}
+        {url && f.type.startsWith('video/') && <video src={url} controls playsInline />}
+        {url && f.type.startsWith('audio/') && <audio src={url} controls />}
+        {url && f.type === 'application/pdf' && <iframe src={url} title={f.name} />}
+        {text !== null && <pre>{text}</pre>}
+      </div>
+      <h4>Tags</h4>
+      <div className="fd-tags">
+        {TAGS.map((t) => {
+          const on = f.tags.includes(t.id);
+          return (
+            <button key={t.id} type="button" className={`fd-tag ${on ? 'on' : ''}`} style={{ ['--tag' as string]: t.color }} aria-pressed={on} onClick={() => void setFileTags(f.id, on ? f.tags.filter((x) => x !== t.id) : [...f.tags, t.id])}>
+              <i />
+              {t.label}
+            </button>
+          );
+        })}
+      </div>
+      <h4>Name</h4>
+      <form
+        className="fd-rename"
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (name.trim() && name.trim() !== f.name) void renameFile(f.id, name.trim());
+        }}
+      >
+        <input value={name} onChange={(e) => setName(e.target.value.slice(0, 120))} aria-label="File name" />
+        <button type="submit" className="btn" disabled={!name.trim() || name.trim() === f.name}>
+          Rename
+        </button>
+      </form>
+      <div className="fd-actions">
+        {url && (
+          <a className="btn btn-primary" href={url} target="_blank" rel="noopener noreferrer">
+            Open
+          </a>
+        )}
+        {url && (
+          <a className="btn" href={url} download={f.name}>
+            Download
+          </a>
+        )}
+        <button type="button" className="btn" onClick={() => void duplicateFile(f.id)}>
+          Duplicate
+        </button>
+        <button type="button" className="btn" data-noconfirm onClick={onDelete}>
+          Delete…
+        </button>
+      </div>
+    </>
+  );
+}
+
 export default function FinderApp({ win }: AppProps) {
   const wm = useWM();
   const sys = useSystem();
   const cz = useCustomize();
+  const deleted = useDeleted();
+  const { settings: fset } = useSettings();
   const [confirmEmpty, setConfirmEmpty] = useState(false);
   const normalise = (f?: string): Folder => (f === 'experience' ? 'all' : ((FOLDERS.some((x) => x.id === f) ? f : 'all') as Folder));
-  const [folder, setFolder] = useState<Folder>(normalise(win.args?.folder));
+  const [tabs, setTabs] = useState<Folder[]>(() => [normalise(win.args?.folder)]);
+  const [tabIx, setTabIx] = useState(0);
+  const folder = tabs[Math.min(tabIx, tabs.length - 1)];
+  const setFolder = (f: Folder) => setTabs((l) => l.map((x, i) => (i === Math.min(tabIx, l.length - 1) ? f : x)));
+  const myFiles = useMyFiles();
+  const [dropping, setDropping] = useState(false);
+  const [askDelFile, setAskDelFile] = useState<MyFile | null>(null);
+  const pick = useRef<HTMLInputElement>(null);
+  const newTab = () => {
+    setTabs((l) => [...l, folder]);
+    setTabIx(tabs.length);
+  };
+  const closeTab = (i: number) => {
+    if (tabs.length < 2) return;
+    setTabs((l) => l.filter((_, k) => k !== i));
+    setTabIx((x) => (i < x || x === tabs.length - 1 ? Math.max(0, x - 1) : x));
+  };
+  useEffect(() => {
+    const dup = (e: Event) => {
+      if ((e as CustomEvent<string>).detail === 'finder' && sel && myFiles.some((f) => f.id === sel)) void duplicateFile(sel);
+    };
+    window.addEventListener('mra-duplicate', dup);
+    return () => window.removeEventListener('mra-duplicate', dup);
+  });
+  useEffect(() => {
+    const on = (e: KeyboardEvent) => {
+      if (!(e.metaKey || e.ctrlKey) || wm.focusedId !== 'finder') return;
+      if (e.key.toLowerCase() === 'd' && sel && myFiles.some((f) => f.id === sel)) {
+        e.preventDefault();
+        void duplicateFile(sel);
+        return;
+      }
+      if (e.key.toLowerCase() === 't') {
+        e.preventDefault();
+        newTab();
+      } else if (e.key.toLowerCase() === 'w' && tabs.length > 1) {
+        e.preventDefault();
+        closeTab(tabIx);
+      }
+    };
+    window.addEventListener('keydown', on);
+    return () => window.removeEventListener('keydown', on);
+  });
   const [sel, setSel] = useState<string | null>(win.args?.item ?? null);
   const [view, setView] = useState<'icons' | 'list'>('icons');
   const [detailOpen, setDetailOpen] = useState(!!win.args?.item);
@@ -262,8 +393,36 @@ export default function FinderApp({ win }: AppProps) {
             ),
           },
         ];
+      case 'myfiles':
+        return myFiles.map((f) => ({ id: f.id, name: f.name, kind: `${kindOf(f.type)} · ${fmtSize(f.size)}`, icon: fileIcon(f.type), open: () => void fileUrl(f.id).then((u) => u && window.open(u, '_blank', 'noopener')), detail: () => <MyFileDetail f={f} onDelete={() => setAskDelFile(f)} /> }));
       case 'trash':
-        return cz.trash.map((t) => ({
+        return [
+          ...deleted.map((d) => ({
+            id: `del-${d.id}`,
+            name: d.title,
+            kind: `${d.app} item`,
+            icon: 'trashfull' as IconName,
+            open: () => restoreDeleted(d),
+            detail: () => (
+              <>
+                <h3>{d.title}</h3>
+                <div className="fd-sub">
+                  From {d.app} · deleted {new Date(d.at).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}
+                  {fset.trashAutoEmpty ? ` · ${daysLeft(d, fset.trashAutoEmpty)} days left` : ''}
+                </div>
+                <p>Put it back to restore it exactly where it was in {d.app}.</p>
+                <div className="fd-actions">
+                  <button type="button" className="btn btn-primary" onClick={() => restoreDeleted(d)}>
+                    Put Back
+                  </button>
+                  <button type="button" className="btn" onClick={() => eraseDeleted(d.id)}>
+                    Delete Immediately
+                  </button>
+                </div>
+              </>
+            ),
+          })),
+          ...cz.trash.map((t) => ({
           id: `${t.kind}-${t.id}`,
           name: t.label,
           kind: t.kind === 'app' ? 'Application' : 'Widget',
@@ -283,8 +442,13 @@ export default function FinderApp({ win }: AppProps) {
               </div>
             </>
           ),
-        }));
+        })),
+        ];
       default:
+        if (folder.startsWith('tag-')) {
+          const tg = folder.slice(4);
+          return myFiles.filter((f) => f.tags.includes(tg)).map((f) => ({ id: f.id, name: f.name, kind: `${kindOf(f.type)} · ${fmtSize(f.size)}`, icon: fileIcon(f.type), open: () => void fileUrl(f.id).then((u) => u && window.open(u, '_blank', 'noopener')), detail: () => <MyFileDetail f={f} onDelete={() => setAskDelFile(f)} /> }));
+        }
         return [];
     }
   })();
@@ -292,18 +456,44 @@ export default function FinderApp({ win }: AppProps) {
   const current = entries.find((e) => e.id === sel) ?? null;
 
   return (
-    <div className={`finder ${detailOpen && current ? 'detail-open' : ''}`}>
+    <div
+      className={`finder ${detailOpen && current ? 'detail-open' : ''} ${dropping ? 'fd-dropping' : ''}`}
+      onDragOver={(e) => {
+        if (!e.dataTransfer.types.includes('Files')) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
+        setDropping(true);
+      }}
+      onDragLeave={(e) => e.currentTarget === e.target && setDropping(false)}
+      onDrop={(e) => {
+        if (!e.dataTransfer.files.length) return;
+        e.preventDefault();
+        setDropping(false);
+        void addFiles(e.dataTransfer.files).then(() => goFolder('myfiles'));
+      }}
+    >
       <aside className="fd-side">
         {(['Experience', 'Portfolio', 'Locations'] as const).map((sec) => (
           <div key={sec}>
             <div className="fd-side-h">{sec}</div>
-            {FOLDERS.filter((f) => f.section === sec).map((f) => (
+            {FOLDERS.filter((f) => f.section === sec && !f.color).map((f) => (
               <button key={f.id} type="button" className={`fd-nav ${folder === f.id ? 'on' : ''}`} onClick={() => goFolder(f.id)}>
-                <span aria-hidden="true">{f.glyph}</span> {f.label}
+                <span aria-hidden="true" className="fd-nav-ico">
+                  <SysIcon n={f.glyph} size={16} />
+                </span>{' '}
+                {f.label}
               </button>
             ))}
           </div>
         ))}
+        <div>
+          <div className="fd-side-h">Tags</div>
+          {FOLDERS.filter((f) => f.color).map((f) => (
+            <button key={f.id} type="button" className={`fd-nav ${folder === f.id ? 'on' : ''}`} onClick={() => goFolder(f.id)}>
+              <i className="fd-tag-dot" style={{ background: f.color }} aria-hidden="true" /> {f.label}
+            </button>
+          ))}
+        </div>
       </aside>
       <section className="fd-main">
         <div className="fd-toolbar">
@@ -322,8 +512,19 @@ export default function FinderApp({ win }: AppProps) {
           <b className="fd-title">{meta.label}</b>
           <span className="fd-count">{folder === 'timeline' ? `${timeline.length} milestones` : `${entries.length} item${entries.length === 1 ? '' : 's'}`}</span>
           <span className="fd-spacer" />
+          {folder === 'myfiles' && (
+            <>
+              <input ref={pick} type="file" multiple hidden onChange={(e) => e.target.files && void addFiles(e.target.files).then(() => (e.target.value = ''))} />
+              <button type="button" className="btn fd-empty-btn" onClick={() => pick.current?.click()}>
+                Add Files…
+              </button>
+            </>
+          )}
+          <button type="button" className="fd-newtab" onClick={newTab} aria-label="New tab" title="New Tab (⌘T)">
+            ＋
+          </button>
           {folder === 'trash' && (
-            <button type="button" className="btn fd-empty-btn" disabled={!cz.trash.length} onClick={() => setConfirmEmpty(true)}>
+            <button type="button" className="btn fd-empty-btn" disabled={!cz.trash.length && !deleted.length} onClick={() => setConfirmEmpty(true)}>
               Empty
             </button>
           )}
@@ -338,6 +539,18 @@ export default function FinderApp({ win }: AppProps) {
             </div>
           )}
         </div>
+        {tabs.length > 1 && (
+          <div className="fd-tabs" role="tablist" aria-label="Finder tabs">
+            {tabs.map((t, i) => (
+              <div key={i} role="tab" aria-selected={i === tabIx} className={`fd-tab ${i === tabIx ? 'on' : ''}`} onClick={() => (setTabIx(i), setSel(null), setDetailOpen(false))}>
+                <button type="button" aria-label="Close tab" onClick={(e) => (e.stopPropagation(), closeTab(i))}>
+                  ✕
+                </button>
+                <span>{FOLDERS.find((f) => f.id === t)?.label}</span>
+              </div>
+            ))}
+          </div>
+        )}
         {folder === 'timeline' ? (
           <ol className={`fd-timeline scroll-smooth slide-${dir > 0 ? 'r' : 'l'}`} key="timeline">
             {timeline.map((t, i) => (
@@ -359,7 +572,7 @@ export default function FinderApp({ win }: AppProps) {
         ) : (
           <div className="fd-content">
             <div className={`fd-items ${view} scroll-smooth slide-${dir > 0 ? 'r' : 'l'}`} key={folder + view}>
-              {!entries.length && <div className="fd-empty">{folder === 'trash' ? 'Trash is empty' : 'No items'}</div>}
+              {!entries.length && <div className="fd-empty">{folder === 'trash' ? 'Trash is empty' : folder === 'myfiles' ? 'Drag files here from your computer, or click “Add Files…”. They stay in this browser only.' : folder.startsWith('tag-') ? 'No files with this tag yet — add tags in My Files.' : 'No items'}</div>}
               {entries.map((e) => (
                 <button
                   key={e.id}
@@ -398,6 +611,22 @@ export default function FinderApp({ win }: AppProps) {
           </div>
         )}
       </section>
+      {askDelFile && (
+        <ConfirmDialog
+          icon="trash"
+          message={`Delete “${askDelFile.name}”?`}
+          detail="It is removed from this browser. The original on your computer isn’t touched."
+          confirmLabel="Delete"
+          onCancel={() => setAskDelFile(null)}
+          onConfirm={() => {
+            void removeFile(askDelFile.id);
+            setAskDelFile(null);
+            setSel(null);
+            setDetailOpen(false);
+          }}
+        />
+      )}
+      {dropping && <div className="fd-drop-hint">Drop to add to My Files</div>}
       {confirmEmpty && (
         <ConfirmDialog
           icon="trash"
@@ -407,6 +636,7 @@ export default function FinderApp({ win }: AppProps) {
           onCancel={() => setConfirmEmpty(false)}
           onConfirm={() => {
             cz.emptyTrash();
+            eraseDeleted();
             setConfirmEmpty(false);
             setSel(null);
             setDetailOpen(false);

@@ -18,5 +18,5 @@ const theme: MailTheme = {
 };
 
 export default function MailApp({ win }: AppProps) {
-  return <MailClient key={win.launchKey} theme={theme} composeOnOpen={win.args?.compose === '1'} />;
+  return <MailClient key={win.launchKey} theme={theme} composeOnOpen={win.args?.compose === '1'} subject={win.args?.subject} body={win.args?.body} />;
 }

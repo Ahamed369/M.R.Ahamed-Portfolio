@@ -7,6 +7,7 @@ import { photos } from '../data/media';
 import { SERVICE_AREAS, SERVICE_GROUPS } from '../data/services';
 import { usePersisted } from '../system/useStore';
 import { playUi } from '../system/sounds';
+import { SysIcon } from './SysIcons';
 
 /**
  * v9 — extra widgets for the gallery (Right-click the desktop → Add Widgets…).
@@ -81,7 +82,7 @@ function BatteryWidget() {
       </svg>
       <div className="w9-battery-txt">
         <b>{pct === null ? '—' : `${pct}%`}</b>
-        <span>{pct === null ? 'Not reported by this browser' : b?.charging ? '⚡ Charging' : 'On battery'}</span>
+        <span>{pct === null ? 'Not reported by this browser' : b?.charging ? 'Charging' : 'On battery'}</span>
         <small>This device</small>
       </div>
     </div>
@@ -141,13 +142,13 @@ function ContactWidget() {
       </div>
       <div className="w9-contact-actions">
         <button type="button" title="WhatsApp chat" onClick={() => openExternal(socials.whatsapp, { title: 'Opening WhatsApp chat with M.R. Ahamed', app: 'WhatsApp', icon: 'whatsapp' })}>
-          <span className="wa">💬</span>WhatsApp
+          <span className="wa"><SysIcon n="message" size={15} /></span>WhatsApp
         </button>
         <a href={personal.phoneHref} title={`Call ${personal.phone}`}>
-          <span className="call">📞</span>Call
+          <span className="call"><SysIcon n="phone" size={15} /></span>Call
         </a>
         <button type="button" title="Email" onClick={() => wm.open('mail', { compose: '1' })}>
-          <span className="mail">✉️</span>Mail
+          <span className="mail"><SysIcon n="mail" size={15} /></span>Mail
         </button>
         <button type="button" title="LinkedIn" onClick={() => openExternal(socials.linkedin, { title: 'Opening LinkedIn — M.R. Ahamed', app: 'Safari', icon: 'linkedin' })}>
           <span className="li">in</span>LinkedIn
@@ -275,7 +276,7 @@ function PomodoroWidget() {
         </b>
         <div className="w9-pomo-btns">
           <button type="button" onClick={() => setRun((v) => !v)} aria-label={run ? 'Pause' : 'Start'}>
-            {run ? '❚❚' : '▶'}
+            <SysIcon n={run ? 'pause' : 'play'} size={16} />
           </button>
           <button
             type="button"
@@ -285,7 +286,7 @@ function PomodoroWidget() {
               setLeft(total);
             }}
           >
-            ↺
+            <SysIcon n="undo" size={16} />
           </button>
         </div>
       </div>

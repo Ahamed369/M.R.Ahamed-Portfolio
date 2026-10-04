@@ -1,0 +1,132 @@
+/* ═══════════ v10.3 — iOS 18 / iPadOS 18 widget gallery, Smart Stack editing, folders ═══════════ */
+.ios-wg-preview { display: block; padding: 0; border: 0; background: none; color: inherit; font: inherit; cursor: pointer; }
+.ios-wg-preview .ios-widget { display: block; height: 100%; border-radius: 22px; overflow: hidden; }
+.ios-wg-sheet { display: flex; flex-direction: column; }
+.ios-wg-top { display: flex; align-items: center; gap: 10px; margin: 4px 0 12px; }
+.ios-wg-top .ios-back { margin-right: auto; }
+.ios-wg-search { flex: 1; display: flex; align-items: center; gap: 7px; height: 38px; padding: 0 12px; border-radius: 12px; background: rgba(118, 118, 128, 0.16); color: rgba(60, 60, 67, 0.6); }
+:root[data-theme='dark'] .ios-wg-search { color: rgba(235, 235, 245, 0.6); background: rgba(118, 118, 128, 0.26); }
+.ios-wg-search input { flex: 1; min-width: 0; border: 0; background: none; outline: none; font: inherit; font-size: 16px; color: #000; }
+:root[data-theme='dark'] .ios-wg-search input { color: #fff; }
+.ios-wg-x { flex: none; width: 32px; height: 32px; border: 0; border-radius: 50%; display: grid; place-items: center; background: rgba(118, 118, 128, 0.2); color: rgba(60, 60, 67, 0.75); cursor: pointer; }
+:root[data-theme='dark'] .ios-wg-x { color: rgba(235, 235, 245, 0.75); background: rgba(118, 118, 128, 0.32); }
+
+/* big suggestions (like the top of the iOS 18 gallery) */
+.ios-wg-featured { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 0 0 18px; }
+.ios-wg-feat.w-m, .ios-wg-feat.w-l { grid-column: 1 / -1; }
+.ios-wg-feat .ios-wg-preview { width: 100%; max-width: none; margin: 0; height: auto; aspect-ratio: 1; }
+.ios-wg-feat.w-m .ios-wg-preview { aspect-ratio: 2.12; }
+.ios-wg-feat .ios-wg-preview:active { transform: scale(0.97); }
+.ios-wg-list button.on { background: rgba(10, 132, 255, 0.14); }
+.ios-wg-chev { opacity: 0.35; }
+.ios-wg-none { margin: 0; padding: 18px; text-align: center; opacity: 0.6; }
+
+/* app detail: swipe through sizes */
+.ios-wg-head { display: flex; flex-direction: column; align-items: center; gap: 4px; margin-bottom: 6px; }
+.ios-wg-head h2 { margin: 2px 0 0; font-size: 22px; }
+.ios-wg-hico { width: 46px; height: 46px; }
+.ios-wg-hico svg { width: 100%; height: 100%; }
+.ios-wg-sub { margin: 0; font-size: 14px; opacity: 0.6; text-align: center; }
+.ios-wg-pager { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; margin: 8px -18px 0; flex: 1; min-height: 360px; }
+.ios-wg-pager::-webkit-scrollbar { display: none; }
+.ios-wg-page { flex: 0 0 100%; scroll-snap-align: center; display: grid; place-items: center; padding: 10px 18px; box-sizing: border-box; }
+.ios-wg-page .ios-wg-preview { margin: 0; cursor: default; }
+.ios-wg-page .ios-wg-preview.w-s { width: 170px; height: 170px; }
+.ios-wg-page .ios-wg-preview.w-m { width: min(340px, 100%); height: 160px; }
+.ios-wg-page .ios-wg-preview.w-l { width: min(340px, 100%); height: 340px; }
+.ios-wg-dots { display: flex; justify-content: center; gap: 8px; margin: 6px 0 14px; }
+.ios-wg-dots button { width: 8px; height: 8px; padding: 0; border: 0; border-radius: 50%; background: rgba(127, 127, 127, 0.4); cursor: pointer; }
+.ios-wg-dots button.on { background: currentColor; }
+.ios-wg-sheet .ios-big-btn, .ios-wg-ipad .ios-big-btn { display: flex; align-items: center; justify-content: center; gap: 8px; }
+
+/* iPad: two panes */
+.ios-ipad .ios-sheet.ios-wg-ipad { width: min(880px, calc(100% - 60px)); height: min(640px, calc(100% - 120px)); margin: auto; padding: 0; border-radius: 30px; display: grid; grid-template-columns: 280px minmax(0, 1fr); overflow: hidden; align-self: center; }
+.ios-sheet-back:has(.ios-wg-ipad) { align-items: center; justify-content: center; }
+.ios-wg-side { display: flex; flex-direction: column; gap: 10px; padding: 18px 14px; border-right: 0.5px solid rgba(127, 127, 127, 0.25); overflow-y: auto; background: rgba(255, 255, 255, 0.35); }
+:root[data-theme='dark'] .ios-wg-side { background: rgba(255, 255, 255, 0.04); }
+.ios-wg-side .ios-wg-search { flex: none; }
+.ios-wg-main { position: relative; overflow-y: auto; padding: 26px 28px 30px; display: flex; flex-direction: column; align-items: center; }
+.ios-wg-main .ios-wg-x { position: absolute; top: 16px; right: 16px; }
+.ios-wg-main h2 { display: flex; align-items: center; gap: 10px; margin: 6px 0 4px; font-size: 24px; }
+.ios-wg-main h2 .ios-wg-hico { width: 34px; height: 34px; }
+.ios-wg-sizes { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-end; gap: 22px; margin: 22px 0 24px; }
+.ios-wg-size { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.ios-wg-size .ios-wg-preview { margin: 0; border-radius: 24px; transition: box-shadow 0.15s, transform 0.15s; }
+.ios-wg-size .ios-wg-preview.w-s { width: 150px; height: 150px; }
+.ios-wg-size .ios-wg-preview.w-m { width: 316px; height: 150px; }
+.ios-wg-size .ios-wg-preview.w-l { width: 316px; height: 316px; }
+.ios-wg-size.on .ios-wg-preview { box-shadow: 0 0 0 3px #0a84ff; }
+.ios-wg-size small { font-size: 13px; font-weight: 600; opacity: 0.7; }
+.ios-wg-size.on small { color: #0a84ff; opacity: 1; }
+.ios-ipad .ios-wg-ipad .ios-big-btn { width: auto; min-width: 220px; padding: 0 28px; }
+
+/* Smart Stack editor */
+.ios-stack-ed .ios-wg-top h2 { margin: 0; flex: 1; }
+.ios-stack-ed .ios-row-toggle span { display: flex; flex-direction: column; }
+.ios-stack-ed .ios-row-toggle small { font-size: 12.5px; opacity: 0.6; }
+.ios-stack-h { margin: 18px 6px 8px; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.02em; opacity: 0.55; }
+.ios-stack-row { display: flex; align-items: center; gap: 12px; padding: 8px 12px; min-height: 44px; }
+.ios-stack-row + .ios-stack-row { border-top: 0.5px solid rgba(127, 127, 127, 0.25); }
+.ios-stack-row .app-icon { width: 30px; height: 30px; }
+.ios-stack-row span { flex: 1; font-size: 16px; }
+.ios-stack-row button { border: 0; background: none; padding: 6px; display: grid; place-items: center; color: inherit; cursor: pointer; }
+.ios-stack-row button:disabled { opacity: 0.25; cursor: default; }
+.ios-stack-rm { color: #ff3b30 !important; }
+.ios-stack-add { color: #30d158 !important; }
+.ios-stack-note { font-size: 13px; opacity: 0.6; margin: 14px 6px 0; }
+
+/* folders: drop target + taking apps out */
+.ios-cell.merge-target .ios-icon-img { transform: scale(1.18); box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.55), 0 10px 26px rgba(0, 0, 0, 0.3); transition: transform 0.18s ease, box-shadow 0.18s ease; }
+.ios-folder-app { position: relative; display: grid; place-items: center; }
+.ios-folder-app > button:first-child { border: 0; background: none; padding: 0; cursor: pointer; }
+.ios-folder-app .ios-minus { position: absolute; top: -4px; left: 2px; }
+/* the sheet is a flex column: never squash the sections (they scroll instead) */
+.ios-wg-sheet > * { flex-shrink: 0; }
+.ios-wg-sheet > .ios-wg-pager { flex: 1 0 auto; }
+.ios-wg-main .ios-big-btn { flex: none; min-height: 50px; border-radius: 14px; font-size: 17px; font-weight: 600; }
+.ios-wg-list button span { text-align: left; }
+.ios-wg-sheet .ios-big-btn { min-height: 50px; }
+
+/* v10.3 — Add a Control: browse by app */
+.xcc-gal-sec h4 {
+  display: flex; align-items: center; gap: 8px; margin: 14px 6px 4px;
+  font-size: 13px; font-weight: 600; color: rgba(255, 255, 255, 0.82);
+}
+.xcc-gal-sec:first-child h4 { margin-top: 4px; }
+.xcc-gal-appico { width: 22px; height: 22px; flex: none; border-radius: 6px; }
+.xcc-gal-appico.sys { display: grid; place-items: center; background: rgba(255, 255, 255, 0.16); color: #fff; }
+.xcc-gal-add svg { width: 16px; height: 16px; }
+
+/* v10.3 — iPad: optional Launchpad-style grid of every app */
+.ios-lp {
+  position: absolute; inset: 0; z-index: 500; display: flex; flex-direction: column; align-items: center;
+  padding: 56px 48px 28px; gap: 22px;
+  background: rgba(24, 26, 34, 0.86); backdrop-filter: blur(34px) saturate(1.4); -webkit-backdrop-filter: blur(34px) saturate(1.4);
+  animation: ios-lp-in 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@keyframes ios-lp-in { from { opacity: 0; transform: scale(1.06); } }
+.ios-lp-q {
+  width: min(280px, 70%); height: 34px; display: flex; align-items: center; gap: 8px; padding: 0 12px; border-radius: 10px;
+  background: rgba(255, 255, 255, 0.18); color: rgba(255, 255, 255, 0.8); box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.25);
+}
+.ios-lp-q input { flex: 1; min-width: 0; border: 0; outline: none; background: none; color: #fff; font: inherit; font-size: 15px; }
+.ios-lp-q input::placeholder { color: rgba(255, 255, 255, 0.65); }
+.ios-lp-grid {
+  flex: 1; min-height: 0; width: 100%; max-width: 980px; overflow-y: auto; overscroll-behavior: contain;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 22px 12px; align-content: start; padding: 4px 4px 12px;
+}
+.ios-lp-grid > button {
+  border: 0; background: none; color: #fff; display: flex; flex-direction: column; align-items: center; gap: 7px; cursor: pointer; padding: 0; font: inherit; min-width: 0;
+}
+.ios-lp-grid > button:active .ios-icon-img { filter: brightness(0.75); }
+.ios-lp-grid .ios-icon-label { max-width: 96px; font-size: 12.5px; }
+.ios-lp-done {
+  border: 0; border-radius: 999px; padding: 8px 22px; font: inherit; font-size: 15px; font-weight: 600; cursor: pointer;
+  background: rgba(255, 255, 255, 0.22); color: #fff;
+}
+
+/* v10.3 — small About widget: name on one/two clean lines, title clamped (no half-cut words) */
+.iw-profile.s { justify-content: space-between; gap: 8px; }
+.iw-profile.s b { font-size: 15px; line-height: 1.15; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.iw-profile.s small { font-size: 11px; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.iw-profile.s div { min-height: 0; overflow: hidden; }

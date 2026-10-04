@@ -1,3 +1,4 @@
+import { ring as ringTone } from '../system/sounds';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSettings } from '../system/SettingsContext';
 import { getBatteryManager, recordBattery } from '../system/batteryLog';
@@ -5,6 +6,7 @@ import { CALL_EVT, type CallRequest } from '../system/call';
 import { personal, socials } from '../data/portfolio';
 import { openExternal } from '../system/notify';
 import { sharePortfolio } from '../system/share';
+import { SysIcon } from './SysIcons';
 
 /**
  * v9 — system agents that need no UI of their own:
@@ -52,8 +54,7 @@ export function SystemV9() {
   // Natural scrolling off → reverse wheel scrolling inside the portfolio; pinch zoom off → block page zoom
   useEffect(() => {
     const natural = settings.naturalScroll !== false;
-    const pinch = settings.pinchZoom !== false;
-    if (natural && pinch) return;
+    if (natural) return; // v10: pinch / Ctrl+scroll is handled by SystemV10 (never zooms the page)
     const scrollable = (el: Element | null): Element | null => {
       while (el && el !== document.body) {
         const cs = getComputedStyle(el);
@@ -63,11 +64,7 @@ export function SystemV9() {
       return null;
     };
     const on = (e: WheelEvent) => {
-      if (e.ctrlKey) {
-        if (!pinch) e.preventDefault();
-        return;
-      }
-      if (natural) return;
+      if (e.ctrlKey) return;
       const t = scrollable(e.target as Element);
       if (!t) return;
       e.preventDefault();
@@ -75,7 +72,7 @@ export function SystemV9() {
     };
     window.addEventListener('wheel', on, { passive: false, capture: true });
     return () => window.removeEventListener('wheel', on, { capture: true });
-  }, [settings.naturalScroll, settings.pinchZoom]);
+  }, [settings.naturalScroll]);
 
   // menu bar auto-hide: reveal when the pointer reaches the top edge; data-fs for "in full screen only"
   useEffect(() => {
@@ -179,14 +176,22 @@ function CallOverlay() {
   // ringing sound + outgoing auto-answer after ~3.5 s
   useEffect(() => {
     if (!call || (call.phase !== 'incoming' && call.phase !== 'ringing')) return;
-    ring(audio);
-    const iv = window.setInterval(() => ring(audio), 2200);
+    // v10 — an incoming call rings with the ringtone chosen in Settings → Sounds; outgoing keeps the ring-back tone
+    const rt = call.phase === 'incoming' ? ringTone() : null;
+    if (!rt) ring(audio);
+    const iv = rt ? 0 : window.setInterval(() => ring(audio), 2200);
     const auto = call.phase === 'ringing' ? window.setTimeout(() => setCall((c) => (c && c.phase === 'ringing' ? { ...c, phase: 'active', started: Date.now() } : c)), 3600) : window.setTimeout(() => end(true), 30000);
     return () => {
       window.clearInterval(iv);
       window.clearTimeout(auto);
+      rt?.stop();
     };
   }, [call?.phase, end, call]);
+
+  // v10 — let the Dynamic Island show the call
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent('mra-call-state', { detail: call && call.phase !== 'ended' ? { phase: call.phase, started: call.started, video: call.video, app: call.app } : null }));
+  }, [call?.phase, call?.started, call?.video, call?.app, call]);
 
   // active: timer + captions
   useEffect(() => {
@@ -261,7 +266,7 @@ function CallOverlay() {
           <PhoneGlyph down />
         </button>
         <button type="button" className="call9-round accept" aria-label="Accept" onClick={() => setCall((c) => (c ? { ...c, phase: 'active', started: Date.now() } : c))}>
-          {call.video ? '🎥' : <PhoneGlyph />}
+          {call.video ? <SysIcon n="video" size={30} /> : <PhoneGlyph />}
         </button>
       </div>
     );
@@ -270,7 +275,13 @@ function CallOverlay() {
     <div className={`call9 ${wa ? 'app-wa' : 'app-ft'} ph-${call.phase} ${call.video ? 'video' : 'voice'}`} role="dialog" aria-label={`${wa ? 'WhatsApp' : 'FaceTime'} call`}>
       <div className="call9-bg" style={{ backgroundImage: `url(${personal.photo})` }} />
       <div className="call9-head">
-        <span className="call9-app">{wa ? '🔒 End-to-end demo · WhatsApp' : 'FaceTime'}</span>
+        <span className="call9-app">{wa ? (
+            <>
+              <SysIcon n="lock" size={11} /> End-to-end demo · WhatsApp
+            </>
+          ) : (
+            'FaceTime'
+          )}</span>
         <b>{personal.name}</b>
         <span className="call9-status">
           {call.phase === 'ringing' ? (
@@ -304,10 +315,10 @@ function CallOverlay() {
         {call.phase === 'ended' && (
           <div className="call9-end-actions">
             <button type="button" onClick={() => setCall({ ...call, phase: 'ringing', started: Date.now(), declined: false })}>
-              ↻ Call Again
+              <SysIcon n="restart" size={15} /> Call Again
             </button>
             <button type="button" className="wa-btn" onClick={realWa}>
-              💬 Message on WhatsApp
+              <SysIcon n="message" size={15} /> Message on WhatsApp
             </button>
             <button type="button" onClick={() => setCall(null)}>
               Close
@@ -343,23 +354,28 @@ function CallOverlay() {
             </div>
           )}
           <button type="button" className={`call9-ctl ${muted ? 'on' : ''}`} onClick={() => setMuted((m) => !m)} aria-pressed={muted} title="Mute">
-            {muted ? '🔇' : '🎙'}
+            <SysIcon n={muted ? 'mute' : 'mic'} size={24} />
             <small>{muted ? 'Unmute' : 'Mute'}</small>
           </button>
           <button type="button" className={`call9-ctl ${cam ? 'on' : ''}`} onClick={() => setCam((c) => !c)} aria-pressed={cam} title="Camera" disabled={call.phase !== 'active'}>
-            📷<small>Camera</small>
+            <SysIcon n="video" size={24} />
+            <small>Camera</small>
           </button>
           <button type="button" className={`call9-ctl ${speaker ? 'on' : ''}`} onClick={() => setSpeaker((s) => !s)} aria-pressed={speaker} title="Speaker (reads captions aloud)">
-            🔊<small>Speaker</small>
+            <SysIcon n="speaker" size={24} />
+            <small>Speaker</small>
           </button>
           <button type="button" className="call9-ctl" onClick={() => setShowReact((v) => !v)} disabled={call.phase !== 'active'} title="Reactions">
-            😊<small>React</small>
+            <SysIcon n="heart" size={24} />
+            <small>React</small>
           </button>
           <button type="button" className="call9-ctl" onClick={() => void sharePortfolio()} title="Share">
-            ⤴︎<small>Share</small>
+            <SysIcon n="share" size={24} />
+            <small>Share</small>
           </button>
           <button type="button" className="call9-ctl wa-ctl" onClick={realWa} title="Open a real WhatsApp chat">
-            💬<small>WhatsApp</small>
+            <SysIcon n="message" size={24} />
+            <small>WhatsApp</small>
           </button>
           <button type="button" className="call9-round decline" onClick={() => end(call.phase === 'ringing')} aria-label="End call">
             <PhoneGlyph down />

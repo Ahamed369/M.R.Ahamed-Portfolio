@@ -5,6 +5,38 @@ import { notify } from './notify';
 import { wallpaperById , setCustomWallpaper } from '../data/media';
 import { isNight } from './sun';
 import { setLang } from './i18n';
+import type { CCItem } from './types';
+
+/** default Control Centre layout (kept here so Settings has no UI imports) */
+const CC_FAV: CCItem[] = [
+  { id: 'connectivity', s: 'l' },
+  { id: 'nowplaying', s: 'l' },
+  { id: 'rotlock', s: 's' },
+  { id: 'silent', s: 's' },
+  { id: 'brightness', s: 't' },
+  { id: 'volume', s: 't' },
+  { id: 'focus', s: 'm' },
+  { id: 'torch', s: 's' },
+  { id: 'timer', s: 's' },
+  { id: 'calculator', s: 's' },
+  { id: 'camera', s: 's' },
+  { id: 'darkmode', s: 's' },
+  { id: 'lowpower', s: 's' },
+  { id: 'screenrec', s: 's' },
+  { id: 'quicknote', s: 's' },
+];
+const CC_WORK: CCItem[] = [
+  { id: 'cv', s: 'm' },
+  { id: 'hireme', s: 'm' },
+  { id: 'projects', s: 's' },
+  { id: 'call', s: 's' },
+  { id: 'qr', s: 's' },
+  { id: 'website', s: 's' },
+  { id: 'safari', s: 's' },
+  { id: 'websearch', s: 'm' },
+  { id: 'github', s: 's' },
+  { id: 'mirroring', s: 's' },
+];
 
 /** Cross-fade theme changes with the View Transitions API where available. */
 function withTransition(fn: () => void) {
@@ -61,10 +93,90 @@ export const defaultSettings: Settings = {
   dockAnimateOpen: true,
   minimizeToAppIcon: false,
   dockRecents: true,
+  arrivalAnim: 'soft',
   menubarAutohide: 'never',
   menubarBg: true,
   naturalScroll: true,
   pinchZoom: true,
+  viewAs: 'auto',
+  pinchAction: 'missioncontrol',
+  swipeSpaces: true,
+  parallax: true,
+  perfMode: 'auto',
+  macNotch: false,
+  glassEdge: true,
+  notifTone: 'Portfolio Ding',
+  ringtone: 'Daybreak',
+  iosLongPress: 'switcher',
+  iosIconLook: 'default',
+  iosIconMode: 'auto',
+  iosTint: '#5b8cff',
+  iosLabels: true,
+  iosLargeIcons: false,
+  iosLockFont: 'rounded',
+  iosLockColor: '#ffffff',
+  iosDepth: true,
+  threeFinger: true,
+  atOn: false,
+  atIcons: ['notifications', 'device', 'control', 'home', 'siri', 'custom'],
+  atSingle: 'menu',
+  atDouble: 'switcher',
+  atLong: 'siri',
+  atOpacity: 0.4,
+  askBeforeDelete: true,
+  trashAutoEmpty: 30,
+  undoLimit: 50,
+  standBy: true,
+  alwaysOn: false,
+  focusMode: 'off',
+  userPicker: false,
+  ipadStage: false,
+  dockApps: ['phone', 'safari', 'messages', 'music'],
+  showPageDots: true,
+  appLibrary: true,
+  showBadges: true,
+  homeSearch: true,
+  newApps: 'home',
+  lockTorchBtn: true,
+  lockCameraBtn: true,
+  notifStyle: 'stack',
+  showPreviews: 'always',
+  notifApps: {},
+  scheduledSummary: false,
+  summaryTime: '18:00',
+  backTapDouble: 'none',
+  backTapTriple: 'none',
+  siriSuggestions: true,
+  diShow: { music: true, timer: true, call: true, rec: true, torch: true, notif: true },
+  ccHidden: [],
+  displayZoom: 'standard',
+  keyClicks: true,
+  lockSound: true,
+  appLimits: {},
+  downtime: { on: false, from: '22:00', to: '07:00' },
+  iconSize: 64,
+  iconSpacing: 92,
+  iconSort: 'none',
+  desktopStacks: false,
+  mouseSpeed: 5,
+  mouseNatural: true,
+  appSwitcherCorner: false,
+  dictation: true,
+  weatherFx: true,
+  helloScreen: false,
+  achievements: true,
+  ccLayout: { fav: CC_FAV, work: CC_WORK },
+  ipadDockApps: [],
+  wallIphone: '',
+  wallIpad: '',
+  lockWall: { mac: '', ipad: '', iphone: '' },
+  lockScreens: [],
+  lockScreenId: '',
+  iosTintAuto: false,
+  wallBlur: 0,
+  wallMotion: true,
+  portfolioMode: 'explore',
+  presentStep: 0,
   titleBarDoubleClick: 'zoom',
   iconStyle: 'default',
   folderColor: 'auto',
@@ -104,15 +216,42 @@ interface SettingsCtx {
 
 const Ctx = createContext<SettingsCtx | null>(null);
 
+/** v10.2 — for non-React helpers (Terminal, Assistant): read and update settings */
+export const settingsApi: { get: () => Settings; update: (p: Partial<Settings>) => void } = { get: () => defaultSettings, update: () => undefined };
+
+/** older saved settings → current ones */
+function migrate(s: Settings): Settings {
+  // unknown wallpaper ids (older versions) → the default
+  const out = { ...s, wallpaper: wallpaperById(s.wallpaper).id };
+  // v10.2 — the iPhone Dock is Phone · Safari · Messages · Music (only if it was never customised)
+  if (JSON.stringify(s.dockApps) === JSON.stringify(['phone', 'messages', 'safari', 'music'])) out.dockApps = ['phone', 'safari', 'messages', 'music'];
+  return out;
+}
+
 export function SettingsProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState<Settings>(() => {
-    const s = readStore(KEY, defaultSettings); // readStore merges new defaults into older saved settings
-    // migrate unknown wallpaper ids (older versions) to the default
-    return { ...s, wallpaper: wallpaperById(s.wallpaper).id };
+    // readStore merges new defaults into older saved settings
+    return migrate(readStore(KEY, defaultSettings));
   });
   const [osReduced, setOsReduced] = useState(prefersReducedMotion);
   setLang(settings.language ?? 'en');
   setCustomWallpaper(settings.customWallpaper ?? '', settings.customTone ?? 'dark');
+
+  // v10 — stay in sync with other views of the portfolio (the framed iPhone/iPad, iPhone Mirroring, other tabs) and with Undo
+  useEffect(() => {
+    const reload = () => {
+      const s = readStore(KEY, defaultSettings);
+      setSettings((cur) => (JSON.stringify(cur) === JSON.stringify(s) ? cur : migrate(s)));
+    };
+    const onStorage = (e: StorageEvent) => e.key === KEY && reload();
+    const onRestored = (e: Event) => (e as CustomEvent<string>).detail === KEY && reload();
+    window.addEventListener('storage', onStorage);
+    window.addEventListener('mra-store-restored', onRestored);
+    return () => {
+      window.removeEventListener('storage', onStorage);
+      window.removeEventListener('mra-store-restored', onRestored);
+    };
+  }, []);
 
   useEffect(() => {
     let mq: MediaQueryList | null = null;
@@ -216,13 +355,16 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       withTransition(apply);
       notify({ app: 'Appearance', icon: 'settings', title: patch.appearance === 'dark' ? 'Dark Mode Enabled' : 'Light Mode Enabled' });
     } else apply();
-    if (patch.wallpaper && patch.wallpaper !== cur.wallpaper) {
-      notify({ app: 'Wallpaper', icon: 'settings', title: 'Wallpaper Updated', body: wallpaperById(patch.wallpaper).name });
+    const newWall = patch.wallpaper ?? patch.wallIphone ?? patch.wallIpad;
+    if (newWall && newWall !== cur.wallpaper && newWall !== cur.wallIphone && newWall !== cur.wallIpad) {
+      notify({ app: 'Wallpaper', icon: 'settings', title: 'Wallpaper Updated', body: wallpaperById(newWall).name, silent: true });
     }
   }, []);
   // A manual toggle (menu bar, Control Center) switches Auto appearance off.
   const toggleAppearance = useCallback(() => update({ appearance: settingsRef.current.appearance === 'dark' ? 'light' : 'dark', autoAppearance: 'off' }), [update]);
 
+  settingsApi.get = () => settingsRef.current;
+  settingsApi.update = update;
   const value = useMemo(
     () => ({ settings, update, toggleAppearance, motionReduced }),
     [settings, update, toggleAppearance, motionReduced],

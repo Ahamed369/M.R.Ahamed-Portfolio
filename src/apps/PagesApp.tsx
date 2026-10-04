@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type MouseEvent as RMouseEvent } from 'react';
-import { cvBusinessRole, education, leadership, personal, projects, skillNotes, socials, spokenLanguages, ventures } from '../data/portfolio';
+import { cvBusinessRole, cvProjects, cvSkills, education, leadership, personal, projects, skillNotes, socials, spokenLanguages, ventures } from '../data/portfolio';
 import { readStore, writeStore } from '../system/storage';
 import { usePersisted } from '../system/useStore';
 import { notify } from '../system/notify';
@@ -18,6 +18,7 @@ function resumeHtml(): string {
     esc(personal.location),
     `<a href="${esc(socials.github)}">${esc(strip(socials.github))}</a>`,
     `<a href="${esc(socials.linkedin)}">${esc(strip(socials.linkedin))}</a>`,
+    `<a href="${esc(socials.portfolio)}">${esc(strip(socials.portfolio))}</a>`,
   ].join(' &nbsp;·&nbsp; ');
 
   const edu = education
@@ -29,10 +30,13 @@ function resumeHtml(): string {
     )
     .join('');
 
-  const proj = projects
+  const proj = cvProjects()
     .map((p) => {
-      const stack = Array.from(new Set([...(p.stack.frontend ?? []), ...(p.stack.backend ?? []), ...(p.stack.mobile ?? []), ...(p.stack.database ?? []), ...(p.stack.apis ?? [])]));
-      return `<h3>${esc(p.name)}${p.period ? `<span class="r">${esc(p.period)}</span>` : ''}</h3><p class="org">${esc(p.category)}${p.repo ? ` · <a href="${esc(p.repo)}">${esc(strip(p.repo))}</a>` : ''}</p><p>${esc(p.description)}</p><p class="stack"><b>Stack:</b> ${esc(stack.join(', '))}</p>`;
+      const stack = Array.from(new Set([...(p.stack.frontend ?? []), ...(p.stack.backend ?? []), ...(p.stack.mobile ?? []), ...(p.stack.database ?? []), ...(p.stack.apis ?? []), ...(p.stack.security ?? [])]));
+      const link = p.repo ?? p.teamRepo;
+      return `<h3>${esc(p.name)}${p.period ? `<span class="r">${esc(p.period)}</span>` : ''}</h3><p class="org">${esc(p.category)}${link ? ` · <a href="${esc(link)}">${esc(strip(link))}</a>` : ''}</p>${
+        p.responsibilities?.length ? `<ul>${p.responsibilities.map((r) => `<li>${esc(r)}</li>`).join('')}</ul>` : `<p>${esc(p.description)}</p>`
+      }<p class="stack"><b>Technologies:</b> ${esc(stack.join(', '))}</p>`;
     })
     .join('');
 
@@ -42,10 +46,7 @@ function resumeHtml(): string {
 
   const lead = `<ul>${leadership.map((l) => `<li><b>${esc(l.role)}</b> — ${esc(l.org)} (${esc(l.period)})</li>`).join('')}</ul>`;
 
-  const skills = `<ul class="skills">${skillNotes
-    .filter((n) => !['about', 'languages'].includes(n.id))
-    .map((n) => `<li><b>${esc(n.title)}:</b> ${esc(n.tags.join(', '))}</li>`)
-    .join('')}</ul>`;
+  const skills = `<ul class="skills">${cvSkills.map((g) => `<li><b>${esc(g.label)}:</b> ${esc(g.items.join(', '))}</li>`).join('')}</ul>`;
 
   const langs = `<p>${spokenLanguages.map((l) => `<b>${esc(l.name)}</b> — ${esc(l.level)}`).join(' &nbsp;·&nbsp; ')}</p>`;
 
@@ -70,7 +71,7 @@ const BLANK_LANDSCAPE = '<h1>Untitled</h1><p>A landscape page — great for post
 function coverLetterHtml(): string {
   const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
   const edu = education[0];
-  const top = projects.slice(0, 3);
+  const top = cvProjects().slice(0, 3);
   const skills = skillNotes
     .filter((n) => !['about', 'languages', 'soft'].includes(n.id))
     .flatMap((n) => n.tags)

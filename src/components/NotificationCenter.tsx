@@ -1,10 +1,14 @@
 import { useEffect, useRef, useState, type MouseEvent as ReactMouseEvent, type PointerEvent as ReactPointerEvent } from 'react';
+import { useSettings } from '../system/SettingsContext';
 import { AppIcon, type IconName } from './AppIcons';
 import { useSystem, type NotificationItem } from '../system/SystemContext';
 import { useWM } from '../system/WindowManager';
 import { useMusic } from '../system/MusicContext';
 import { education, personal, projects, socials, timeline } from '../data/portfolio';
 import { openExternal, type NotifyAction } from '../system/notify';
+import { SysIcon } from './SysIcons';
+import { WidgetBody } from './Widgets';
+import { useCustomize } from '../system/customize';
 
 function ago(t: number, now: number) {
   const s = Math.round((now - t) / 1000);
@@ -120,6 +124,7 @@ function NotifCard({ n, now, variant, onDismiss }: { n: NotificationItem; now: n
     });
   };
 
+  const hidePreview = useSettings().settings.showPreviews ?? 'always';
   const run = (a: NotifyAction) => {
     sys.markRead(n.id);
     setMenu(false);
@@ -155,7 +160,8 @@ function NotifCard({ n, now, variant, onDismiss }: { n: NotificationItem; now: n
             <i>{ago(n.time, now)}</i>
           </span>
           <b className="nf-title">{n.title}</b>
-          {n.body && <span className="nf-body">{n.body}</span>}
+          {n.body && hidePreview !== 'never' && <span className="nf-body">{n.body}</span>}
+          {n.body && hidePreview === 'never' && <span className="nf-body">Notification</span>}
         </span>
         {variant === 'center' && !n.read && <span className="nf-dot" aria-label="Unread" />}
       </div>
@@ -252,6 +258,7 @@ export function NotificationCenter() {
   const sys = useSystem();
   const wm = useWM();
   const music = useMusic();
+  const cz = useCustomize();
   const ref = useRef<HTMLElement>(null);
   const open = sys.overlay === 'notifications';
   const [now, setNow] = useState(() => new Date());
@@ -274,6 +281,13 @@ export function NotificationCenter() {
     };
   }, [open, sys]);
 
+  // v10.3 — a tap on a notch alert (with nothing more specific to open) shows Notification Center
+  useEffect(() => {
+    const on = () => sys.setOverlay('notifications');
+    window.addEventListener('mra-open-nc', on);
+    return () => window.removeEventListener('mra-open-nc', on);
+  }, [sys]);
+
   const latest = [...projects].filter((p) => p.updated).sort((a, b) => (b.updated ?? '').localeCompare(a.updated ?? ''))[0];
   const featured = projects.find((p) => p.id === 'healthforge') ?? projects[0];
   const current = projects.filter((p) => p.period?.includes('Present'));
@@ -290,20 +304,44 @@ export function NotificationCenter() {
         <div className="nc-time">{now.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })}</div>
       </section>
 
+      {cz.ncWidgets.length > 0 && (
+        <>
+          <h3 className="nc-h">Widgets</h3>
+          <div className="nc-widgets">
+            {cz.ncWidgets.map((id) => (
+              <div key={id} className="wg-slot wg-in-nc">
+                <button type="button" className="wg-remove nc-wrm" aria-label="Remove widget from Notification Center" onClick={() => cz.removeNcWidget(id)}>
+                  <svg viewBox="0 0 10 10" aria-hidden="true">
+                    <path d="M2.5 5h5" />
+                  </svg>
+                </button>
+                <WidgetBody id={id} />
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
       <h3 className="nc-h">Current</h3>
       <div className="nc-widget">
-        <b>🎓 {education[0].qualification}</b>
+        <b>
+          <SysIcon n="graduation" size={14} className="nc-wi" /> {education[0].qualification}
+        </b>
         <span>
           {education[0].institution} · {education[0].period}
         </span>
       </div>
       <div className="nc-widget">
-        <b>💼 {personal.status}</b>
+        <b>
+          <SysIcon n="briefcase" size={14} className="nc-wi" /> {personal.status}
+        </b>
         <span>Full-stack development · {personal.location}</span>
       </div>
       {current.map((p) => (
         <button key={p.id} type="button" className="nc-widget link" onClick={() => go('xcode', { project: p.id })}>
-          <b>🛠 In progress — {p.name}</b>
+          <b>
+            <SysIcon n="hammer" size={14} className="nc-wi" /> In progress — {p.name}
+          </b>
           <span>
             {p.category} · {p.period}
           </span>
@@ -312,21 +350,29 @@ export function NotificationCenter() {
 
       <h3 className="nc-h">Highlights</h3>
       <button type="button" className="nc-widget link" onClick={() => go('xcode', { project: featured.id })}>
-        <b>⭐ Featured project — {featured.name}</b>
+        <b>
+          <SysIcon n="starFill" size={14} className="nc-wi" /> Featured project — {featured.name}
+        </b>
         <span>{featured.description}</span>
       </button>
       {latest && (
         <button type="button" className="nc-widget link" onClick={() => go('xcode', { project: latest.id })}>
-          <b>🆕 Latest repository update — {latest.name}</b>
+          <b>
+            <SysIcon n="newBadge" size={14} className="nc-wi" /> Latest repository update — {latest.name}
+          </b>
           <span>Pushed {new Date(latest.updated!).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}</span>
         </button>
       )}
       <button type="button" className="nc-widget link" onClick={() => openExternal(socials.github, { title: 'Opening GitHub — Ahamed369', app: 'GitHub', icon: 'github' })}>
-        <b>🐙 GitHub — {projects.filter((p) => p.repo).length} public repositories</b>
+        <b>
+          <SysIcon n="code" size={14} className="nc-wi" /> GitHub — {projects.filter((p) => p.repo).length} public repositories
+        </b>
         <span>github.com/{socials.githubHandle}</span>
       </button>
       <button type="button" className="nc-widget link" onClick={() => go('music')}>
-        <b>🎵 {music.playing ? 'Now playing' : 'Music'} — {music.track.title}</b>
+        <b>
+          <SysIcon n="music" size={14} className="nc-wi" /> {music.playing ? 'Now playing' : 'Music'} — {music.track.title}
+        </b>
         <span>{music.track.artist}</span>
       </button>
 
@@ -347,7 +393,7 @@ export function NotificationCenter() {
           </span>
         )}
       </div>
-      {sys.focus && <div className="nc-focus">🌙 Focus is on — banners are silenced, notifications still collect here.</div>}
+      {sys.focus && <div className="nc-focus"><SysIcon n="moon" size={14} className="nc-wi" /> Focus is on — banners are silenced, notifications still collect here.</div>}
       {sys.notifications.length === 0 ? (
         <div className="nc-empty">No notifications yet — open an app to see activity here.</div>
       ) : (
@@ -374,6 +420,16 @@ export function NotificationCenter() {
       </ol>
       <button type="button" className="nc-more" onClick={() => go('finder', { folder: 'timeline' })}>
         Show full timeline
+      </button>
+      <button
+        type="button"
+        className="nc-more nc-editw"
+        onClick={() => {
+          sys.setOverlay('none');
+          window.dispatchEvent(new Event('mra-edit-widgets'));
+        }}
+      >
+        Edit Widgets…
       </button>
     </aside>
   );

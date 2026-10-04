@@ -1,0 +1,40 @@
+/* v10.3 — settings */
+
+/* Screen Saver preview: the real style */
+.ss-saver { position: relative; overflow: hidden; }
+.ss-saver > img, .ss-saver > .wp-proc-thumb { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.ss-saver > .wp-proc-thumb > .pw { position: absolute; inset: 0; }
+.ss-saver span { position: relative; z-index: 1; }
+.ss-saver.mono { background: #000; animation: none; }
+.saver-mono .saver8-shade { display: none; }
+
+/* search result → the exact row flashes */
+.set-flash { animation: set-flash 2s ease-out; border-radius: 10px; }
+@keyframes set-flash {
+  0%, 30% { box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.55); background-color: rgba(10, 132, 255, 0.14); }
+  100% { box-shadow: 0 0 0 3px rgba(10, 132, 255, 0); background-color: transparent; }
+}
+:root[data-motion='reduced'] .set-flash { animation-duration: 0.01s; outline: 2px solid rgba(10, 132, 255, 0.6); }
+
+/* v10.3 — Lock Screen clock font & colour */
+.ss-lockclock { display: flex; flex-direction: column; gap: 12px; padding: 12px; }
+.ss-lockclock-prev {
+  height: 92px; border-radius: 10px; display: grid; place-items: center; overflow: hidden;
+  background: linear-gradient(135deg, #3a4b8a, #8a3a6f 55%, #d9784a);
+  box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.2);
+}
+.ss-lockclock-prev span { font-size: 56px; line-height: 1; text-shadow: 0 2px 14px rgba(0, 0, 0, 0.25); }
+.ss-lockclock-fonts { display: flex; gap: 8px; flex-wrap: wrap; }
+.ss-lockclock-fonts button {
+  flex: 1 1 64px; min-width: 64px; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 4px;
+  border-radius: 9px; border: 0; background: color-mix(in srgb, var(--text) 6%, transparent); color: var(--text); cursor: pointer; font: inherit;
+}
+.ss-lockclock-fonts button span { font-size: 24px; line-height: 1.1; }
+.ss-lockclock-fonts button small { font-size: 11px; color: var(--text-3); }
+.ss-lockclock-fonts button.on { box-shadow: 0 0 0 2px var(--accent); }
+.ss-lockclock-colors { display: flex; gap: 10px; flex-wrap: wrap; }
+.ss-lockclock-colors button {
+  width: 24px; height: 24px; border-radius: 50%; border: 0; cursor: pointer; padding: 0;
+  box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.25);
+}
+.ss-lockclock-colors button.on { box-shadow: 0 0 0 2px var(--win-solid, #fff), 0 0 0 4px var(--accent); }

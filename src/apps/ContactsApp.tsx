@@ -8,6 +8,7 @@ import { notify, openExternal } from '../system/notify';
 import { AppIcon, type IconName } from '../components/AppIcons';
 import { DragBar, Lights } from '../components/Window';
 import { readStore, writeStore } from '../system/storage';
+import { SysIcon } from '../components/SysIcons';
 
 /** Builds a vCard 3.0 so visitors can save M.R. Ahamed to their phone. */
 function vcard(): string {
@@ -127,7 +128,11 @@ function VisitorCard({ c, onSave, onDelete, onDuplicate, onFav, startEditing }: 
             </div>
           ) : (
             <h2>
-              {fullName(c)} {c.favorite && <span title="Favorite">⭐</span>}
+              {fullName(c)} {c.favorite && (
+                <span title="Favorite" className="ct-fav">
+                  <SysIcon n="starFill" size={16} />
+                </span>
+              )}
             </h2>
           )}
           {!edit && c.company && <span>{c.company}</span>}
@@ -362,7 +367,7 @@ export default function ContactsApp() {
                     <span className="ct8-av sm">{initialsOf(c)}</span>
                     <span>
                       <b>
-                        {fullName(c)} {c.favorite && '⭐'}
+                        {fullName(c)} {c.favorite && <SysIcon n="starFill" size={12} className="ct-fav" />}
                       </b>
                       <small>{c.company || c.email || c.phone || 'Saved on this device'}</small>
                     </span>

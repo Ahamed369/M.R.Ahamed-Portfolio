@@ -252,6 +252,19 @@ export default function ServicesApp({ win }: AppProps) {
                 ) : null;
               })()}
             <div className="svc-sheet-actions">
+              <button
+                type="button"
+                className="svc-btn"
+                onClick={() =>
+                  wm.open('mail', {
+                    compose: '1',
+                    subject: `Enquiry: ${sel.title}`,
+                    body: `Hi Ahamed,\n\nI'm interested in "${sel.title}".\n\nWhat I need:\n\nTimeline / budget:\n\nBest way to reach me:\n`,
+                  })
+                }
+              >
+                ✉︎ Enquire about this
+              </button>
               <button type="button" className="svc-btn wa" onClick={wa}>
                 Ask on WhatsApp
               </button>

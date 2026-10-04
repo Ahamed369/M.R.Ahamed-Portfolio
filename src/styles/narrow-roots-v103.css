@@ -1,0 +1,19 @@
+/* v10.3 — generated: these app roots are their own size containers, so their narrow-layout rules
+   (written as @container rules on the root itself) never applied to the root. On iPhone the
+   narrow layout is always right, so the same declarations are applied by device here. */
+/* apps-extra.css (max-width: 560px) */
+:root[data-device='iphone'] .maps { flex-direction: column; }
+/* apps-v5b.css (max-width: 560px) */
+:root[data-device='iphone'] .pg-chooser { padding: 16px 14px; }
+/* apps-v7a.css (max-width: 640px) */
+:root[data-device='iphone'] .gc { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+/* apps-v7c.css (max-width: 560px) */
+:root[data-device='iphone'] .wa7 { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+/* apps-v7c.css (max-width: 600px) */
+:root[data-device='iphone'] .pw { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+/* apps-v7d.css (max-width: 700px) */
+:root[data-device='iphone'] .cal7 { grid-template-columns: minmax(0, 1fr); }
+/* apps-v7d.css (max-width: 640px) */
+:root[data-device='iphone'] .hm-root.hm7 { grid-template-columns: minmax(0, 1fr); }
+/* apps-v7e.css (max-width: 560px) */
+:root[data-device='iphone'] .pg7-ch { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }

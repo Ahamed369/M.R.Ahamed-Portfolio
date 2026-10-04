@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode, type RefObject } from 'react';
+import { getFlag } from '../../system/prefs';
 
 /* ───────────────────────────── Game API contract ───────────────────────────── */
 
@@ -241,6 +242,7 @@ export function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w
 
 let audio: AudioContext | null = null;
 export function tone(freq: number, ms = 160, type: OscillatorType = 'sine', vol = 0.12): void {
+  if (!getFlag('gc-sounds', true)) return; // Settings → Game Center → Game sounds
   try {
     if (!audio) {
       const AC = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;

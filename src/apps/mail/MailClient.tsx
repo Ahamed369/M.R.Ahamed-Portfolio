@@ -1,3 +1,4 @@
+import { islandPing } from '../../system/island';
 import { useEffect, useMemo, useState, type FormEvent, type MouseEvent as RMouseEvent } from 'react';
 import { DragBar, Lights } from '../../components/Window';
 import { AppIcon, type IconName } from '../../components/AppIcons';
@@ -7,6 +8,7 @@ import { notify } from '../../system/notify';
 import { copyText, sharePortfolio } from '../../system/share';
 import { clearBadge } from '../../system/badges';
 import { cv, personal, socials } from '../../data/portfolio';
+import { SysIcon } from '../../components/SysIcons';
 
 /**
  * v8 — full mail client shared by Mail and Yahoo Mail.
@@ -74,12 +76,12 @@ const seedInbox = (): Mail[] => {
 };
 
 const BOXES: { id: Box; label: string; ico: string }[] = [
-  { id: 'inbox', label: 'Inbox', ico: '📥' },
-  { id: 'flagged', label: 'Flagged', ico: '🚩' },
-  { id: 'drafts', label: 'Drafts', ico: '📝' },
-  { id: 'sent', label: 'Sent', ico: '📤' },
-  { id: 'archive', label: 'Archive', ico: '🗄' },
-  { id: 'trash', label: 'Trash', ico: '🗑' },
+  { id: 'inbox', label: 'Inbox', ico: 'inbox' },
+  { id: 'flagged', label: 'Flagged', ico: 'flag' },
+  { id: 'drafts', label: 'Drafts', ico: 'doc' },
+  { id: 'sent', label: 'Sent', ico: 'share' },
+  { id: 'archive', label: 'Archive', ico: 'archive' },
+  { id: 'trash', label: 'Trash', ico: 'trash' },
 ];
 
 interface Draft {
@@ -91,19 +93,19 @@ interface Draft {
   replyEmail: string;
 }
 
-export function MailClient({ theme, composeOnOpen }: { theme: MailTheme; composeOnOpen?: boolean }) {
+export function MailClient({ theme, composeOnOpen, subject: initSubject = '', body: initBody = '' }: { theme: MailTheme; composeOnOpen?: boolean; subject?: string; body?: string }) {
   const sys = useSystem();
   const [mails, setMails] = usePersisted<Mail[]>(theme.storeKey, seedInbox);
   const [box, setBox] = useState<Box>('inbox');
   const [sel, setSel] = useState<string | null>(null);
   const [q, setQ] = useState('');
-  const [draft, setDraft] = useState<Draft | null>(composeOnOpen ? { to: personal.email, subject: '', body: '', fromName: '', replyEmail: '' } : null);
+  const [draft, setDraft] = useState<Draft | null>(composeOnOpen ? { to: personal.email, subject: initSubject, body: initBody, fromName: '', replyEmail: '' } : null);
   const [err, setErr] = useState('');
   const [pane, setPane] = useState<'list' | 'read'>('list');
 
   useEffect(() => clearBadge(theme.app), [theme.app]);
   useEffect(() => {
-    if (composeOnOpen) setDraft((d) => d ?? { to: personal.email, subject: '', body: '', fromName: '', replyEmail: '' });
+    if (composeOnOpen) setDraft((d) => d ?? { to: personal.email, subject: initSubject, body: initBody, fromName: '', replyEmail: '' });
   }, [composeOnOpen]);
 
   const upd = (id: string, patch: Partial<Mail>) => setMails((l) => l.map((m) => (m.id === id ? { ...m, ...patch } : m)));
@@ -194,6 +196,7 @@ export function MailClient({ theme, composeOnOpen }: { theme: MailTheme; compose
     const body = `${draft.body.trim()}${sig ? `\n\n${sig}` : ''}`;
     const subject = draft.subject.trim() || `Hello from your portfolio${draft.fromName ? ` — ${draft.fromName}` : ''}`;
     theme.deliver(to, subject, body);
+    islandPing({ icon: 'mail', title: 'Opening your email app', sub: 'Press Send there', tint: '#0a84ff', ms: 1600 });
     const m: Mail = { id: uid('s'), box: 'sent', from: draft.fromName || 'You', fromEmail: draft.replyEmail || 'you', to, subject, body, at: Date.now(), read: true };
     setMails((l) => [m, ...l.filter((x) => x.id !== draft.id)]);
     setDraft(null);
@@ -208,13 +211,15 @@ export function MailClient({ theme, composeOnOpen }: { theme: MailTheme; compose
           <Lights />
         </DragBar>
         <button type="button" className="mc-compose" onClick={() => setDraft({ to: personal.email, subject: '', body: '', fromName: '', replyEmail: '' })}>
-          ✎ Compose
+          <SysIcon n="pencil" size={15} /> Compose
         </button>
         {BOXES.map((b) => {
           const c = count(b.id);
           return (
             <button key={b.id} type="button" className={`mc-box ${box === b.id ? 'on' : ''}`} onClick={() => (setBox(b.id), setSel(null), setPane('list'))}>
-              <span>{b.ico}</span>
+              <span className="mc-bico">
+                <SysIcon n={b.ico} size={17} />
+              </span>
               <b>{b.label}</b>
               {c > 0 && <em className={b.id === 'inbox' ? 'unread' : ''}>{c}</em>}
             </button>
@@ -247,9 +252,9 @@ export function MailClient({ theme, composeOnOpen }: { theme: MailTheme; compose
                   <time>{fmtWhen(m.at)}</time>
                 </span>
                 <span className="mc-subj">
-                  {m.pinned && '📌 '}
-                  {m.flagged && '🚩 '}
-                  {m.attachment && '📎 '}
+                  {m.pinned && <SysIcon n="pin" size={12} className="mc-mark pin" />}
+                  {m.flagged && <SysIcon n="flag" size={12} className="mc-mark flag" />}
+                  {m.attachment && <SysIcon n="paperclip" size={12} className="mc-mark" />}
                   {m.subject}
                 </span>
                 <small>{m.body.replace(/\n+/g, ' ').slice(0, 90)}</small>
@@ -267,25 +272,25 @@ export function MailClient({ theme, composeOnOpen }: { theme: MailTheme; compose
                 ‹
               </button>
               <button type="button" onClick={() => reply(cur)} title="Reply">
-                ↩ Reply
+                <SysIcon n="reply" size={15} /> Reply
               </button>
               <button type="button" onClick={() => reply(cur, true)} title="Forward">
-                ↪ Forward
+                <SysIcon n="forward" size={15} /> Forward
               </button>
               <button type="button" onClick={() => upd(cur.id, { flagged: !cur.flagged })} title="Flag">
-                {cur.flagged ? '🚩 Unflag' : '⚑ Flag'}
+                <SysIcon n="flag" size={15} /> {cur.flagged ? 'Unflag' : 'Flag'}
               </button>
               {cur.box === 'archive' || cur.box === 'trash' ? (
                 <button type="button" onClick={() => upd(cur.id, { box: cur.prevBox ?? 'inbox' })}>
-                  ↺ Restore
+                  <SysIcon n="undo" size={15} /> Restore
                 </button>
               ) : (
                 <button type="button" onClick={() => (upd(cur.id, { box: 'archive', prevBox: cur.box === 'trash' || cur.box === 'archive' ? 'inbox' : cur.box }), setSel(null))}>
-                  🗄 Archive
+                  <SysIcon n="archive" size={15} /> Archive
                 </button>
               )}
-              <button type="button" onClick={() => trash(cur)} title="Delete">
-                🗑
+              <button type="button" onClick={() => trash(cur)} title="Delete" aria-label="Delete">
+                <SysIcon n="trash" size={16} />
               </button>
               <button type="button" onClick={(e) => menu(e as unknown as RMouseEvent, cur)} title="More">
                 ⋯
@@ -315,7 +320,7 @@ export function MailClient({ theme, composeOnOpen }: { theme: MailTheme; compose
               )}
               <div className="mc-quick">
                 <button type="button" onClick={() => reply(cur)}>
-                  ↩ Reply
+                  <SysIcon n="reply" size={15} /> Reply
                 </button>
                 <button type="button" onClick={() => void copyText(cur.body).then(() => notify({ app: theme.title, icon: theme.icon, title: 'Copied' }))}>
                   Copy
@@ -382,7 +387,7 @@ export function MailClient({ theme, composeOnOpen }: { theme: MailTheme; compose
                 Sends through {theme.app === 'yahoomail' ? 'Yahoo Mail' : 'your email app'} · replies arrive in your inbox.
               </small>
               <button type="submit" className="mc-send">
-                ➤ Send
+                <SysIcon n="share" size={15} /> Send
               </button>
             </footer>
           </form>

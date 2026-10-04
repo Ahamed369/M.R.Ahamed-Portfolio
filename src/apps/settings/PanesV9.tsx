@@ -1,20 +1,20 @@
-import { useEffect, useRef, useState, type PointerEvent as RPointerEvent } from 'react';
-import { Hero, Note, PopUp, Row, Section, Seg, Sim, Slider, Toggle, usePrefs } from '../SettingsApp';
+import { useEffect, useState, type PointerEvent as RPointerEvent } from 'react';
+import { Hero, Note, PopUp, Row, Section, Seg, Toggle, usePrefs } from '../SettingsApp';
 import { useSettings } from '../../system/SettingsContext';
 import { useSystem } from '../../system/SystemContext';
 import { useWM } from '../../system/WindowManager';
 import { useAccount, setAccount, requireSignIn } from '../../system/account';
 import { readStore, writeStore } from '../../system/storage';
 import { usePersisted } from '../../system/useStore';
-import { notify } from '../../system/notify';
 import { AppIcon } from '../../components/AppIcons';
+import { PinchRow } from './PanesV10';
+import { SysIcon } from '../../components/SysIcons';
 import { personal, socials } from '../../data/portfolio';
 
 /* ════════════════════════════ Trackpad ════════════════════════════ */
 
 export function TrackpadPane() {
   const { settings, update } = useSettings();
-  const { flag, setFlag, choice, setChoice } = usePrefs();
   const [tab, setTab] = useState<'point' | 'scroll' | 'more'>('point');
   const [probe, setProbe] = useState<string>('Click, tap, right-click or press firmly here');
   const [pressure, setPressure] = useState(0);
@@ -49,46 +49,7 @@ export function TrackpadPane() {
       </div>
       {tab === 'point' && (
         <>
-          <Section>
-            <Row label="Tracking speed" sub={<>Pointer speed comes from your device settings <Sim>Device</Sim></>}>
-              <Slider label="Tracking speed" min={0} max={9} step={1} value={Number(choice('tp-speed', '5'))} onChange={(v) => setChoice('tp-speed', String(v))} left={<small>Slow</small>} right={<small>Fast</small>} />
-            </Row>
-            <Row label="Click">
-              <Slider label="Click pressure" min={0} max={2} step={1} value={Number(choice('tp-click', '1'))} onChange={(v) => setChoice('tp-click', String(v))} left={<small>Light</small>} right={<small>Firm</small>} />
-            </Row>
-            <Row label="Force Click and haptic feedback" sub="Click, then press firmly to enable Force Click and haptic feedback">
-              <Toggle label="Force Click and haptic feedback" on={flag('tp-force', true)} onChange={(v) => setFlag('tp-force', v)} />
-            </Row>
-            <Row label="Look up & data detectors">
-              <PopUp
-                label="Look up & data detectors"
-                value={choice('tp-lookup', 'force') as 'force' | 'three' | 'off'}
-                options={[
-                  ['force', 'Force Click with One Finger'],
-                  ['three', 'Tap with Three Fingers'],
-                  ['off', 'Off'],
-                ]}
-                onChange={(v) => setChoice('tp-lookup', v)}
-              />
-            </Row>
-            <Row label="Secondary click">
-              <PopUp
-                label="Secondary click"
-                value={choice('tp-secondary', 'two') as 'two' | 'br' | 'bl' | 'off'}
-                options={[
-                  ['two', 'Click or Tap with Two Fingers'],
-                  ['br', 'Click in Bottom Right Corner'],
-                  ['bl', 'Click in Bottom Left Corner'],
-                  ['off', 'Off'],
-                ]}
-                onChange={(v) => setChoice('tp-secondary', v)}
-              />
-            </Row>
-            <Row label="Tap to click" sub="Tap with one finger">
-              <Toggle label="Tap to click" on={flag('tp-tap', true)} onChange={(v) => setFlag('tp-tap', v)} />
-            </Row>
-          </Section>
-          <Section title="Try it">
+          <Section title="Try it" sub="The portfolio reacts to clicks, taps, right-clicks and (on supporting devices) pressure.">
             <div className="ss-tp-probe" onPointerDown={onProbe} onContextMenu={(e) => (e.preventDefault(), setProbe('Secondary click detected'))} role="button" tabIndex={0} aria-label="Trackpad test area">
               <b>{probe}</b>
               <span className="ss-tp-meter">
@@ -96,6 +57,7 @@ export function TrackpadPane() {
               </span>
             </div>
           </Section>
+          <Note>Tracking speed, click pressure, Force Click, Tap to click and secondary-click options belong to your computer — change them in your Mac’s (or PC’s) own settings. A website can’t, so they aren’t shown here as fake switches.</Note>
         </>
       )}
       {tab === 'scroll' && (
@@ -103,37 +65,31 @@ export function TrackpadPane() {
           <Row label="Natural scrolling" sub="Content tracks finger movement. Turn off to reverse wheel and trackpad scrolling inside the portfolio.">
             <Toggle label="Natural scrolling" on={settings.naturalScroll !== false} onChange={(v) => update({ naturalScroll: v })} />
           </Row>
-          <Row label="Zoom in or out" sub="Pinch with two fingers. Turn off to stop pinch-zooming the page.">
-            <Toggle label="Zoom in or out" on={settings.pinchZoom !== false} onChange={(v) => update({ pinchZoom: v })} />
-          </Row>
-          <Row label="Smart zoom" sub="Double-tap with two fingers">
-            <Toggle label="Smart zoom" on={flag('tp-smartzoom', true)} onChange={(v) => setFlag('tp-smartzoom', v)} />
-          </Row>
-          <Row label="Rotate" sub="Rotate with two fingers">
-            <Toggle label="Rotate" on={flag('tp-rotate', true)} onChange={(v) => setFlag('tp-rotate', v)} />
+          <PinchRow />
+          <Row label="Swipe between desktops" sub="Swipe left or right with two fingers on the desktop">
+            <Toggle label="Swipe between desktops" on={settings.swipeSpaces !== false} onChange={(v) => update({ swipeSpaces: v })} />
           </Row>
         </Section>
       )}
       {tab === 'more' && (
-        <Section>
+        <Section title="Gestures and their shortcuts in this portfolio" sub="Browsers only pass on scrolling and pinching, so the other macOS gestures have keyboard shortcuts here.">
           {(
             [
-              ['tp-pages', 'Swipe between pages', 'Scroll left or right with two fingers'],
-              ['tp-fsapps', 'Swipe between full-screen applications', 'Swipe left or right with three fingers'],
-              ['tp-nc', 'Notification Center', 'Swipe left from the right edge with two fingers'],
-              ['tp-mc', 'Mission Control', 'Swipe up with three fingers'],
-              ['tp-expose', 'App Exposé', 'Swipe down with three fingers'],
-              ['tp-lp', 'Launchpad', 'Pinch with thumb and three fingers'],
-              ['tp-desktop', 'Show Desktop', 'Spread with thumb and three fingers'],
+              ['Mission Control', 'Pinch in, F3 or ⌃↑'],
+              ['Launchpad', 'Pinch in further, F4 or the Launchpad icon'],
+              ['Switch desktops', 'Two-finger swipe or ⌃← / ⌃→'],
+              ['Notification Center', 'Click the date and time in the menu bar'],
+              ['App Switcher', '⌘ Tab (or ⌃ Tab)'],
+              ['Show Desktop', 'F11 or a hot corner'],
             ] as const
-          ).map(([k, l, d]) => (
-            <Row key={k} label={l} sub={d}>
-              <Toggle label={l} on={flag(k, k !== 'tp-expose')} onChange={(v) => setFlag(k, v)} />
+          ).map(([l, d]) => (
+            <Row key={l} label={l}>
+              <small className="ss-kbd-hint">{d}</small>
             </Row>
           ))}
         </Section>
       )}
-      <Note>Gestures are handled by your device. Natural scrolling and pinch-to-zoom settings are applied inside this portfolio.</Note>
+      {tab === 'scroll' && <Note>Natural scrolling, pinch and desktop swipes are applied inside this portfolio.</Note>}
     </>
   );
 }
@@ -141,7 +97,7 @@ export function TrackpadPane() {
 /* ════════════════════════════ Keyboard ════════════════════════════ */
 
 export function KeyboardPane() {
-  const { choice, setChoice, flag, setFlag } = usePrefs();
+  const { flag, setFlag } = usePrefs();
   const [last, setLast] = useState<string>('Press any key…');
   const [text, setText] = useState('');
   useEffect(() => {
@@ -156,13 +112,7 @@ export function KeyboardPane() {
     <>
       <Hero glyph="keyboard" color="#8e8e93" title="Keyboard" desc="Keyboard shortcuts, input sources and a live key tester for this portfolio." />
       <Section>
-        <Row label="Key repeat rate">
-          <Slider label="Key repeat rate" min={0} max={7} step={1} value={Number(choice('kb-repeat', '5'))} onChange={(v) => setChoice('kb-repeat', String(v))} left={<small>Off</small>} right={<small>Fast</small>} />
-        </Row>
-        <Row label="Delay until repeat">
-          <Slider label="Delay until repeat" min={0} max={5} step={1} value={Number(choice('kb-delay', '3'))} onChange={(v) => setChoice('kb-delay', String(v))} left={<small>Long</small>} right={<small>Short</small>} />
-        </Row>
-        <Row label="Keyboard navigation" sub="Use Tab to move focus between controls">
+        <Row label="Keyboard navigation" sub="Shows a clear focus ring on the control you reach with Tab / Shift-Tab">
           <Toggle label="Keyboard navigation" on={flag('kb-nav', true)} onChange={(v) => setFlag('kb-nav', v)} />
         </Row>
         <Row label="Keyboard Shortcuts…">
@@ -177,7 +127,7 @@ export function KeyboardPane() {
         </div>
         <textarea className="ss-kb-text" value={text} onChange={(e) => setText(e.target.value)} placeholder="Type here to test key repeat…" aria-label="Keyboard test" />
       </Section>
-      <Note>Key repeat and delay are handled by your device — the sliders show how macOS arranges them.</Note>
+      <Note>Key repeat rate and delay come from your computer’s own keyboard settings — a website can’t change them.</Note>
     </>
   );
 }
@@ -235,7 +185,7 @@ export function MenuBarPane() {
   );
 }
 
-/* ════════════════════════════ Intelligence & Siri ════════════════════════════ */
+/* ════════════════════════════ Assistant (the portfolio's own — not Apple's Siri) ════════════════════════════ */
 
 export function SiriPane() {
   const wm = useWM();
@@ -264,30 +214,27 @@ export function SiriPane() {
   };
   return (
     <>
-      <Hero glyph="siri" color="#bf5af2" title="Intelligence & Siri" desc="Ask questions about M.R. Ahamed by voice or text. Answers come from the portfolio’s own data." />
-      <Section title="Siri">
-        <Row label="Siri" sub="Answers questions and opens apps">
-          <Toggle label="Siri" on={flag('siri-on', true)} onChange={(v) => setFlag('siri-on', v)} />
+      <Hero glyph="siri" color="#bf5af2" title="Assistant" desc="The portfolio’s own assistant (not Apple’s Siri). Ask about M.R. Ahamed by voice or text — answers come from the portfolio’s own data." />
+      <Section title="Assistant">
+        <Row label="Assistant" sub="Answers questions and opens apps, sets timers and changes wallpapers">
+          <Toggle label="Assistant" on={flag('siri-on', true)} onChange={(v) => setFlag('siri-on', v)} />
         </Row>
-        <Row label="Keyboard shortcut">
+        <Row label="Keyboard shortcut" sub="Opens the Assistant from anywhere">
           <PopUp
             label="Keyboard shortcut"
-            value={choice('siri-key', 'app') as 'app' | 'off'}
+            value={choice('siri-key', 'opt-space') as 'opt-space' | 'off'}
             options={[
-              ['app', 'Open from the Dock or Spotlight'],
+              ['opt-space', 'Press ⌥ Space'],
               ['off', 'Off'],
             ]}
             onChange={(v) => setChoice('siri-key', v)}
           />
         </Row>
-        <Row label="Voice responses" sub="Siri speaks its answers">
-          <Toggle label="Voice responses" on={siri.speak} onChange={(v) => save({ speak: v })} />
+        <Row label="Speak responses" sub="The Assistant reads its answers aloud">
+          <Toggle label="Speak responses" on={siri.speak} onChange={(v) => save({ speak: v })} />
         </Row>
         <Row label="Voice" sub={voices.length ? `${voices.length} voices on this device` : 'Voices come from your browser'}>
-          <PopUp label="Siri voice" value={siri.voice ?? ''} options={[['', 'System default'], ...voices.map((v) => [v.name, `${v.name} (${v.lang})`] as [string, string])]} onChange={(v) => save({ voice: v || undefined })} />
-        </Row>
-        <Row label="Show captions" sub="Always show Siri’s answers on screen">
-          <Toggle label="Show captions" on={flag('siri-captions', true)} onChange={(v) => setFlag('siri-captions', v)} />
+          <PopUp label="Assistant voice" value={siri.voice ?? ''} options={[['', 'System default'], ...voices.map((v) => [v.name, `${v.name} (${v.lang})`] as [string, string])]} onChange={(v) => save({ voice: v || undefined })} />
         </Row>
       </Section>
       <div className="ss-btnrow">
@@ -297,8 +244,8 @@ export function SiriPane() {
         <button type="button" className="ss-btn" onClick={() => wm.open('askai')}>
           Open Ask Me AI
         </button>
-        <button type="button" className="ss-btn ss-btn-primary" onClick={() => wm.open('siri')}>
-          Ask Siri
+        <button type="button" className="ss-btn ss-btn-primary" onClick={() => wm.open('siri')} disabled={!flag('siri-on', true)}>
+          Open Assistant
         </button>
       </div>
       <Note>Speech recognition and voices are provided by your browser. Nothing you say is stored.</Note>
@@ -309,11 +256,8 @@ export function SiriPane() {
 /* ════════════════════════════ Touch ID & Password ════════════════════════════ */
 
 export function TouchIdPane() {
-  const { flag, setFlag } = usePrefs();
   const wm = useWM();
   const [platform, setPlatform] = useState<'checking' | 'yes' | 'no'>('checking');
-  const [prints, setPrints] = usePersisted<string[]>('mra-touchid-v9', []);
-  const [scan, setScan] = useState<number | null>(null);
   useEffect(() => {
     const P = window.PublicKeyCredential as (typeof PublicKeyCredential & { isUserVerifyingPlatformAuthenticatorAvailable?: () => Promise<boolean> }) | undefined;
     if (!P?.isUserVerifyingPlatformAuthenticatorAvailable) {
@@ -324,66 +268,16 @@ export function TouchIdPane() {
       .then((v) => setPlatform(v ? 'yes' : 'no'))
       .catch(() => setPlatform('no'));
   }, []);
-  const timer = useRef(0);
-  const add = () => {
-    if (prints.length >= 3) return;
-    setScan(0);
-    let p = 0;
-    window.clearInterval(timer.current);
-    timer.current = window.setInterval(() => {
-      p += 12;
-      setScan(Math.min(100, p));
-      if (p >= 100) {
-        window.clearInterval(timer.current);
-        setPrints((x) => [...x, `Finger ${x.length + 1}`]);
-        setScan(null);
-        notify({ app: 'Touch ID', icon: 'passwords', title: 'Fingerprint added (demo)', body: 'Nothing was scanned — this portfolio only simulates Touch ID.' });
-      }
-    }, 120);
-  };
-  useEffect(() => () => window.clearInterval(timer.current), []);
   return (
     <>
-      <Hero glyph="fingerprint" color="#ff375f" title="Touch ID & Password" desc="A demo of Touch ID settings. The portfolio never reads fingerprints or real passwords." />
-      <Section title="Touch ID">
-        <div className="ss-fp-row">
-          {prints.map((p, i) => (
-            <div key={p} className="ss-fp">
-              <span className="ss-fp-ico">☝︎</span>
-              <small>{p}</small>
-              <button type="button" aria-label={`Delete ${p}`} onClick={() => setPrints((x) => x.filter((_, k) => k !== i))}>
-                ×
-              </button>
-            </div>
-          ))}
-          {prints.length < 3 && (
-            <button type="button" className="ss-fp add" onClick={add} disabled={scan !== null}>
-              {scan === null ? (
-                <>
-                  <span className="ss-fp-ico">＋</span>
-                  <small>Add Fingerprint</small>
-                </>
-              ) : (
-                <>
-                  <span className="ss-fp-ring" style={{ ['--p' as string]: `${scan}%` }} />
-                  <small>Place finger… {scan}%</small>
-                </>
-              )}
-            </button>
-          )}
-        </div>
-        <Row label="Use Touch ID to unlock the portfolio lock screen" sub={<Sim />}>
-          <Toggle label="Use Touch ID to unlock" on={flag('tid-unlock', true)} onChange={(v) => setFlag('tid-unlock', v)} />
+      <Hero glyph="lock" color="#ff375f" title="Login & Password" desc="How unlocking works in this portfolio. There are no fingerprints, faces or real passwords anywhere here." />
+      <Section title="Unlocking">
+        <Row label="Lock Screen" sub="Click, press Enter or swipe up — no password and no biometrics">
+          <button type="button" className="ss-btn" onClick={() => wm.open('settings', { pane: 'lock' })}>
+            Lock Screen Settings…
+          </button>
         </Row>
-        <Row label="Use Touch ID for Wallet" sub={<Sim />}>
-          <Toggle label="Use Touch ID for Wallet" on={flag('tid-wallet', false)} onChange={(v) => setFlag('tid-wallet', v)} />
-        </Row>
-        <Row label="Use Touch ID for autofilling passwords" sub={<Sim />}>
-          <Toggle label="Use Touch ID for autofilling passwords" on={flag('tid-autofill', true)} onChange={(v) => setFlag('tid-autofill', v)} />
-        </Row>
-      </Section>
-      <Section title="This device">
-        <Row label="Built-in biometric / passkey support" sub="Reported by your browser (WebAuthn)">
+        <Row label="Built-in biometric / passkey support on this device" sub="Reported by your browser (WebAuthn). The portfolio never uses it.">
           {platform === 'checking' ? 'Checking…' : platform === 'yes' ? 'Available' : 'Not available'}
         </Row>
       </Section>
@@ -512,12 +406,12 @@ export function PrintersPane() {
     <>
       <Hero glyph="printer" color="#8e8e93" title="Printers & Scanners" desc="Printing uses your browser’s print dialog — choose a printer or Save as PDF there." />
       <Section title="Printers">
-        <Row label="System Print Dialog" sub="Default · via your browser" glyph={<span className="ss-printer" aria-hidden="true">🖨</span>}>
+        <Row label="System Print Dialog" sub="Default · via your browser" glyph={<span className="ss-printer" aria-hidden="true"><SysIcon n="doc" size={20} /></span>}>
           <button type="button" className="ss-btn" onClick={() => (sys.setOverlay('none'), window.setTimeout(() => window.print(), 50))}>
             Print Test Page
           </button>
         </Row>
-        <Row label="Default paper size">
+        <Row label="Default paper size" sub="Used when you print or save a page as PDF">
           <PopUp
             label="Default paper size"
             value={choice('paper', 'a4') as 'a4' | 'letter'}

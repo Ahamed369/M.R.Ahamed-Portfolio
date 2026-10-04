@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { SysIcon, WxIcon, wxKind } from '../components/SysIcons';
 import { personal } from '../data/portfolio';
 import { readStore, writeStore } from '../system/storage';
 
@@ -56,19 +57,22 @@ interface Stored {
 
 /* ───────────────────────────── Weather codes ───────────────────────────── */
 
-function describe(code: number, day = true): { icon: string; text: string; kind: Sky } {
-  if (code === 0) return { icon: day ? '☀️' : '🌙', text: 'Clear', kind: 'clear' };
-  if (code === 1) return { icon: day ? '🌤️' : '🌙', text: 'Mostly Clear', kind: 'clear' };
-  if (code === 2) return { icon: day ? '⛅️' : '☁️', text: 'Partly Cloudy', kind: 'cloud' };
-  if (code === 3) return { icon: '☁️', text: 'Cloudy', kind: 'cloud' };
-  if (code === 45 || code === 48) return { icon: '🌫️', text: 'Fog', kind: 'fog' };
-  if (code >= 51 && code <= 57) return { icon: '🌦️', text: 'Drizzle', kind: 'rain' };
-  if (code >= 61 && code <= 67) return { icon: '🌧️', text: code >= 65 ? 'Heavy Rain' : 'Rain', kind: 'rain' };
-  if (code >= 71 && code <= 77) return { icon: '🌨️', text: 'Snow', kind: 'snow' };
-  if (code >= 80 && code <= 82) return { icon: day ? '🌦️' : '🌧️', text: code === 82 ? 'Heavy Showers' : 'Showers', kind: 'rain' };
-  if (code === 85 || code === 86) return { icon: '🌨️', text: 'Snow Showers', kind: 'snow' };
-  if (code >= 95) return { icon: '⛈️', text: 'Thunderstorms', kind: 'storm' };
-  return { icon: '🌡️', text: 'Weather', kind: 'cloud' };
+/** v10.3 — original weather glyphs (no emoji); size follows the surrounding font size */
+const wx = (code: number, day: boolean) => <WxIcon kind={wxKind(code, day)} size={24} className="wa-wx" />;
+
+function describe(code: number, day = true): { icon: ReactNode; text: string; kind: Sky } {
+  if (code === 0) return { icon: wx(code, day), text: 'Clear', kind: 'clear' };
+  if (code === 1) return { icon: wx(code, day), text: 'Mostly Clear', kind: 'clear' };
+  if (code === 2) return { icon: wx(code, day), text: 'Partly Cloudy', kind: 'cloud' };
+  if (code === 3) return { icon: wx(code, day), text: 'Cloudy', kind: 'cloud' };
+  if (code === 45 || code === 48) return { icon: wx(code, day), text: 'Fog', kind: 'fog' };
+  if (code >= 51 && code <= 57) return { icon: wx(code, day), text: 'Drizzle', kind: 'rain' };
+  if (code >= 61 && code <= 67) return { icon: wx(code, day), text: code >= 65 ? 'Heavy Rain' : 'Rain', kind: 'rain' };
+  if (code >= 71 && code <= 77) return { icon: wx(code, day), text: 'Snow', kind: 'snow' };
+  if (code >= 80 && code <= 82) return { icon: wx(code, day), text: code === 82 ? 'Heavy Showers' : 'Showers', kind: 'rain' };
+  if (code === 85 || code === 86) return { icon: wx(code, day), text: 'Snow Showers', kind: 'snow' };
+  if (code >= 95) return { icon: wx(code, day), text: 'Thunderstorms', kind: 'storm' };
+  return { icon: wx(code, day), text: 'Weather', kind: 'cloud' };
 }
 
 type Sky = 'clear' | 'cloud' | 'fog' | 'rain' | 'snow' | 'storm';
@@ -568,7 +572,7 @@ function Report({ city, f, unit, map, onHideMap }: { city: City; f: Forecast; un
       <div className="wa-grid">
         <section className="wa-panel wa-days" aria-label="10-day forecast">
           <h3 className="wa-cap">
-            <span aria-hidden="true">📅</span> 10-day forecast
+            <SysIcon n="calendar" size={13} /> 10-day forecast
           </h3>
           {f.daily.time.map((day, i) => {
             const mn = f.daily.temperature_2m_min[i];
@@ -601,24 +605,32 @@ function Report({ city, f, unit, map, onHideMap }: { city: City; f: Forecast; un
 
         <div className="wa-cards">
           <section className="wa-panel wa-card">
-            <h3 className="wa-cap">🌡️ Feels like</h3>
+            <h3 className="wa-cap">
+              <SysIcon n="thermo" size={13} /> Feels like
+            </h3>
             <div className="wa-big">{deg(c.apparent_temperature, unit)}</div>
             <p>{Math.abs(c.apparent_temperature - c.temperature_2m) < 1.5 ? 'Similar to the actual temperature.' : c.apparent_temperature > c.temperature_2m ? 'Humidity is making it feel warmer.' : 'Wind is making it feel cooler.'}</p>
           </section>
           <section className="wa-panel wa-card">
-            <h3 className="wa-cap">💧 Humidity</h3>
+            <h3 className="wa-cap">
+              <SysIcon n="drop" size={13} /> Humidity
+            </h3>
             <div className="wa-big">{Math.round(c.relative_humidity_2m)}%</div>
             <div className="wa-meter" aria-hidden="true">
               <span style={{ width: `${c.relative_humidity_2m}%` }} />
             </div>
           </section>
           <section className="wa-panel wa-card">
-            <h3 className="wa-cap">💨 Wind</h3>
+            <h3 className="wa-cap">
+              <SysIcon n="windGlyph" size={13} /> Wind
+            </h3>
             <div className="wa-big">{wind}</div>
             <p>Wind speed at 10 m above ground.</p>
           </section>
           <section className="wa-panel wa-card">
-            <h3 className="wa-cap">☀️ UV index</h3>
+            <h3 className="wa-cap">
+              <SysIcon n="sun" size={13} /> UV index
+            </h3>
             <div className="wa-big">
               {Math.round(uv)} <small>{uvLabel(uv)}</small>
             </div>
@@ -628,14 +640,18 @@ function Report({ city, f, unit, map, onHideMap }: { city: City; f: Forecast; un
             <p>Today’s maximum.</p>
           </section>
           <section className="wa-panel wa-card">
-            <h3 className="wa-cap">🌧️ Precipitation</h3>
+            <h3 className="wa-cap">
+              <SysIcon n="umbrella" size={13} /> Precipitation
+            </h3>
             <div className="wa-big">
               {unit === 'F' ? `${(c.precipitation / 25.4).toFixed(2)}″` : `${c.precipitation} mm`}
             </div>
             <p>{rainChance != null ? `${rainChance}% chance of rain today.` : 'In the last hour.'}</p>
           </section>
           <section className="wa-panel wa-card">
-            <h3 className="wa-cap">🌅 {daytime ? 'Sunset' : 'Sunrise'}</h3>
+            <h3 className="wa-cap">
+              <SysIcon n="sunrise" size={13} /> {daytime ? 'Sunset' : 'Sunrise'}
+            </h3>
             <div className="wa-big">{clock(daytime ? f.daily.sunset[0] : f.daily.sunrise[0])}</div>
             <svg className="wa-sun" viewBox="0 0 120 56" aria-hidden="true">
               <path d="M10 50 Q60 -26 110 50" fill="none" stroke="rgba(255,255,255,.35)" strokeWidth="2" strokeDasharray="3 4" />

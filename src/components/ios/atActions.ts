@@ -1,0 +1,20 @@
+/** AssistiveTouch actions (shared by the iPhone shell and Settings). */
+export const AT_ACTIONS: Record<string, { label: string; glyph: string; icon: string }> = {
+  menu: { label: 'Open Menu', glyph: '◉' , icon: 'grid' },
+  home: { label: 'Home', glyph: '⌂' , icon: 'home' },
+  notifications: { label: 'Notification Centre', glyph: '☰' , icon: 'bell' },
+  control: { label: 'Control Centre', glyph: '◧' , icon: 'toggles' },
+  switcher: { label: 'App Switcher', glyph: '▤' , icon: 'grid' },
+  siri: { label: 'Assistant', glyph: '◎' , icon: 'sparkle' },
+  device: { label: 'Device', glyph: '▯' , icon: 'device' },
+  custom: { label: 'Custom', glyph: '★' , icon: 'star' },
+  screenshot: { label: 'Screenshot', glyph: '⧈' , icon: 'shot' },
+  lock: { label: 'Lock Screen', glyph: '🔒' , icon: 'lock' },
+  search: { label: 'Spotlight', glyph: '⌕' , icon: 'search' },
+  undo: { label: 'Undo (shake)', glyph: '↶' , icon: 'undo' },
+  torch: { label: 'Torch', glyph: '🔦' , icon: 'torch' },
+  camera: { label: 'Camera', glyph: '◉' , icon: 'camera' },
+  poweroff: { label: 'Power Off', glyph: '⏻' , icon: 'power' },
+  settings: { label: 'Settings', glyph: '⚙︎' , icon: 'gear' },
+  none: { label: 'None', glyph: '·' , icon: 'x' },
+};

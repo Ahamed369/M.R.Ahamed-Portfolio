@@ -3,7 +3,10 @@
  * (No proprietary icon assets are used.)
  */
 import { useId, type ReactElement, type ReactNode } from 'react';
+import { LearningIcon, MirroringIcon, TimeMachineIcon, WhatsNewIcon } from './AppIcons101';
+import { FlashcardsIcon, FocusplannerIcon, GoalsIcon, BizplannerIcon, PlaygroundIcon, DocumentsIcon, GuidebookIcon } from './AppIcons103';
 import { ActivityIcon, BatteryIcon, CanvaIcon, ColorMeterIcon, DiscordIcon, FontBookIcon, GoogleDocsIcon, GrapherIcon, LiveClockIcon, PinterestIcon, RedditIcon, ServicesIcon, StackIcon, StickiesIcon, SysPrefsIcon, TranslateIcon } from './AppIcons9';
+import { AppLibraryIcon, ChessIcon, FilesIcon, PhoneAppIcon, ShortcutsIcon, TextEditIcon } from './AppIcons10';
 import { AskAIIcon, CaseStudyIcon, CvIcon, GuestbookIcon, HireMeIcon, PlayStoreIcon, ShareIcon, TelegramIcon, WalletIcon, WhatsAppIcon, XIcon, YahooMailIcon } from './AppIcons8';
 
 export type IconName =
@@ -103,6 +106,17 @@ export type IconName =
   | 'activity'
   | 'services'
   | 'stickies'
+  | 'timemachine'
+  | 'mirroring'
+  | 'learning'
+  | 'whatsnew'
+  | 'flashcards'
+  | 'focusplanner'
+  | 'goals'
+  | 'bizplanner'
+  | 'playground'
+  | 'documents'
+  | 'guidebook'
   | 'sysprefs'
   | 'translate'
   | 'fontbook'
@@ -113,7 +127,14 @@ export type IconName =
   | 'stackoverflow'
   | 'pinterest'
   | 'canva'
-  | 'gdocs';
+  | 'gdocs'
+  /* v10 */
+  | 'phoneapp'
+  | 'shortcuts'
+  | 'chess'
+  | 'textedit'
+  | 'files'
+  | 'applibrary';
 
 // Squircle-ish rounded square
 const R = { x: 6, y: 6, width: 88, height: 88, rx: 21 };
@@ -1418,6 +1439,17 @@ const MAP: Record<IconName, (p: { u: string }) => ReactElement> = {
   activity: ActivityIcon,
   services: ServicesIcon,
   stickies: StickiesIcon,
+  timemachine: TimeMachineIcon,
+  mirroring: MirroringIcon,
+  learning: LearningIcon,
+  whatsnew: WhatsNewIcon,
+  flashcards: FlashcardsIcon,
+  focusplanner: FocusplannerIcon,
+  goals: GoalsIcon,
+  bizplanner: BizplannerIcon,
+  playground: PlaygroundIcon,
+  documents: DocumentsIcon,
+  guidebook: GuidebookIcon,
   sysprefs: SysPrefsIcon,
   translate: TranslateIcon,
   fontbook: FontBookIcon,
@@ -1521,6 +1553,12 @@ const MAP: Record<IconName, (p: { u: string }) => ReactElement> = {
   playstore: PlayStoreIcon,
   share: ShareIcon,
   cv: CvIcon,
+  phoneapp: PhoneAppIcon,
+  shortcuts: ShortcutsIcon,
+  chess: ChessIcon,
+  textedit: TextEditIcon,
+  files: FilesIcon,
+  applibrary: AppLibraryIcon,
 };
 
 export function AppIcon({ name, className }: { name: IconName; className?: string }) {

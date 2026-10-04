@@ -4,10 +4,10 @@
  * • Offline fallback: the last cached copy of every file.
  * • notificationclick focuses the portfolio tab.
  */
-const CACHE = 'mra-portfolio-v8';
+const CACHE = 'mra-portfolio-v10';
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(['./', './index.html', './favicon.svg']).catch(() => undefined)));
+  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(['./', './index.html', './favicon.svg', './offline.html']).catch(() => undefined)));
   self.skipWaiting();
 });
 
@@ -51,7 +51,7 @@ self.addEventListener('fetch', (e) => {
         }
         return res;
       })
-      .catch(() => caches.match(req).then((hit) => hit || caches.match('./index.html'))),
+      .catch(() => caches.match(req).then((hit) => hit || (req.mode === 'navigate' ? caches.match('./index.html').then((i) => i || caches.match('./offline.html')) : undefined))),
   );
 });
 

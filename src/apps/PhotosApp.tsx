@@ -1,5 +1,8 @@
+import { rightClick } from '../system/input';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type MouseEvent as RMouseEvent, type ReactNode } from 'react';
 import { photos, videos, type Photo, type Video } from '../data/media';
+import { addFiles, useFileUrls, useMyFiles } from '../system/myFiles';
+import { currentDevice, setDeviceWall } from '../system/wallpaperCycle';
 import { personal } from '../data/portfolio';
 import { useSystem } from '../system/SystemContext';
 import { useSettings } from '../system/SettingsContext';
@@ -7,14 +10,37 @@ import { readStore, writeStore } from '../system/storage';
 import { notify } from '../system/notify';
 import { wallFromUrl, wallNotice } from '../system/customWallpaper';
 import { DragBar, Lights } from '../components/Window';
+import { ConfirmDialog } from '../components/ConfirmDialog';
 import type { AppProps } from '../components/Desktop';
+import { SysIcon } from '../components/SysIcons';
 
-type View = 'library' | 'collections' | 'favorites' | 'recent' | 'map' | 'videos' | 'screenshots' | 'people' | 'deleted' | 'Portraits' | 'Screenshots' | 'Wallpapers';
+type View = 'library' | 'collections' | 'favorites' | 'recent' | 'map' | 'videos' | 'screenshots' | 'people' | 'deleted' | 'hidden' | 'duplicates' | 'live' | 'Portraits' | 'Screenshots' | 'Wallpapers' | 'Imports';
 type Filter = 'all' | 'favorites' | 'Portraits' | 'Screenshots';
 
 const FAV_KEY = 'mra-photos-favorites';
 const DEL_KEY = 'mra-photos-deleted';
 const ROT_KEY = 'mra-photos-rotation';
+/* v10 */
+const HID_KEY = 'mra-photos-hidden';
+const DAT_KEY = 'mra-photos-deleted-at';
+const EDIT_KEY = 'mra-photos-edits';
+
+/** v10 — photo edits (non-destructive: Revert brings back the original) */
+export interface PhotoEdit {
+  light: number;
+  contrast: number;
+  sat: number;
+  warmth: number;
+  vignette: number;
+  bw: boolean;
+}
+const NO_EDIT: PhotoEdit = { light: 0, contrast: 0, sat: 0, warmth: 0, vignette: 0, bw: false };
+export const editFilter = (e?: PhotoEdit) =>
+  e ? `brightness(${1 + e.light / 100}) contrast(${1 + e.contrast / 100}) saturate(${e.bw ? 0 : 1 + e.sat / 100}) sepia(${Math.max(0, e.warmth) / 160}) hue-rotate(${Math.min(0, e.warmth) / 4}deg)` : undefined;
+/** Portraits are shown as Live Photos (press and hold to play the motion effect) */
+const isLive = (p: Photo) => p.album === 'Portraits';
+/** hidden albums unlock once per visit (a simple lock — no biometrics) */
+let unlockedThisVisit = false;
 
 /* ─────────── sidebar glyphs (simple line icons) ─────────── */
 const IC: Record<string, ReactNode> = {
@@ -58,6 +84,25 @@ const IC: Record<string, ReactNode> = {
     </>
   ),
   deleted: <path d="M5 7h14M10 7V5h4v2M6.5 7l1 12.5h9L17.5 7M10.2 10.5v6M13.8 10.5v6" />,
+  hidden: (
+    <>
+      <path d="M3 12s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6z" />
+      <path d="M4 20L20 4" />
+    </>
+  ),
+  duplicates: (
+    <>
+      <rect x="3.5" y="7" width="12" height="12" rx="2" />
+      <path d="M8 4.5h10.5a2 2 0 0 1 2 2V17" />
+    </>
+  ),
+  live: (
+    <>
+      <circle cx="12" cy="12" r="3" />
+      <circle cx="12" cy="12" r="6" />
+      <circle cx="12" cy="12" r="9" strokeDasharray="1.5 2.2" />
+    </>
+  ),
   album: (
     <>
       <rect x="3.5" y="5" width="17" height="14" rx="2" />
@@ -128,19 +173,26 @@ const TITLES: Record<View, string> = {
   screenshots: 'Screenshots',
   people: 'People & Pets',
   deleted: 'Recently Deleted',
+  hidden: 'Hidden',
+  duplicates: 'Duplicates',
+  live: 'Live Photos',
   Portraits: 'Portraits',
   Screenshots: 'Portfolio Screenshots',
   Wallpapers: 'Wallpapers',
+  Imports: 'Imports',
 };
 
 export default function PhotosApp({ win }: AppProps) {
   const sys = useSystem();
   const { motionReduced, update } = useSettings();
-  applyWall = (src, tone) => update({ customWallpaper: src, customTone: tone, wallpaper: 'custom' });
+  applyWall = (src, tone) => {
+    update({ customWallpaper: src, customTone: tone });
+    setDeviceWall('custom', currentDevice(), 'home');
+  };
   const rootRef = useRef<HTMLDivElement>(null);
   const [view, setView] = useState<View>((win.args?.album as View) || 'library');
   const [sel, setSel] = useState<string | null>(null);
-  const [viewer, setViewer] = useState<{ id: string; origin: DOMRect | null; slideshow: boolean } | null>(null);
+  const [viewer, setViewer] = useState<{ id: string; origin: DOMRect | null; slideshow: boolean; edit?: boolean } | null>(null);
   const [cols, setCols] = useState(5);
   const [filter, setFilter] = useState<Filter>('all');
   const [newestFirst, setNewestFirst] = useState(false);
@@ -154,6 +206,28 @@ export default function PhotosApp({ win }: AppProps) {
   const [narrow, setNarrow] = useState(false);
   const [sideOpen, setSideOpen] = useState(true);
   const [closed, setClosed] = useState<Record<string, boolean>>({ Sharing: true, 'Media Types': true, Utilities: true, Projects: true });
+
+  /* v10 — Hidden album, deletion dates, edits, multi-select, album lock */
+  const [hidden, setHidden] = useState<string[]>(() => readStore(HID_KEY, { ids: [] as string[] }).ids);
+  const [delAt, setDelAt] = useState<Record<string, number>>(() => readStore(DAT_KEY, { m: {} as Record<string, number> }).m);
+  const [edits, setEdits] = useState<Record<string, PhotoEdit>>(() => readStore(EDIT_KEY, { m: {} as Record<string, PhotoEdit> }).m);
+  const [picking, setPicking] = useState(false);
+  const [picked, setPicked] = useState<string[]>([]);
+  const [unlocked, setUnlocked] = useState(unlockedThisVisit);
+  const [scanning, setScanning] = useState(false);
+  const [askDel, setAskDel] = useState<string[] | null>(null);
+  const { settings: pset } = useSettings();
+  useEffect(() => writeStore(HID_KEY, { ids: hidden }), [hidden]);
+  useEffect(() => writeStore(DAT_KEY, { m: delAt }), [delAt]);
+  useEffect(() => writeStore(EDIT_KEY, { m: edits }), [edits]);
+  const faceId = () => {
+    setScanning(true);
+    window.setTimeout(() => {
+      setScanning(false);
+      unlockedThisVisit = true;
+      setUnlocked(true);
+    }, 1100);
+  };
 
   useEffect(() => writeStore(FAV_KEY, { ids: favs }), [favs]);
   useEffect(() => writeStore(DEL_KEY, { ids: deleted }), [deleted]);
@@ -181,7 +255,14 @@ export default function PhotosApp({ win }: AppProps) {
     }
   }, [win.launchKey, win.args?.album, win.args?.photo]);
 
-  const live = useMemo(() => photos.filter((p) => !deleted.includes(p.id)), [deleted]);
+  /* v10.1 — your own photos, dragged in or imported (kept in this browser) */
+  const myFiles = useMyFiles();
+  const myImgs = useMemo(() => myFiles.filter((f) => f.type.startsWith('image/')), [myFiles]);
+  const myUrls = useFileUrls(myImgs.map((f) => f.id));
+  const allPhotos = useMemo<Photo[]>(() => [...photos, ...myImgs.filter((f) => myUrls[f.id]).map((f) => ({ id: f.id, src: myUrls[f.id], title: f.name.replace(/\.[a-z0-9]+$/i, ''), album: 'Imports' as const, ratio: 1 }))], [myImgs, myUrls]);
+  const importRef = useRef<HTMLInputElement>(null);
+  const [dropping, setDropping] = useState(false);
+  const live = useMemo(() => allPhotos.filter((p) => !deleted.includes(p.id) && !hidden.includes(p.id)), [allPhotos, deleted, hidden]);
   const portraits = live.filter((p) => p.album === 'Portraits');
   const shots = live.filter((p) => p.album === 'Screenshots');
 
@@ -205,9 +286,24 @@ export default function PhotosApp({ win }: AppProps) {
       case 'Wallpapers':
         l = live.filter((p) => p.album === 'Wallpapers');
         break;
-      case 'deleted':
-        l = photos.filter((p) => deleted.includes(p.id));
+      case 'Imports':
+        l = live.filter((p) => p.album === 'Imports');
         break;
+      case 'deleted':
+        l = allPhotos.filter((p) => deleted.includes(p.id));
+        break;
+      case 'hidden':
+        l = allPhotos.filter((p) => hidden.includes(p.id) && !deleted.includes(p.id));
+        break;
+      case 'live':
+        l = live.filter(isLive);
+        break;
+      case 'duplicates': {
+        const seen = new Map<string, number>();
+        live.forEach((p) => seen.set(p.src, (seen.get(p.src) ?? 0) + 1));
+        l = live.filter((p) => (seen.get(p.src) ?? 0) > 1);
+        break;
+      }
       case 'library':
         l = live.filter((p) => (filter === 'all' ? true : filter === 'favorites' ? favs.includes(p.id) : p.album === filter));
         break;
@@ -217,10 +313,11 @@ export default function PhotosApp({ win }: AppProps) {
     if (newestFirst && view !== 'recent') l = [...l].reverse();
     const s = q.trim().toLowerCase();
     return s ? l.filter((p) => `${p.title} ${p.album}`.toLowerCase().includes(s)) : l;
-  }, [view, favs, live, deleted, filter, newestFirst, q]);
+  }, [view, favs, live, allPhotos, deleted, hidden, filter, newestFirst, q]);
+  const locked = (view === 'deleted' || view === 'hidden') && !unlocked;
 
   const isGrid = !['collections', 'map', 'videos', 'people'].includes(view);
-  const selPhoto = photos.find((p) => p.id === sel) ?? null;
+  const selPhoto = allPhotos.find((p) => p.id === sel) ?? null;
 
   const go = (v: View) => {
     setView(v);
@@ -228,12 +325,31 @@ export default function PhotosApp({ win }: AppProps) {
     if (narrow) setSideOpen(false);
   };
   const toggleFav = (id: string) => setFavs((f) => (f.includes(id) ? f.filter((x) => x !== id) : [...f, id]));
-  const del = (id: string) => {
-    setDeleted((d) => (d.includes(id) ? d : [...d, id]));
+  const delNow = (ids: string[]) => {
+    setDeleted((d) => [...d, ...ids.filter((id) => !d.includes(id))]);
+    setDelAt((m) => ({ ...m, ...Object.fromEntries(ids.map((id) => [id, Date.now()])) }));
     setSel(null);
-    notify({ app: 'Photos', icon: 'photos', title: 'Moved to Recently Deleted', body: photos.find((p) => p.id === id)?.title });
+    notify({ app: 'Photos', icon: 'photos', title: ids.length === 1 ? 'Moved to Recently Deleted' : `${ids.length} photos moved to Recently Deleted`, body: ids.length === 1 ? allPhotos.find((p) => p.id === ids[0])?.title : 'Recover them any time.' });
+  };
+  // v10 — every delete asks first (Settings → Trash & Undo → Ask before deleting)
+  const del = (id: string | string[]) => {
+    const ids = Array.isArray(id) ? id : [id];
+    if (pset.askBeforeDelete !== false) setAskDel(ids);
+    else delNow(ids);
   };
   const restore = (id: string) => setDeleted((d) => d.filter((x) => x !== id));
+  const toggleHide = (ids: string[]) => {
+    const allHidden = ids.every((id) => hidden.includes(id));
+    setHidden((h) => (allHidden ? h.filter((x) => !ids.includes(x)) : [...h, ...ids.filter((x) => !h.includes(x))]));
+    setSel(null);
+    notify({ app: 'Photos', icon: 'photos', title: allHidden ? 'Unhidden' : `Hidden ${ids.length === 1 ? 'photo' : `${ids.length} photos`}`, body: allHidden ? 'Back in your library.' : 'Find it in Utilities → Hidden.' });
+  };
+  const daysLeftOf = (id: string) => Math.max(0, 30 - Math.floor((Date.now() - (delAt[id] ?? Date.now())) / 86400000));
+  const pick = (id: string) => setPicked((l) => (l.includes(id) ? l.filter((x) => x !== id) : [...l, id]));
+  const endPick = () => {
+    setPicking(false);
+    setPicked([]);
+  };
   const rotate = (id: string) => setRot((r) => ({ ...r, [id]: ((r[id] ?? 0) + 270) % 360 }));
   const open = (id: string, el?: HTMLElement | null, slideshow = false) => {
     if (view === 'deleted') return;
@@ -301,6 +417,8 @@ export default function PhotosApp({ win }: AppProps) {
         { label: 'Rotate Counterclockwise', action: () => rotate(p.id) },
         { label: 'Copy Link', action: () => void share(p) },
         { label: 'Use as Wallpaper', action: () => void useAsWallpaper(p) },
+        { label: hidden.includes(p.id) ? 'Unhide' : 'Hide', action: () => toggleHide([p.id]) },
+        { label: edits[p.id] ? 'Revert to Original' : 'Edit…', action: () => (edits[p.id] ? setEdits((m) => { const n = { ...m }; delete n[p.id]; return n; }) : setViewer({ id: p.id, origin: node.getBoundingClientRect(), slideshow: false, edit: true })) },
         { label: '', sep: true },
         {
           label: 'Get Info',
@@ -346,7 +464,25 @@ export default function PhotosApp({ win }: AppProps) {
   const sub = view === 'library' || isGrid ? `${personal.name} · ${list.length} item${list.length === 1 ? '' : 's'}` : view === 'collections' ? 'Memories, people and albums' : '';
 
   return (
-    <div ref={rootRef} className={`px ${narrow ? 'narrow' : ''} ${sideOpen ? 'side-open' : 'side-closed'} ${info && isGrid ? 'info-open' : ''}`}>
+    <div
+      ref={rootRef}
+      className={`px ${narrow ? 'narrow' : ''} ${sideOpen ? 'side-open' : 'side-closed'} ${info && isGrid ? 'info-open' : ''} ${dropping ? 'px-dropping' : ''}`}
+      onDragOver={(e) => {
+        if (!e.dataTransfer.types.includes('Files')) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
+        setDropping(true);
+      }}
+      onDragLeave={(e) => e.currentTarget === e.target && setDropping(false)}
+      onDrop={(e) => {
+        if (!e.dataTransfer.files.length) return;
+        e.preventDefault();
+        setDropping(false);
+        void addFiles(e.dataTransfer.files, 'image').then((a) => a.length && setView('Imports'));
+      }}
+    >
+      <input ref={importRef} type="file" accept="image/*" multiple hidden onChange={(e) => e.target.files && void addFiles(e.target.files, 'image').then((a) => ((e.target.value = ''), a.length && setView('Imports')))} />
+      {dropping && <div className="px-drop-hint">Drop photos to import</div>}
       <aside className="px-side" aria-label="Photos sidebar">
         <DragBar className="px-side-top">
           <Lights />
@@ -372,10 +508,20 @@ export default function PhotosApp({ win }: AppProps) {
               <Tb n="lock" />
             </span>,
           )}
-          {group('Albums', [navBtn('Portraits', 'album', <span className="px-count">{portraits.length}</span>), navBtn('Screenshots', 'album', <span className="px-count">{shots.length}</span>), navBtn('Wallpapers', 'album', <span className="px-count">{live.filter((p) => p.album === 'Wallpapers').length}</span>)])}
+          {group('Albums', [navBtn('Portraits', 'album', <span className="px-count">{portraits.length}</span>), navBtn('Screenshots', 'album', <span className="px-count">{shots.length}</span>), navBtn('Wallpapers', 'album', <span className="px-count">{live.filter((p) => p.album === 'Wallpapers').length}</span>), navBtn('Imports', 'album', <span className="px-count">{live.filter((p) => p.album === 'Imports').length}</span>)])}
           {group('Sharing')}
-          {group('Media Types', [navBtn('videos', 'videos'), navBtn('screenshots', 'screenshots')])}
-          {group('Utilities', [navBtn('deleted', 'deleted')])}
+          {group('Media Types', [navBtn('videos', 'videos'), navBtn('live', 'live', <span className="px-count">{live.filter(isLive).length}</span>), navBtn('screenshots', 'screenshots')])}
+          {group('Utilities', [
+            navBtn(
+              'hidden',
+              'hidden',
+              <span className="px-lock" aria-label="Locked">
+                <Tb n="lock" />
+              </span>,
+            ),
+            navBtn('deleted', 'deleted'),
+            navBtn('duplicates', 'duplicates'),
+          ])}
           {group('Projects')}
         </nav>
       </aside>
@@ -465,6 +611,16 @@ export default function PhotosApp({ win }: AppProps) {
               </button>
             </div>
           )}
+          {isGrid && (view === 'Imports' || view === 'library') && (
+            <button type="button" className="px-pill px-import" onClick={() => importRef.current?.click()} aria-label="Import photos" title="Import photos from your device">
+              ＋
+            </button>
+          )}
+          {isGrid && !locked && list.length > 0 && (
+            <button type="button" className={`px-pill px-select ${picking ? 'on' : ''}`} onClick={() => (picking ? endPick() : setPicking(true))}>
+              {picking ? 'Cancel' : 'Select'}
+            </button>
+          )}
           <div className={`px-pill px-search ${searching || q ? 'open' : ''}`}>
             <button type="button" aria-label="Search" onClick={() => setSearching((s) => !s)}>
               <Tb n="search" />
@@ -517,19 +673,40 @@ export default function PhotosApp({ win }: AppProps) {
             <VideoGrid />
           ) : (
             <>
+              {locked ? (
+                <div className={`px-locked ${scanning ? 'scan' : ''}`}>
+                  <span className="px-faceid" aria-hidden="true">
+                    <SysIcon n="lock" size={44} />
+                  </span>
+                  <b>{TITLES[view]} is Locked</b>
+                  <span>{scanning ? 'Unlocking…' : 'This album stays hidden until you choose to view it (for this visit). No passcode or biometrics are used.'}</span>
+                  <button type="button" className="px-btn" disabled={scanning} onClick={faceId}>
+                    View Album
+                  </button>
+                </div>
+              ) : (
+                <>
               {view === 'deleted' && (
                 <div className="px-deleted-bar">
-                  <span>Photos you delete stay here and can be recovered. Items are never removed from the portfolio itself.</span>
+                  <span>Photos stay here for 30 days and can be recovered. Nothing is removed from the portfolio itself.</span>
                   <button type="button" className="px-btn" disabled={!deleted.length} onClick={() => setDeleted([])}>
                     Recover All
                   </button>
                 </div>
               )}
+              {view === 'hidden' && list.length > 0 && (
+                <div className="px-deleted-bar">
+                  <span>Hidden photos don’t appear in your library, albums or widgets.</span>
+                  <button type="button" className="px-btn" onClick={() => setHidden([])}>
+                    Unhide All
+                  </button>
+                </div>
+              )}
               {list.length === 0 ? (
                 <Empty
-                  icon={view === 'favorites' ? 'favorites' : view === 'deleted' ? 'deleted' : 'library'}
-                  title={q ? 'No Results' : view === 'favorites' ? 'No Favorites' : view === 'deleted' ? 'No Recently Deleted Items' : 'No Photos'}
-                  text={q ? `Nothing matches “${q}”.` : view === 'favorites' ? 'Select a photo and tap ♥︎ to add it here.' : ''}
+                  icon={view === 'favorites' ? 'favorites' : view === 'deleted' ? 'deleted' : view === 'hidden' ? 'hidden' : view === 'duplicates' ? 'duplicates' : 'library'}
+                  title={q ? 'No Results' : view === 'favorites' ? 'No Favorites' : view === 'deleted' ? 'No Recently Deleted Items' : view === 'hidden' ? 'No Hidden Photos' : view === 'duplicates' ? 'No Duplicates Found' : view === 'Imports' ? 'No Imported Photos' : 'No Photos'}
+                  text={q ? `Nothing matches “${q}”.` : view === 'favorites' ? 'Select a photo and tap ♥︎ to add it here.' : view === 'duplicates' ? 'Every photo in the library is unique.' : view === 'hidden' ? `${rightClick()} a photo and choose Hide.` : view === 'Imports' ? 'Drag photos here from your computer or tap ＋. They stay in this browser only.' : ''}
                 />
               ) : (
                 <div className="px-grid" style={{ ['--cols' as string]: cols }} role="grid" aria-label={title} onKeyDown={onGridKey}>
@@ -538,14 +715,15 @@ export default function PhotosApp({ win }: AppProps) {
                       <button
                         type="button"
                         data-photo={p.id}
-                        className={`px-thumb ${sel === p.id ? 'sel' : ''}`}
+                        className={`px-thumb ${sel === p.id ? 'sel' : ''} ${picked.includes(p.id) ? 'picked' : ''}`}
                         aria-label={`${p.title}${favs.includes(p.id) ? ', favourite' : ''}`}
-                        onClick={() => setSel(p.id)}
-                        onFocus={() => setSel(p.id)}
+                        aria-pressed={picking ? picked.includes(p.id) : undefined}
+                        onClick={() => (picking ? pick(p.id) : setSel(p.id))}
+                        onFocus={() => !picking && setSel(p.id)}
                         onPointerUp={(e) => {
-                          if (e.pointerType === 'touch') open(p.id, e.currentTarget);
+                          if (e.pointerType === 'touch' && !picking) open(p.id, e.currentTarget);
                         }}
-                        onDoubleClick={(e) => open(p.id, e.currentTarget)}
+                        onDoubleClick={(e) => !picking && open(p.id, e.currentTarget)}
                         onContextMenu={(e) => photoMenu(e, p)}
                       >
                         <img
@@ -554,7 +732,7 @@ export default function PhotosApp({ win }: AppProps) {
                           loading="lazy"
                           decoding="async"
                           draggable={false}
-                          style={rot[p.id] ? { transform: `rotate(${rot[p.id]}deg)` } : undefined}
+                          style={{ transform: rot[p.id] ? `rotate(${rot[p.id]}deg)` : undefined, filter: editFilter(edits[p.id]) }}
                           onLoad={(e) => {
                             const im = e.currentTarget;
                             setDims((d) => (d[p.id] ? d : { ...d, [p.id]: `${im.naturalWidth} × ${im.naturalHeight}` }));
@@ -565,15 +743,26 @@ export default function PhotosApp({ win }: AppProps) {
                             <Tb n="heart" />
                           </span>
                         )}
+                        {isLive(p) && <span className="px-live">◎ LIVE</span>}
+                        {edits[p.id] && <span className="px-edited">Edited</span>}
+                        {view === 'deleted' && <span className="px-days">{daysLeftOf(p.id)} days</span>}
+                        {picking && <span className={`px-check ${picked.includes(p.id) ? 'on' : ''}`}>{picked.includes(p.id) ? '✓' : ''}</span>}
                       </button>
                       {view === 'deleted' && (
                         <button type="button" className="px-recover" onClick={() => restore(p.id)}>
                           Recover
                         </button>
                       )}
+                      {view === 'hidden' && (
+                        <button type="button" className="px-recover" onClick={() => toggleHide([p.id])}>
+                          Unhide
+                        </button>
+                      )}
                     </div>
                   ))}
                 </div>
+              )}
+                </>
               )}
             </>
           )}
@@ -613,9 +802,49 @@ export default function PhotosApp({ win }: AppProps) {
         )}
       </section>
 
+      {picking && (
+        <div className="px-pickbar" role="toolbar" aria-label="Selected photos">
+          <b>{picked.length ? `${picked.length} Selected` : 'Select Items'}</b>
+          <button type="button" disabled={!picked.length} onClick={() => (picked.forEach((id) => !favs.includes(id) && toggleFav(id)), endPick())}>
+            <SysIcon n="heart" size={14} /> Favorite
+          </button>
+          {view !== 'deleted' && (
+            <button type="button" disabled={!picked.length} onClick={() => (toggleHide(picked), endPick())}>
+              {view === 'hidden' ? 'Unhide' : 'Hide'}
+            </button>
+          )}
+          {view === 'deleted' ? (
+            <button type="button" disabled={!picked.length} onClick={() => (picked.forEach(restore), endPick())}>
+              Recover
+            </button>
+          ) : (
+            <button type="button" className="danger" disabled={!picked.length} onClick={() => del(picked)}>
+              Delete
+            </button>
+          )}
+          <button type="button" onClick={() => setPicked(picked.length === list.length ? [] : list.map((p) => p.id))}>
+            {picked.length === list.length ? 'Deselect All' : 'Select All'}
+          </button>
+        </div>
+      )}
+
+      {askDel && (
+        <ConfirmDialog
+          icon="photos"
+          message={askDel.length === 1 ? `Delete “${allPhotos.find((p) => p.id === askDel[0])?.title ?? 'photo'}”?` : `Delete ${askDel.length} photos?`}
+          detail="They move to Recently Deleted for 30 days — you can recover them."
+          onCancel={() => setAskDel(null)}
+          onConfirm={() => {
+            delNow(askDel);
+            setAskDel(null);
+            endPick();
+          }}
+        />
+      )}
+
       {viewer && (
         <Viewer
-          list={list.some((p) => p.id === viewer.id) ? list : live.some((p) => p.id === viewer.id) ? live : photos}
+          list={list.some((p) => p.id === viewer.id) ? list : live.some((p) => p.id === viewer.id) ? live : allPhotos}
           id={viewer.id}
           origin={viewer.origin}
           slideshow={viewer.slideshow}
@@ -624,6 +853,17 @@ export default function PhotosApp({ win }: AppProps) {
           onFav={toggleFav}
           onClose={() => setViewer(null)}
           onChange={(id) => setViewer((v) => (v ? { ...v, id, origin: null } : v))}
+          edits={edits}
+          startEdit={!!viewer.edit}
+          onEdit={(id, e) =>
+            setEdits((m) => {
+              const n = { ...m };
+              if (e) n[id] = e;
+              else delete n[id];
+              return n;
+            })
+          }
+          onDelete={(id) => del(id)}
         />
       )}
     </div>
@@ -694,6 +934,10 @@ function Viewer({
   onFav,
   onClose,
   onChange,
+  edits,
+  startEdit,
+  onEdit,
+  onDelete,
 }: {
   list: Photo[];
   id: string;
@@ -704,6 +948,10 @@ function Viewer({
   onFav: (id: string) => void;
   onClose: () => void;
   onChange: (id: string) => void;
+  edits: Record<string, PhotoEdit>;
+  startEdit: boolean;
+  onEdit: (id: string, e: PhotoEdit | null) => void;
+  onDelete: (id: string) => void;
 }) {
   const imgRef = useRef<HTMLImageElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -711,6 +959,20 @@ function Viewer({
   const i = Math.max(0, list.findIndex((p) => p.id === id));
   const p = list[i];
   const go = (d: number) => onChange(list[(i + d + list.length) % list.length].id);
+  /* v10 — Live Photo (press & hold) and non-destructive editing */
+  const [livePlay, setLivePlay] = useState(false);
+  const [editing, setEditing] = useState(startEdit);
+  const [draft, setDraft] = useState<PhotoEdit>(edits[id] ?? NO_EDIT);
+  useEffect(() => setDraft(edits[id] ?? NO_EDIT), [id, edits]);
+  const shown = editing ? draft : edits[id];
+  const slider = (k: keyof Omit<PhotoEdit, 'bw'>, label: string, min = -100, max = 100) => (
+    <label key={k} className="ph-edit-row">
+      <span>
+        {label} <i>{draft[k]}</i>
+      </span>
+      <input type="range" min={min} max={max} value={draft[k]} onChange={(e) => setDraft({ ...draft, [k]: Number(e.target.value) })} />
+    </label>
+  );
 
   useEffect(() => {
     rootRef.current?.focus();
@@ -766,17 +1028,62 @@ function Viewer({
         <span className="ph-v-title">{p.title}</span>
         <span className="ph-spacer" />
         <button type="button" className={`ph-btn ${favs.includes(p.id) ? 'fav-on' : ''}`} onClick={() => onFav(p.id)} aria-pressed={favs.includes(p.id)}>
-          ♥︎
+          <SysIcon n="heart" size={16} />
         </button>
         <button type="button" className="ph-btn" onClick={() => void useAsWallpaper(p)} title="Use as Wallpaper">
-          🖼 Use as Wallpaper
+          <SysIcon n="photo" size={15} /> Use as Wallpaper
         </button>
         <button type="button" className="ph-btn" onClick={() => setPlaying((x) => !x)}>
-          {playing ? '❚❚ Pause' : '▶ Slideshow'}
+          <SysIcon n={playing ? 'pause' : 'play'} size={14} /> {playing ? 'Pause' : 'Slideshow'}
+        </button>
+        <button type="button" className={`ph-btn ${editing ? 'fav-on' : ''}`} onClick={() => setEditing((x) => !x)}>
+          <SysIcon n="pencil" size={14} /> Edit
+        </button>
+        <button type="button" className="ph-btn" onClick={() => onDelete(p.id)} aria-label="Delete photo">
+          <SysIcon n="trash" size={16} />
         </button>
       </div>
-      <div className="ph-v-stage">
-        <img ref={imgRef} key={p.id} src={p.src} alt={p.title} className="ph-v-img" />
+      <div className={`ph-v-stage ${editing ? 'with-edit' : ''}`}>
+        {isLive(p) && (
+          <span className={`ph-live-badge ${livePlay ? 'on' : ''}`} aria-hidden="true">
+            ◎ LIVE
+          </span>
+        )}
+        <img
+          ref={imgRef}
+          key={p.id}
+          src={p.src}
+          alt={p.title}
+          className={`ph-v-img ${livePlay ? 'live-play' : ''}`}
+          style={{ filter: editFilter(shown) }}
+          onPointerDown={() => isLive(p) && !editing && setLivePlay(true)}
+          onPointerUp={() => setLivePlay(false)}
+          onPointerLeave={() => setLivePlay(false)}
+          draggable={false}
+        />
+        {shown && shown.vignette > 0 && <span className="ph-vignette" style={{ opacity: shown.vignette / 100 }} />}
+        {editing && (
+          <aside className="ph-edit" aria-label="Edit photo">
+            <b>Adjust</b>
+            {slider('light', 'Light')}
+            {slider('contrast', 'Contrast')}
+            {slider('sat', 'Saturation')}
+            {slider('warmth', 'Warmth')}
+            {slider('vignette', 'Vignette', 0, 100)}
+            <label className="ph-edit-row inline">
+              <span>Black & White</span>
+              <input type="checkbox" checked={draft.bw} onChange={(e) => setDraft({ ...draft, bw: e.target.checked })} />
+            </label>
+            <div className="ph-edit-actions">
+              <button type="button" className="ph-btn" onClick={() => (onEdit(p.id, null), setDraft(NO_EDIT))} disabled={!edits[p.id] && JSON.stringify(draft) === JSON.stringify(NO_EDIT)}>
+                Revert to Original
+              </button>
+              <button type="button" className="ph-btn primary" onClick={() => (onEdit(p.id, JSON.stringify(draft) === JSON.stringify(NO_EDIT) ? null : draft), setEditing(false))}>
+                Done
+              </button>
+            </div>
+          </aside>
+        )}
         <button type="button" className="ql-nav prev" onClick={() => go(-1)} aria-label="Previous photo">
           ‹
         </button>

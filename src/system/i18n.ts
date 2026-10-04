@@ -21,15 +21,16 @@ export const LANGS: { id: Lang; label: string; native: string }[] = [
 
 const D = {
   welcomeTitle: {
-    en: '👋 Welcome to my portfolio!',
-    si: '👋 මගේ portfolio එකට සාදරයෙන් පිළිගනිමු!',
-    ta: '👋 என் portfolio-க்கு வரவேற்கிறேன்!',
+    en: 'Welcome!',
+    si: 'සාදරයෙන් පිළිගනිමු!',
+    ta: 'வரவேற்கிறோம்!',
   },
   welcomeBody: {
-    en: "Thanks for visiting — I'm M.R. Ahamed. Explore my projects, skills and CV; everything here works like a real Mac.",
-    si: 'පැමිණීමට ස්තූතියි — මම M.R. Ahamed. මගේ ව්‍යාපෘති, කුසලතා සහ CV බලන්න; මෙහි සියල්ල සැබෑ Mac එකක් මෙන් ක්‍රියා කරයි.',
-    ta: 'வருகைக்கு நன்றி — நான் M.R. Ahamed. என் திட்டங்கள், திறன்கள் மற்றும் CV-ஐ பாருங்கள்; இங்கே எல்லாம் உண்மையான Mac போலவே இயங்கும்.',
+    en: 'Read the Guidebook to discover how this portfolio works and explore all its interactive features.',
+    si: 'මෙම portfolio එක ක්‍රියා කරන ආකාරය සහ එහි සියලු අන්තර්ක්‍රියාකාරී විශේෂාංග දැනගැනීමට Guidebook කියවන්න.',
+    ta: 'இந்த portfolio எப்படி இயங்குகிறது என்பதையும் அதன் அனைத்து ஊடாடும் அம்சங்களையும் அறிய Guidebook-ஐப் படியுங்கள்.',
   },
+  openGuide: { en: 'Open Guidebook', si: 'Guidebook විවෘත කරන්න', ta: 'Guidebook-ஐத் திற' },
   takeTour: { en: 'Take the Tour', si: 'චාරිකාව අරඹන්න', ta: 'சுற்றிப் பாருங்கள்' },
   hireMe: { en: 'Hire Me', si: 'මාව බඳවා ගන්න', ta: 'என்னை பணியமர்த்துங்கள்' },
   followLabel: { en: 'Stay connected', si: 'සම්බන්ධව සිටින්න', ta: 'இணைந்திருங்கள்' },
@@ -79,6 +80,22 @@ const D = {
   emailMe: { en: 'Email Me', si: 'මට Email කරන්න', ta: 'எனக்கு மின்னஞ்சல் அனுப்பு' },
   share: { en: 'Share', si: 'බෙදාගන්න', ta: 'பகிர்' },
   language: { en: 'Language', si: 'භාෂාව', ta: 'மொழி' },
+  /* v10.1 — iPhone / iPad shell */
+  iSwipeOpen: { en: 'Swipe up to open', si: 'විවෘත කිරීමට ඉහළට swipe කරන්න', ta: 'திறக்க மேலே swipe செய்யவும்' },
+  iUnlocked: { en: 'Unlocked', si: 'අගුළු හැර ඇත', ta: 'திறக்கப்பட்டது' },
+  iNC: { en: 'Notification Centre', si: 'දැනුම්දීම් මධ්‍යස්ථානය', ta: 'அறிவிப்பு மையம்' },
+  iNoOlder: { en: 'No Older Notifications', si: 'පැරණි දැනුම්දීම් නැත', ta: 'பழைய அறிவிப்புகள் இல்லை' },
+  iClear: { en: 'Clear', si: 'ඉවත් කරන්න', ta: 'அழி' },
+  iSearch: { en: 'Search', si: 'සොයන්න', ta: 'தேடு' },
+  iAppLibrary: { en: 'App Library', si: 'යෙදුම් පුස්තකාලය', ta: 'செயலி நூலகம்' },
+  iDone: { en: 'Done', si: 'අවසන්', ta: 'முடிந்தது' },
+  iEdit: { en: 'Edit', si: 'සංස්කරණය', ta: 'திருத்து' },
+  iCancel: { en: 'Cancel', si: 'අවලංගු කරන්න', ta: 'ரத்து செய்' },
+  iSiriSugg: { en: 'Siri Suggestions', si: 'Siri යෝජනා', ta: 'Siri பரிந்துரைகள்' },
+  iSuggested: { en: 'Suggested', si: 'යෝජිත', ta: 'பரிந்துரைக்கப்பட்டவை' },
+  iPowerOff: { en: 'slide to power off', si: 'ක්‍රියා විරහිත කිරීමට ලිස්සන්න', ta: 'அணைக்க ஸ்லைடு செய்யவும்' },
+  iShowLess: { en: 'Show less', si: 'අඩුවෙන් පෙන්වන්න', ta: 'குறைவாகக் காட்டு' },
+  iControlCentre: { en: 'Control Centre', si: 'පාලන මධ්‍යස්ථානය', ta: 'கட்டுப்பாட்டு மையம்' },
 } satisfies Record<string, Record<Lang, string>>;
 
 export type I18nKey = keyof typeof D;

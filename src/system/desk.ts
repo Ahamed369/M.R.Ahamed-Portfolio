@@ -29,7 +29,19 @@ export function clampPos(x: number, y: number, w: number, h: number): Pos {
  * The drag starts after a 5 px threshold, so clicks / double-clicks still work;
  * `wasDragged()` lets click handlers ignore the click that ends a drag.
  */
-export function useFreeDrag(opts: { enabled: boolean; snap?: number; onDrop: (p: Pos, el: HTMLElement) => void; ignore?: string }) {
+export function useFreeDrag(opts: {
+  enabled: boolean;
+  snap?: number;
+  onDrop: (p: Pos, el: HTMLElement) => void;
+  ignore?: string;
+  /** v10.3 — turn a raw drop point into a valid slot (snapped, on screen, not overlapping); null = no room → slide back */
+  resolve?: (x: number, y: number, w: number, h: number, el: HTMLElement) => Pos | null;
+  /** v10.3 — live preview of the slot while dragging (null hides it) */
+  onPreview?: (p: Pos | null, w: number, h: number) => void;
+  /** v10.3 — called once when a drag really starts / ends (for collision caches) */
+  onStart?: (el: HTMLElement) => void;
+  onEnd?: () => void;
+}) {
   const st = useRef<{ id: number; sx: number; sy: number; rect: DOMRect; el: HTMLElement; on: boolean } | null>(null);
   const dragged = useRef(0);
   const o = useRef(opts);
@@ -50,6 +62,7 @@ export function useFreeDrag(opts: { enabled: boolean; snap?: number; onDrop: (p:
         if (Math.hypot(dx, dy) < 5) return;
         s.on = true;
         s.el.classList.add('free-dragging');
+        o.current.onStart?.(s.el);
         try {
           s.el.setPointerCapture(s.id);
         } catch {
@@ -57,6 +70,7 @@ export function useFreeDrag(opts: { enabled: boolean; snap?: number; onDrop: (p:
         }
       }
       s.el.style.translate = `${dx}px ${dy}px`;
+      if (o.current.onPreview && o.current.resolve) o.current.onPreview(o.current.resolve(s.rect.left + dx, s.rect.top + dy, s.rect.width, s.rect.height, s.el), s.rect.width, s.rect.height);
     };
     const up = (ev: PointerEvent) => {
       window.removeEventListener('pointermove', move);
@@ -70,6 +84,13 @@ export function useFreeDrag(opts: { enabled: boolean; snap?: number; onDrop: (p:
       s.el.style.translate = '';
       let x = s.rect.left + (ev.clientX - s.sx);
       let y = s.rect.top + (ev.clientY - s.sy);
+      o.current.onPreview?.(null, 0, 0);
+      o.current.onEnd?.();
+      if (o.current.resolve) {
+        const r = o.current.resolve(x, y, s.rect.width, s.rect.height, s.el);
+        if (r) o.current.onDrop(r, s.el);
+        return;
+      }
       const g = o.current.snap;
       if (g) {
         x = Math.round(x / g) * g + 6;
@@ -84,4 +105,64 @@ export function useFreeDrag(opts: { enabled: boolean; snap?: number; onDrop: (p:
 
   const wasDragged = useCallback(() => performance.now() - dragged.current < 250, []);
   return { onPointerDown, wasDragged };
+}
+
+/* ───────────── v10.3 — widget slots on the Mac desktop ───────────── */
+
+export const WIDGET_GRID = 12;
+export interface Rect { x: number; y: number; w: number; h: number }
+const overlaps = (a: Rect, b: Rect, gap: number) => a.x < b.x + b.w + gap && a.x + a.w + gap > b.x && a.y < b.y + b.h + gap && a.y + a.h + gap > b.y;
+
+/** The desktop area widgets may use: below the menu bar, above the Dock, clear of the screen edges. */
+export function widgetBounds(): Rect {
+  const W = window.innerWidth;
+  const H = window.innerHeight;
+  // same origin as the widget columns (14 px from the left, 12 px under the menu bar)
+  const left = 14;
+  const top = 38;
+  let right = W - 14;
+  let bottom = H - 12;
+  const dock = document.querySelector('.dock-wrap:not(.autohide) .dock')?.getBoundingClientRect();
+  if (dock && dock.width) {
+    if (dock.width >= dock.height) bottom = Math.min(bottom, dock.top - 10);
+    else if (dock.left < W / 2) return { x: Math.max(left, dock.right + 12), y: top, w: right - Math.max(left, dock.right + 12), h: bottom - top };
+    else right = Math.min(right, dock.left - 12);
+  }
+  return { x: left, y: top, w: right - left, h: bottom - top };
+}
+
+/**
+ * Snap (x, y) to the widget grid inside the desktop bounds, then — if that
+ * spot touches another widget — search outwards for the nearest free slot.
+ * Returns null when there's no room anywhere (the widget slides back).
+ */
+export function findWidgetSlot(x: number, y: number, w: number, h: number, others: Rect[], gap = 10): Pos | null {
+  const b = widgetBounds();
+  const G = WIDGET_GRID;
+  const clampX = (v: number) => Math.max(b.x, Math.min(b.x + b.w - w, v));
+  const clampY = (v: number) => Math.max(b.y, Math.min(b.y + b.h - h, v));
+  if (w > b.w || h > b.h) return null;
+  const snap = (v: number, o: number) => Math.round((v - o) / G) * G + o;
+  const sx = clampX(snap(x, b.x));
+  const sy = clampY(snap(y, b.y));
+  const free = (px: number, py: number) => !others.some((r) => overlaps({ x: px, y: py, w, h }, r, gap));
+  if (free(sx, sy)) return { x: sx, y: sy };
+  for (let ring = 1; ring < 80; ring++) {
+    let best: Pos | null = null;
+    let bestD = Infinity;
+    for (let dx = -ring; dx <= ring; dx++)
+      for (let dy = -ring; dy <= ring; dy++) {
+        if (Math.max(Math.abs(dx), Math.abs(dy)) !== ring) continue;
+        const px = clampX(sx + dx * G);
+        const py = clampY(sy + dy * G);
+        if (!free(px, py)) continue;
+        const d = Math.hypot(px - sx, py - sy);
+        if (d < bestD) {
+          bestD = d;
+          best = { x: px, y: py };
+        }
+      }
+    if (best) return best;
+  }
+  return null;
 }

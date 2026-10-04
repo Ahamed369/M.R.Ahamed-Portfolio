@@ -165,6 +165,8 @@ export default function XcodeApp({ win }: AppProps) {
       if (x) notify({ app: 'Xcode', icon: 'xcode', title: `Project selected — ${x.name}`, body: x.category });
     }
     setActiveId(id);
+    // v10 — on a phone the navigator slides away once a file is picked
+    if (window.innerWidth < 700) setShowNav(false);
     setTabs((t) => (t.includes(id) ? t : [...t, id]));
   }
 

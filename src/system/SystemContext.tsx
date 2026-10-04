@@ -3,9 +3,17 @@ import { onNotify, type NotifyInput } from './notify';
 import { readStore, writeStore } from './storage';
 import { useSettings } from './SettingsContext';
 import { playNotification } from './sounds';
+import { notify } from './notify';
 import { showSystemNotification } from './webNotify';
 
 /* ─────────────────────────────── Types ─────────────────────────────── */
+
+/** v10.3 — Work and Personal Focus still let a few apps through (Settings → Focus) */
+const FOCUS_ALLOW: Record<string, string[]> = {
+  work: ['Mail', 'Messages', 'Calendar', 'Reminders', 'Clock', 'Focus'],
+  personal: ['Messages', 'WhatsApp', 'Phone', 'FaceTime', 'Music', 'Clock', 'Focus'],
+};
+const focusAllows = (mode: string | undefined, app: string) => !!mode && (FOCUS_ALLOW[mode] ?? []).includes(app);
 
 export type Phase = 'boot' | 'ready' | 'shutdown' | 'off';
 export type Overlay = 'none' | 'control' | 'notifications' | 'launchpad' | 'spotlight' | 'missioncontrol' | 'forcequit';
@@ -60,10 +68,14 @@ interface Persisted {
   airdrop: AirDrop;
   /** Warm colour filter (Displays → Night Shift) */
   nightShift: boolean;
+  /** v10.2 — portfolio Aeroplane Mode / Mobile Data / Orientation Lock (Control Centre) */
+  airplane: boolean;
+  cellular: boolean;
+  rotationLock: boolean;
 }
 
 const KEY = 'mra-portfolio-system-v1';
-const DEFAULTS: Persisted = { brightness: 1, keyboardBrightness: 0.6, focus: false, wifi: true, bluetooth: true, airdrop: 'contacts', nightShift: false };
+const DEFAULTS: Persisted = { brightness: 1, keyboardBrightness: 0.6, focus: false, wifi: true, bluetooth: true, airdrop: 'contacts', nightShift: false, airplane: false, cellular: true, rotationLock: false };
 
 interface SystemCtx extends Persisted {
   set: (patch: Partial<Persisted>) => void;
@@ -153,10 +165,13 @@ export function SystemProvider({ children }: { children: ReactNode }) {
   useEffect(
     () =>
       onNotify((n) => {
-        const item: NotificationItem = { ...n, id: seq.current++, time: Date.now(), banner: !focusRef.current || !!n.critical, read: false };
-        setNotifications((list) => [item, ...(n.key ? list.filter((x) => x.key !== n.key) : list)].slice(0, 60));
         const st = soundRef.current;
-        if (item.banner && !n.silent && st.notificationSounds) playNotification(st.alertVolume);
+        // v10 — per-app switches (Settings → Notifications) and Scheduled Summary
+        const ap = st.notifApps?.[n.app];
+        const held = !!st.scheduledSummary && !n.critical && !n.summary;
+        const item: NotificationItem = { ...n, id: seq.current++, time: Date.now(), banner: ((((!focusRef.current || focusAllows(st.focusMode, n.app)) && ap?.banners !== false && !held) || !!n.critical) && !(n.island && document.documentElement.dataset.device === 'iphone')), read: false };
+        setNotifications((list) => [item, ...(n.key ? list.filter((x) => x.key !== n.key) : list)].slice(0, 60));
+        if (item.banner && !n.silent && st.notificationSounds && ap?.sounds !== false) playNotification(st.alertVolume);
         if (st.systemNotifications) showSystemNotification(n);
       }),
     [],
@@ -223,6 +238,36 @@ export function SystemProvider({ children }: { children: ReactNode }) {
     setLocked(true);
   }, [locked]);
   const logout = useCallback(() => lock('logout'), [lock]);
+
+  // v10 — Scheduled Summary: held-back notifications are delivered together at the chosen time
+  const notifRef = useRef(notifications);
+  notifRef.current = notifications;
+  useEffect(() => {
+    if (!settings.scheduledSummary) return;
+    const t = window.setInterval(() => {
+      const d = new Date();
+      const hm = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+      const day = d.toDateString();
+      if (hm !== (settings.summaryTime ?? '18:00')) return;
+      let last = '';
+      try {
+        last = localStorage.getItem('mra-summary-last') ?? '';
+      } catch {
+        last = '';
+      }
+      if (last === day) return;
+      try {
+        localStorage.setItem('mra-summary-last', day);
+      } catch {
+        /* ignore */
+      }
+      const unread = notifRef.current.filter((x) => !x.read && !x.summary);
+      if (!unread.length) return;
+      const apps = Array.from(new Set(unread.map((x) => x.app))).slice(0, 4).join(', ');
+      notify({ app: 'Scheduled Summary', icon: 'settings', title: `Your Summary · ${unread.length} notification${unread.length === 1 ? '' : 's'}`, body: apps, summary: true, critical: true });
+    }, 20000);
+    return () => window.clearInterval(t);
+  }, [settings.scheduledSummary, settings.summaryTime]);
 
   // window event 'mra-lock' (used by other components / the console)
   useEffect(() => {

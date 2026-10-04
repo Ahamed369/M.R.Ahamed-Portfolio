@@ -42,6 +42,16 @@ export default function NotesApp({ win }: AppProps) {
     setMine((l) => [n, ...l]);
     setMineSel(n.id);
   };
+  // v10.1 — Edit → Duplicate (⌘D)
+  useEffect(() => {
+    const on = (e: Event) => {
+      if ((e as CustomEvent<string>).detail !== 'notes') return;
+      const m = mine.find((x) => x.id === mineSel && !x.deleted);
+      if (m) dupNote(m);
+    };
+    window.addEventListener('mra-duplicate', on);
+    return () => window.removeEventListener('mra-duplicate', on);
+  });
   const noteMenu = (e: RMouseEvent, m: MyNote) => {
     e.preventDefault();
     sys.setContextMenu({
