@@ -1789,60 +1789,6 @@ This keeps the portfolio technically impressive **without making false hardware 
 
 ---
 
-# 🧪 Run Locally
-
-## 1. Clone
-
-```bash
-git clone https://github.com/Ahamed369/M.R.Ahamed-Portfolio.git
-```
-
-## 2. Enter the project
-
-```bash
-cd M.R.Ahamed-Portfolio
-```
-
-## 3. Install dependencies
-
-```bash
-npm install
-```
-
-## 4. Start development
-
-```bash
-npm run dev
-```
-
----
-
-# 🏗️ Production Build
-
-```bash
-npm run build
-```
-
-Then preview:
-
-```bash
-npm run preview
-```
-
----
-
-# 📜 Commands
-
-| Command | Purpose |
-|---|---|
-| `npm run dev` | Development server |
-| `npm run build` | TypeScript + production build |
-| `npm run preview` | Preview production build |
-| `npm run lint` | ESLint |
-| `npm run typecheck` | TypeScript validation |
-
----
-
 # 🚀 Deployment
 
 <div align="center">
@@ -1851,13 +1797,25 @@ npm run preview
 [![Vercel](https://img.shields.io/badge/HOSTED_ON-VERCEL-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://m-r-ahamed-portfolio.vercel.app/)
 [![Main](https://img.shields.io/badge/BRANCH-main-181717?style=for-the-badge&logo=git&logoColor=white)](https://github.com/Ahamed369/M.R.Ahamed-Portfolio/tree/main)
 
+<br><br>
+
+<a href="https://m-r-ahamed-portfolio.vercel.app/">
+<img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=800&size=26&duration=1800&pause=500&color=34C759&center=true&vCenter=true&repeat=true&width=900&height=65&lines=%F0%9F%9A%80+OPEN+THE+LIVE+PORTFOLIO;%F0%9F%92%BB+Explore+the+Mac+Experience;%F0%9F%93%B1+Explore+the+iPhone+Experience;%F0%9F%96%A5%EF%B8%8F+Explore+the+iPad+Experience;%E2%9C%A8+Click+Here+to+Enter+the+Portfolio" alt="Open Live Portfolio">
+</a>
+
 <br>
 
-<img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=600&size=17&duration=2000&pause=600&color=34C759&center=true&vCenter=true&width=850&height=50&lines=Production+Portfolio+Online;Mac+%7C+iPhone+%7C+iPad;Explore+the+Interactive+Experience" alt="Deployment animation">
+[![OPEN LIVE PORTFOLIO](https://img.shields.io/badge/OPEN_LIVE_PORTFOLIO-CLICK_HERE-FF3B30?style=for-the-badge&logo=safari&logoColor=white)](https://m-r-ahamed-portfolio.vercel.app/)
+
+[![ENTER EXPERIENCE](https://img.shields.io/badge/ENTER_EXPERIENCE-LIVE_NOW-0A84FF?style=for-the-badge&logo=vercel&logoColor=white)](https://m-r-ahamed-portfolio.vercel.app/)
+
+[![MAC IPHONE IPAD](https://img.shields.io/badge/MAC_%7C_IPHONE_%7C_IPAD-EXPLORE-FF9F0A?style=for-the-badge)](https://m-r-ahamed-portfolio.vercel.app/)
 
 <br>
 
-### [🚀 OPEN LIVE PORTFOLIO](https://m-r-ahamed-portfolio.vercel.app/)
+### 🌐 **[m-r-ahamed-portfolio.vercel.app](https://m-r-ahamed-portfolio.vercel.app/)**
+
+**Click above to experience the complete interactive portfolio.**
 
 </div>
 
@@ -2122,6 +2080,49 @@ Future refinements can focus on:
 
 ---
 
+# 🔐 Source Code & Usage
+
+<div align="center">
+
+<img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=800&size=21&duration=1900&pause=700&color=FF3B30&center=true&vCenter=true&repeat=true&width=950&height=58&lines=%E2%9A%A0%EF%B8%8F+SOURCE+CODE+%26+USAGE+NOTICE;%F0%9F%94%90+Publicly+Visible+%E2%80%94+Not+Open+for+Reuse;%C2%A9+2026+M.R.Ahamed+%E2%80%94+All+Rights+Reserved" alt="Source Code and Usage Notice">
+
+<br>
+
+[![VIEW SOURCE](https://img.shields.io/badge/VIEW_SOURCE-Professional_Review_Only-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Ahamed369/M.R.Ahamed-Portfolio)
+
+[![LIVE PORTFOLIO](https://img.shields.io/badge/LIVE_PORTFOLIO-EXPLORE_NOW-0A84FF?style=for-the-badge&logo=safari&logoColor=white)](https://m-r-ahamed-portfolio.vercel.app/)
+
+<br><br>
+
+### 🔴 PUBLICLY VISIBLE — NOT LICENSED FOR REUSE
+
+</div>
+
+This repository is maintained publicly so **recruiters, developers, collaborators, prospective clients, and other professional reviewers** can inspect the engineering, architecture, implementation quality, interface design, and technical work behind the portfolio.
+
+You are welcome to **explore the live portfolio and review the source code for professional evaluation and learning purposes**.
+
+> ### ⚠️ IMPORTANT USAGE NOTICE
+>
+> **Public access does not grant permission to copy, reproduce, redistribute, modify, rebrand, republish, sell, sublicense, commercially exploit, or present this portfolio or substantial portions of its source code, interface, design, content, branding, media, architecture, or original assets as another person's work, portfolio, template, product, or service.**
+
+The source code, custom interface implementation, portfolio architecture, interactions, written content, personal branding, original media, and original project assets contained in this repository are the work of **M.R.Ahamed**, except where third-party technologies, services, trademarks, libraries, or assets are separately identified.
+
+If you would like permission to reuse a specific original component, design, implementation, or other material from this project, please contact me first and obtain permission before doing so.
+
+<div align="center">
+
+![Copyright](https://img.shields.io/badge/%C2%A9_2026_M.R.Ahamed-ALL_RIGHTS_RESERVED-FF3B30?style=for-the-badge)
+
+![No Rebranding](https://img.shields.io/badge/NO_REBRANDING-FF453A?style=flat-square)
+![No Redistribution](https://img.shields.io/badge/NO_REDISTRIBUTION-FF453A?style=flat-square)
+![No Resale](https://img.shields.io/badge/NO_RESALE-FF453A?style=flat-square)
+![Permission Required](https://img.shields.io/badge/REUSE-PERMISSION_REQUIRED-FF9F0A?style=flat-square)
+
+</div>
+
+---
+
 # ⚠️ Project Notice
 
 This is an independent **web-based personal portfolio inspired by familiar desktop and mobile operating-system interaction patterns**.
@@ -2160,7 +2161,7 @@ Apple and other third-party names, marks, products and services remain the prope
 
 <br><br>
 
-<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=16&duration=1900&pause=550&color=0A84FF&center=true&vCenter=true&width=850&height=48&lines=Explore.+Interact.+Discover.;Not+just+a+portfolio+—+an+experience.;Think+Different.+Build+Different." alt="Closing animation">
+<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=16&duration=1900&pause=550&color=0A84FF&center=true&vCenter=true&width=850&height=48&lines=Explore.+Interact.+Discover.;Not+just+a+portfolio+%E2%80%94+an+experience.;Think+Different.+Build+Different." alt="Closing animation">
 
 <br><br>
 
