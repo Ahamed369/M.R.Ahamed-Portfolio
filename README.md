@@ -1,43 +1,27 @@
-<!-- =========================================================
-     M.R.Ahamed — Interactive macOS Portfolio
-     GitHub README
-     ========================================================= -->
+# 🍎 M.R.Ahamed — Interactive Portfolio OS
 
 <div align="center">
 
-<!-- macOS-style header -->
+### 💻 Mac Experience · 📱 iPhone Experience · 🖥️ iPad Experience
 
-<table>
-<tr>
-<td>
-
-🔴 &nbsp; 🟡 &nbsp; 🟢
-
-</td>
-</tr>
-</table>
-
-#  M.R.Ahamed
-
-### 🖥️ Interactive macOS-Inspired Portfolio
-
-<img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=600&size=22&duration=2600&pause=900&color=0A84FF&center=true&vCenter=true&multiline=false&repeat=true&width=850&height=50&lines=Computer+Science+Undergraduate;Full-Stack+Developer;React+%7C+TypeScript+%7C+Node.js;UI%2FUX+%26+Software+Development;Entrepreneur+%7C+Building+Digital+Solutions" alt="Typing introduction" />
-
-<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=17&duration=2200&pause=700&color=BF5AF2&center=true&vCenter=true&repeat=true&width=850&height=38&lines=Interactive+Desktop+Portfolio;Projects+%7C+Skills+%7C+Experience+%7C+Services;Explore+the+Live+macOS-Inspired+Experience" alt="Portfolio highlights typing animation" />
+<img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=700&size=24&duration=2500&pause=700&color=0A84FF&center=true&vCenter=true&width=900&height=60&lines=Computer+Science+Undergraduate;Full-Stack+Developer;Interactive+Multi-Device+Portfolio;Mac+%7C+iPhone+%7C+iPad;Technology+%2B+Entrepreneurship" alt="M.R.Ahamed animated introduction">
 
 <br>
 
-**A portfolio that behaves like a desktop — not just another website.**
+<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=16&duration=2200&pause=500&color=BF5AF2&center=true&vCenter=true&width=950&height=50&lines=Desktop+Windows+%7C+Dock+%7C+Launchpad+%7C+Spotlight;Control+Centre+%7C+Dynamic+Island+%7C+Lock+Screens;Live+Weather+%7C+Music+%7C+Game+Center+%7C+Guestbook;Finder+%7C+Files+%7C+Wallpapers+%7C+Widgets;One+Portfolio.+Three+Device+Experiences." alt="Portfolio feature animation">
 
 <br>
 
-[![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=000000)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?style=for-the-badge&logo=typescript&logoColor=ffffff)](https://www.typescriptlang.org/)
-[![Vite](https://img.shields.io/badge/Vite-6-646CFF?style=for-the-badge&logo=vite&logoColor=ffffff)](https://vite.dev/)
-![Responsive](https://img.shields.io/badge/Responsive-Desktop_%7C_Tablet_%7C_Mobile-34C759?style=for-the-badge)
-![PWA](https://img.shields.io/badge/PWA-Ready-FF375F?style=for-the-badge)
-[![Live Portfolio](https://img.shields.io/badge/LIVE_PORTFOLIO-OPEN_NOW-34C759?style=for-the-badge&logo=vercel&logoColor=white)](https://m-r-ahamed-portfolio.vercel.app/)
-[![Deployment](https://img.shields.io/badge/DEPLOYMENT-VERCEL-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://m-r-ahamed-portfolio.vercel.app/)
+**Not just a portfolio page — an interactive browser-based portfolio operating-system experience.**
+
+<br>
+
+[![Live Portfolio](https://img.shields.io/badge/🚀_LIVE_PORTFOLIO-OPEN_NOW-34C759?style=for-the-badge)](https://m-r-ahamed-portfolio.vercel.app/)
+[![Version](https://img.shields.io/badge/VERSION-v10.3-0A84FF?style=for-the-badge)](https://github.com/Ahamed369/M.R.Ahamed-Portfolio)
+[![React](https://img.shields.io/badge/React-19.1-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/Vite-6-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vite.dev/)
+[![Vercel](https://img.shields.io/badge/Vercel-Production-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://m-r-ahamed-portfolio.vercel.app/)
 
 <br>
 
@@ -45,679 +29,1536 @@
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-M.R.Ahamed-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/mr-ahamed-6146a5276)
 [![Email](https://img.shields.io/badge/Email-Contact_Me-EA4335?style=for-the-badge&logo=gmail&logoColor=white)](mailto:ahamedrock369@gmail.com)
 
-<br>
-
-<img src="https://capsule-render.vercel.app/api?type=rect&height=3&color=gradient" width="100%" alt="gradient divider">
-
 </div>
 
 ---
 
-# 🌐 Live Portfolio
-
-<div align="center">
-
-<img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=600&size=18&duration=2100&pause=700&color=FF9F0A&center=true&vCenter=true&repeat=true&width=800&height=42&lines=Portfolio+Now+Live+on+Vercel;Desktop+%7C+Tablet+%7C+Mobile;Click+Below+to+Launch+the+Experience" alt="Live deployment typing animation" />
-
-<br>
-
-<a href="https://m-r-ahamed-portfolio.vercel.app/">
-  <img src="./public/assets/screenshots/desktop.jpg" alt="M.R.Ahamed live portfolio desktop preview" width="92%">
-</a>
-
-<br><br>
-
-[![Launch Portfolio](https://img.shields.io/badge/LAUNCH_PORTFOLIO-0A84FF?style=for-the-badge&logo=vercel&logoColor=white)](https://m-r-ahamed-portfolio.vercel.app/)
-[![View Source](https://img.shields.io/badge/VIEW_SOURCE-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Ahamed369/M.R.Ahamed-Portfolio)
-[![LinkedIn](https://img.shields.io/badge/CONNECT_LINKEDIN-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/mr-ahamed-6146a5276)
-
-<br>
-
-**Production:** Vercel &nbsp; • &nbsp; **Frontend:** React + TypeScript + Vite &nbsp; • &nbsp; **Experience:** Responsive + PWA
-
-</div>
-
----
-
-## 🍎 Welcome to My Digital Desktop
-
-This project transforms a traditional developer portfolio into an interactive **macOS-inspired desktop experience**.
-
-Rather than navigating through ordinary pages, visitors explore my work through a desktop environment containing applications, draggable windows, a Dock, Launchpad, Spotlight, Finder-style interfaces, Terminal, Control Center, Notification Center, widgets, games, media applications and system settings.
-
-It brings together:
-
-```text
-Portfolio + Desktop UI + Software Engineering + Browser APIs + UI/UX
-                              │
-                              ▼
-               An Interactive Digital Experience
-```
-
-The goal is simple:
-
-> **Show my work through an experience that demonstrates the work itself.**
-
----
-
-# 🖼️ Desktop Preview
+# 🚀 Launch the Experience
 
 <div align="center">
 
 <a href="https://m-r-ahamed-portfolio.vercel.app/">
-<img src="./public/assets/screenshots/desktop.jpg" alt="M.R.Ahamed macOS-inspired portfolio desktop" width="95%">
+<img src="./public/assets/screenshots/desktop.jpg" width="95%" alt="M.R.Ahamed Interactive Portfolio Desktop">
 </a>
 
 <br><br>
 
-### ✨ Explore • Launch • Interact • Discover
+[![Launch Portfolio](https://img.shields.io/badge/▶_ENTER_PORTFOLIO-0A84FF?style=for-the-badge&logo=safari&logoColor=white)](https://m-r-ahamed-portfolio.vercel.app/)
 
-[![Open Live Desktop](https://img.shields.io/badge/OPEN_LIVE_DESKTOP-FF375F?style=for-the-badge&logo=vercel&logoColor=white)](https://m-r-ahamed-portfolio.vercel.app/)
+**💻 Mac · 📱 iPhone · 🖥️ iPad · 📄 Classic**
 
 </div>
 
 ---
 
-# 🚀 Portfolio Highlights
+# ✨ What Makes This Portfolio Different?
 
-<table>
-<tr>
-<td width="50%" valign="top">
+Most portfolios are websites you scroll through.
 
-### 🪟 Desktop Engine
+**This portfolio is a system you explore.**
 
-- Custom window management
-- Drag & resize
-- Minimize & maximize
-- Window focus / z-index
+| Traditional Portfolio | M.R.Ahamed Portfolio OS |
+|---|---|
+| Static navigation | 🚀 Apps + system navigation |
+| One responsive page | 💻📱🖥️ Three device experiences |
+| Normal cards | 🪟 Interactive windows |
+| Static project list | 🧑‍💻 Xcode-style project experience |
+| Fixed background | 🎨 Wallpaper system |
+| Basic menu | 🎛️ Control Centre |
+| No system search | 🔎 Spotlight |
+| Static screenshots | ⚡ Interactive applications |
+| No file management | 📂 Finder + My Files |
+| No games | 🎮 20 playable games |
+| No live information | 🌦️ Live weather |
+| No media system | 🎵 Music + Now Playing |
+| Basic contact form | 💬 Guestbook + Hire Me |
+| No device simulation | 📱 iPhone + 🖥️ iPad + 💻 Mac |
+
+### 🌟 Signature Features
+
+- 💻 Mac-inspired interactive desktop
+- 📱 Dedicated iPhone/iOS-style experience
+- 🖥️ Dedicated iPad/iPadOS-style experience
+- 🪟 Custom window-management system
+- 🚀 Dock
+- 🔎 Spotlight
+- 🧩 Widgets
+- 🎛️ Control Centre
+- 🔔 Notification Centre
+- 🏝️ Dynamic Island
+- 🔒 Lock Screens
+- 🎨 Wallpaper Studio
+- 🌦️ Live Weather
+- 🎵 Music
+- 🎮 Game Center
+- 💬 Guestbook
+- 📂 Finder
+- 📁 My Files
+- 📸 Photos
+- 📝 Notes
+- ⏰ Reminders
+- 📚 Learning Hub
+- 🤖 Portfolio Assistant
+- ⌨️ Interactive Terminal
+- 📦 PWA / offline support
+- 🌐 English, Sinhala and Tamil interface support
+
+---
+
+# 💻 📱 🖥️ Three Devices — Three Experiences
+
+## 💻 Mac Experience
+
+<div align="center">
+
+<img src="./public/assets/guide/mac-desktop.webp" width="92%" alt="Mac Desktop">
+
+</div>
+
+The desktop version is designed as an interactive Mac-inspired portfolio environment.
+
+### 🪟 Window System
+
+- Drag windows
+- Resize windows
+- Focus and z-index management
+- Minimize
+- Restore
+- Maximize
 - Window tiling
+- Half-screen layouts
+- Quarter-screen layouts
+- App switching
+- Show All Windows
+- Hide applications
+- Multiple desktop Spaces
 - Mission Control
-- Stage Manager
-- App Switcher
-- Genie / Scale effects
-
-</td>
-
-<td width="50%" valign="top">
-
-### 🍎 macOS Experience
-
-- Desktop environment
-- Animated Dock
-- Menu Bar
-- Launchpad
-- Spotlight
-- Control Center
-- Notification Center
-- Lock Screen
-- System Settings
-
-</td>
-</tr>
-
-<tr>
-<td width="50%" valign="top">
-
-### 🧩 Application Ecosystem
-
-- Portfolio applications
-- Productivity tools
-- Communication apps
-- Media applications
-- Utilities
-- Developer tools
-- Browser services
-- Game Center
-
-</td>
-
-<td width="50%" valign="top">
-
-### ⚡ Modern Web
-
-- React 19
-- TypeScript
-- Vite
-- Lazy loading
-- Dynamic imports
-- PWA capabilities
-- Browser APIs
-- Responsive design
-
-</td>
-</tr>
-</table>
-
----
-
-# 🧬 Portfolio DNA
+- Stage Manager-inspired workflows
+- Hot Corners
+- Genie-style minimizing
+- Scale minimizing
+- Keyboard window controls
 
 <div align="center">
 
-```text
-╭──────────────────────────────────────────────────────────────╮
-│                     M.R.AHAMED PORTFOLIO                     │
-├──────────────────────────────────────────────────────────────┤
-│                                                              │
-│   💻 SOFTWARE ENGINEERING     ██████████████████████████      │
-│   🎨 UI / UX                  ███████████████████████         │
-│   🌐 FULL-STACK               █████████████████████████       │
-│   📱 APPLICATIONS             ██████████████████████          │
-│   🗄️ DATA & SYSTEMS          ████████████████████            │
-│   🚀 ENTREPRENEURSHIP         █████████████████████           │
-│                                                              │
-╰──────────────────────────────────────────────────────────────╯
-```
-
-<sub>Visual overview of the portfolio's areas of focus — not a proficiency score.</sub>
+<img src="./public/assets/guide/mac-tile.webp" width="45%" alt="Window Tiling">
+&nbsp;
+<img src="./public/assets/guide/mac-mission.webp" width="45%" alt="Mission Control">
 
 </div>
 
 ---
 
-# 🥧 Portfolio Ecosystem
+## 🚀 Dock
 
-```mermaid
-pie showData
-    title Portfolio Experience Areas
-    "Portfolio & Career" : 24
-    "System Experience" : 22
-    "Productivity & Utilities" : 20
-    "Media & Communication" : 14
-    "Games & Interaction" : 12
-    "Business & Services" : 8
-```
+The Dock behaves as an application launcher and running-app manager.
 
-> The chart is a visual categorization of the portfolio experience, not measured usage analytics.
+### Dock Features
 
----
-
-# 🏗️ System Architecture
-
-```mermaid
-flowchart TB
-
-    A["👤 Visitor"] --> B["🚀 Startup Experience"]
-    B --> C["🔐 Lock Screen"]
-    C --> D["🖥️ Interactive Desktop"]
-
-    D --> E["📌 Dock"]
-    D --> F["🔍 Spotlight"]
-    D --> G["🚀 Launchpad"]
-    D --> H["🎛️ Control Center"]
-    D --> I["🔔 Notification Center"]
-    D --> J["🧩 Desktop Widgets"]
-    D --> K["🪟 Window Manager"]
-
-    K --> L["💼 Portfolio Apps"]
-    K --> M["⚙️ System Apps"]
-    K --> N["🧰 Utilities"]
-    K --> O["🎵 Media Apps"]
-    K --> P["🎮 Game Center"]
-
-    L --> Q["⚛️ React Application Layer"]
-    M --> Q
-    N --> Q
-    O --> Q
-    P --> Q
-
-    Q --> R["SettingsProvider"]
-    Q --> S["SystemProvider"]
-    Q --> T["MusicProvider"]
-    Q --> U["WindowManagerProvider"]
-
-    R --> V["💾 Persistent Preferences"]
-    S --> W["🌐 Browser APIs"]
-    T --> X["🎧 Global Media State"]
-    U --> Y["🪟 Window Lifecycle"]
-```
-
----
-
-# 🔄 How the Portfolio Works
-
-```mermaid
-flowchart LR
-
-    A["Open Portfolio"] --> B["Boot"]
-    B --> C["Lock Screen"]
-    C --> D["Desktop"]
-
-    D --> E["Open App"]
-    E --> F["Window Manager"]
-    F --> G["Application"]
-
-    G --> H["Portfolio Data"]
-    G --> I["System State"]
-    G --> J["Browser APIs"]
-
-    H --> K["Render Content"]
-    I --> K
-    J --> K
-
-    K --> L["Interactive Experience"]
-```
-
----
-
-# 🪟 Window Management
-
-The portfolio contains a custom desktop-style window management system.
-
-### Supported interactions
-
-```text
-                    ┌───────────────────────┐
-                    │      APP WINDOW       │
-                    ├───────────────────────┤
-                    │ 🔴   🟡   🟢          │
-                    │                       │
-                    │  Drag                 │
-                    │  Resize               │
-                    │  Focus                │
-                    │  Minimize             │
-                    │  Maximize             │
-                    │  Restore              │
-                    │  Tile                 │
-                    │                       │
-                    └───────────────────────┘
-```
-
-It supports:
-
-- 🟢 Open
-- 🔴 Close
-- 🟡 Minimize
-- 🔲 Maximize
-- 🖱️ Drag
-- ↔️ Resize
-- 🎯 Focus
-- 📚 Z-index management
-- 🧲 Edge tiling
-- 🪄 Genie / Scale minimization
-- 🗂️ Stage Manager
-- 🖥️ Mission Control
-- ⌨️ Application switching
-
----
-
-# 🚀 Dock Experience
-
-<div align="center">
-
-```text
-╭─────────────────────────────────────────────────────────────╮
-│  Finder  Safari  Xcode  Notes  Photos  Music  ⚙️  🗑️       │
-╰─────────────────────────────────────────────────────────────╯
-```
-
-</div>
-
-The Dock supports:
-
-- Cursor-proximity magnification
-- Smooth application animation
+- Application launching
 - Running indicators
 - Minimized windows
-- Recent applications
-- Context menus
-- Dock positioning
+- Magnification
 - Auto-hide
+- Recent applications
 - Keep in Dock
-- Remove from Dock
+- Open at Login
 - Show in Finder
 - Add to Desktop
+- Remove from Dock
 - New Window
 - Show All Windows
+- Context menus
+- Trash state
 
 ---
 
-# 🔍 Spotlight
+# 🔎 Spotlight
 
-Search the portfolio from one central interface.
+<div align="center">
 
-```text
-⌘ + Space
+<img src="./public/assets/guide/mac-spotlight.webp" width="75%" alt="Spotlight">
 
-╭──────────────────────────────────────────────╮
-│ 🔍 Search M.R.Ahamed Portfolio...            │
-├──────────────────────────────────────────────┤
-│                                              │
-│  💻 Projects                                 │
-│  🧠 Skills                                   │
-│  💼 Experience                               │
-│  🎓 Education                                │
-│  🛠️ Services                                │
-│  📄 CV                                       │
-│  🚀 Applications                             │
-│                                              │
-╰──────────────────────────────────────────────╯
-```
+</div>
 
-Spotlight can surface portfolio information, applications and system actions.
+Spotlight provides system-wide portfolio search.
+
+Search across:
+
+- Applications
+- Projects
+- Experience
+- Skills
+- Portfolio sections
+- Settings
+- System actions
 
 ---
 
 # 🚀 Launchpad
 
-Launchpad provides an application-launching environment inspired by macOS.
+<div align="center">
 
-### Features
+<img src="./public/assets/guide/mac-launchpad.webp" width="88%" alt="Launchpad">
 
-- 🔎 Search
-- 📄 Multiple pages
-- 📁 Application folders
-- 🖱️ Drag-to-rearrange
-- ✏️ Edit mode
-- 🔴 App badges
-- 🗑️ Application removal
-- ♻️ Restore defaults
-- 🧩 Organized categories
+</div>
 
-Application groups include areas such as:
-
-`Utilities` • `Google` • `Microsoft 365` • `AI` • `Other`
+Launchpad provides an application-grid experience for discovering the portfolio's application ecosystem.
 
 ---
 
-# 🎛️ Control Center
+# 🪟 Mission Control
 
-<table>
-<tr>
-<td width="33%" align="center">
+<div align="center">
 
-### 📡 Connectivity
+<img src="./public/assets/guide/mac-mission.webp" width="90%" alt="Mission Control">
 
-Wi-Fi  
-Bluetooth  
-AirDrop  
-Hotspot  
-Airplane Mode  
-Cellular Data
+</div>
 
-</td>
-
-<td width="33%" align="center">
-
-### 🎨 Display
-
-Brightness  
-Dark Mode  
-Night Shift  
-Text Size  
-Screen Mirroring  
-Keyboard Brightness
-
-</td>
-
-<td width="33%" align="center">
-
-### ⚡ Quick Tools
-
-Screenshot  
-Timer  
-Stopwatch  
-Calculator  
-Camera  
-Voice Memo
-
-</td>
-</tr>
-</table>
-
-Additional controls include:
-
-`Focus` • `Stage Manager` • `Sound` • `Low Power Mode` • `Accessibility` • `Quick Note` • `Now Playing` • `Share Portfolio` • `Hire Me`
-
-> Hardware controls that cannot be accessed directly from a browser are represented as simulated desktop interactions.
+Mission Control provides a visual overview of running windows and desktop spaces.
 
 ---
 
-# 🔔 Notification Center
+# 🧩 Widgets
 
-The portfolio contains its own notification experience.
+<div align="center">
 
-```text
-╭────────────────────────────────────╮
-│ 🔔 Notifications                   │
-├────────────────────────────────────┤
-│                                    │
-│ 💼 New Portfolio Update            │
-│ Explore my latest work             │
-│                                    │
-│ 📌 Reminder                        │
-│ Check out Projects                 │
-│                                    │
-│ 🎵 Now Playing                     │
-│ Portfolio Ambient                  │
-│                                    │
-╰────────────────────────────────────╯
-```
+<img src="./public/assets/guide/mac-widgets.webp" width="88%" alt="Widgets">
 
-Features include:
+</div>
 
-- Notification banners
-- Notification history
-- Read / unread state
+The portfolio includes a widget environment with:
+
+- Widget gallery
+- Live previews
+- Desktop placement
+- Notification Centre placement
+- Grid snapping
+- Calendar widgets
+- Clock widgets
+- Portfolio information widgets
+- Device-aware presentation
+
+---
+
+# 🎛️ Mac Control Center
+
+<div align="center">
+
+<img src="./public/assets/guide/mac-cc.webp" width="72%" alt="Mac Control Center">
+
+</div>
+
+### Controls include
+
+- 📶 Wi-Fi
+- 🟦 Bluetooth
+- 🌙 Focus
+- 🪟 Stage Manager
+- ☀️ Brightness
+- 🔊 Volume
+- 🔋 Low Power Mode
+- 🔠 Text Size
+- ♿ Accessibility
+- 🎵 Recognize Music
+- 📝 Quick Note
+- 📹 FaceTime
+- 📤 Share Portfolio
+- 💼 Hire Me
+
+---
+
+# 🔔 Mac Notification Center
+
+<div align="center">
+
+<img src="./public/assets/guide/mac-nc.webp" width="72%" alt="Notification Center">
+
+</div>
+
+### Notification Features
+
+- Notification cards
+- Read/unread state
+- Dismiss actions
+- Swipe behavior
+- Action buttons
 - Application badges
-- Mark All Read
-- Clear All
-- Swipe-to-dismiss
-- Actions
-- Context menus
 - Notification sounds
-- Reminder notifications
-- Browser notifications where supported
+- Notification settings
+- Scheduled portfolio notifications
 
 ---
 
 # ⚙️ System Settings
 
-System Settings controls the desktop experience.
+<div align="center">
+
+<img src="./public/assets/guide/mac-settings.webp" width="85%" alt="System Settings">
+
+</div>
+
+Settings acts as the control room for the portfolio.
+
+### 🌐 Connectivity
+
+- Wi-Fi
+- Bluetooth
+- Network
+
+### 🔋 Power
+
+- Battery
+- Low Power Mode
+- Battery information
+
+### ⚙️ General
+
+- About
+- Software Update
+- Storage
+- AirDrop & Handoff
+- Language & Region
+- Date & Time
+- Login Items
+
+### ♿ Accessibility
+
+- Reduce Motion
+- Increase Contrast
+- Text Size
+- Reduce Transparency
+- AssistiveTouch
+
+### 🎨 Appearance
+
+- Light Mode
+- Dark Mode
+- Automatic appearance
+- Accent colours
+- Highlight colours
+- Interface styling
+
+### 🖥️ Desktop & Dock
+
+- Dock size
+- Magnification
+- Mission Control
+- Hot Corners
+- Windows
+- Desktop icons
+- Widgets
+- Stage Manager concepts
+
+### 🖼️ Wallpaper
+
+- Wallpaper library
+- Dynamic wallpaper concepts
+- Device-specific wallpaper
+- Home Screen wallpaper
+- Lock Screen wallpaper
+
+### 🔔 Notifications
+
+- Application notifications
+- Banners
+- Sounds
+- Badges
+- Previews
+- Scheduled Summary
+
+### 🔊 Sound
+
+- Volume
+- Alerts
+- Output
+- Input
+- Startup sounds
+
+### 🌙 Focus
+
+- Focus mode
+- Do Not Disturb concepts
+
+### ⏳ Screen Time
+
+- Usage
+- App activity
+- Limits
+- Downtime
+
+### 🔒 Lock Screen
+
+- Lock settings
+- Clock styling
+- Device behavior
+
+### 🛡️ Privacy & Security
+
+- Camera permission concepts
+- Microphone permission concepts
+- Location permission concepts
+- Browser privacy
+
+### 🤖 Assistant
+
+- Portfolio Assistant preferences
+
+### 🎮 Game Center
+
+- Nickname
+- Scores
+- Achievements
+
+### ⌨️ Keyboard
+
+- Keyboard preferences
+- Shortcuts
+
+### 🖱️ Trackpad
+
+- Gesture preferences
+- Scrolling concepts
+- Tracking concepts
+
+### 📱 Devices & View
+
+- Mac
+- iPhone
+- iPad
+- Device-specific behavior
+
+### 🗑️ Trash & Undo
+
+- Recently Deleted
+- Restore
+- Undo
+- Redo
+- Delete confirmations
+
+---
+
+# 📱 iPhone / iOS-Style Experience
+
+<div align="center">
+
+<img src="./public/assets/screenshots/iphone-home.jpg" width="42%" alt="iPhone Portfolio">
+
+</div>
+
+The iPhone version is **not simply the desktop squeezed onto a phone**.
+
+It has its own mobile shell and interaction model.
+
+## 🏠 Home Screen
+
+<div align="center">
+
+<img src="./public/assets/guide/iphone-home.webp" width="42%" alt="iPhone Home Screen">
+
+</div>
+
+### Home Screen Features
+
+- iOS-style application grid
+- Four-app Dock
+- Multiple pages
+- Page indicators
+- Search
+- App Library
+- Application badges
+- Widgets
+- Edit mode
+- Folders
+- Wallpaper-aware styling
+- Device-specific persistence
+
+---
+
+# 🔒 iPhone Lock Screen
+
+<div align="center">
+
+<img src="./public/assets/guide/iphone-lock.webp" width="42%" alt="iPhone Lock Screen">
+
+</div>
+
+### Lock Screen Features
+
+- Wallpaper-first design
+- Custom clock
+- Clock font selection
+- Clock colour
+- Notification presentation
+- Count mode
+- Stack mode
+- List mode
+- Torch shortcut
+- Camera shortcut
+- Lock sound
+- Saved Lock Screens
+- Long-press customization
+- Separate Lock/Home wallpapers
+
+---
+
+# 🏝️ Dynamic Island
+
+<div align="center">
+
+<img src="./public/assets/guide/iphone-island.webp" width="42%" alt="Dynamic Island">
+
+</div>
+
+Dynamic Island is used as an activity surface.
+
+### Activities
+
+- 🎵 Music
+- ⏱️ Timer
+- 🤖 Portfolio Assistant
+- 🎙️ Voice recording
+- 🔴 Screen recording
+- 📞 Calls
+- 🔦 Torch
+- 🌙 Focus alerts
+- 🔕 Silent-mode alerts
+- 🔋 Battery alerts
+
+It can display simultaneous activity concepts and expand into richer controls.
+
+---
+
+# 🎛️ iPhone Control Centre
+
+<div align="center">
+
+<img src="./public/assets/guide/iphone-cc.webp" width="44%" alt="iPhone Control Centre">
+
+</div>
+
+### Control Centre Features
+
+- Favourites
+- Media controls
+- Connectivity
+- Work controls
+- Multiple pages
+- Side navigation
+- Edit mode
+- Add Control
+- Search controls
+- Browse by application
+- Drag/reorder controls
+- Resize controls
+- Remove controls
+- Restore defaults
+- Persistent layout
+
+---
+
+# 🔔 iPhone Notification Centre
+
+<div align="center">
+
+<img src="./public/assets/guide/iphone-nc.webp" width="44%" alt="iPhone Notification Centre">
+
+</div>
+
+Notifications integrate with the portfolio-wide notification system.
+
+---
+
+# 🔄 iPhone App Switcher
+
+<div align="center">
+
+<img src="./public/assets/guide/iphone-switcher.webp" width="44%" alt="iPhone App Switcher">
+
+</div>
+
+---
+
+# ⚙️ iPhone Settings
+
+<div align="center">
+
+<img src="./public/assets/guide/iphone-settings.webp" width="44%" alt="iPhone Settings">
+
+</div>
+
+Mobile settings include:
+
+- Home Screen options
+- Lock Screen options
+- Control Centre customization
+- Dynamic Island
+- AssistiveTouch
+- Back Tap concepts
+- Display Zoom
+- Keyboard clicks
+- Device presentation
+
+---
+
+# 🖥️ iPad / iPadOS-Style Experience
+
+<div align="center">
+
+<img src="./public/assets/screenshots/ipad-home.jpg" width="80%" alt="iPad Portfolio">
+
+</div>
+
+The iPad experience has its own tablet-oriented shell.
+
+## 🏠 iPad Home
+
+<div align="center">
+
+<img src="./public/assets/guide/ipad-home.webp" width="78%" alt="iPad Home">
+
+</div>
+
+### iPad Experience
+
+- Tablet application grid
+- Adaptive Dock
+- Portrait mode
+- Landscape mode
+- App Library
+- Widgets
+- Multitasking concepts
+- Split View concepts
+- Stage Manager-inspired workflows
+- Tablet-specific spacing
+
+---
+
+# 🎛️ iPad Control Centre
+
+<div align="center">
+
+<img src="./public/assets/guide/ipad-cc.webp" width="78%" alt="iPad Control Centre">
+
+</div>
+
+---
+
+# 🔄 iPad App Switcher
+
+<div align="center">
+
+<img src="./public/assets/guide/ipad-switcher.webp" width="78%" alt="iPad App Switcher">
+
+</div>
+
+---
+
+# 🔒 iPad Lock Screen
+
+<div align="center">
+
+<img src="./public/assets/guide/ipad-lock.webp" width="78%" alt="iPad Lock Screen">
+
+</div>
+
+---
+
+# ✏️ iPad Edit Mode
+
+<div align="center">
+
+<img src="./public/assets/guide/ipad-edit.webp" width="78%" alt="iPad Edit Mode">
+
+</div>
+
+---
+
+# 🎨 Wallpaper Studio
+
+The project includes a large wallpaper system instead of one static background.
+
+### 🌄 Features
+
+- 💻 Mac wallpapers
+- 📱 iPhone wallpapers
+- 🖥️ iPad wallpapers
+- ☀️ Light variants
+- 🌙 Dark variants
+- ✨ Dynamic wallpaper concepts
+- 🌊 Live/code-driven wallpapers
+- 🔎 Wallpaper search
+- 🗂️ Categories
+- 🔒 Lock Screen preview
+- 🏠 Home Screen preview
+- 🖥️ iPad portrait preview
+- 🖥️ iPad landscape preview
+- 🔗 Apply as pair
+- 🏠 Apply to Home
+- 🔒 Apply to Lock
+- 🌫️ Home Screen blur
+- 🎨 Wallpaper-aware tint
+- 📷 User-selected photos
+- ⚡ Motion awareness
+- 🔋 Low Power awareness
+- ♿ Reduced Motion support
+
+### 🖼️ Wallpaper Gallery
+
+<div align="center">
+
+<img src="./public/assets/wallpapers/liquid-glass.jpg" width="30%" alt="Liquid Glass">
+<img src="./public/assets/wallpapers/northern-lights.jpg" width="30%" alt="Northern Lights">
+<img src="./public/assets/wallpapers/ocean-shore.jpg" width="30%" alt="Ocean Shore">
+
+</div>
+
+Wallpaper styles include:
+
+`Liquid Glass` · `Lone Cypress` · `Mesh Coral` · `Mesh Ocean` · `Midnight` · `Navy Waves` · `Northern Lights` · `Ocean Shore` · `Peaks` · `Pro Light` · `Pro Dark` · `Sage Waves` · `Sonoma` · `Sunset` · `Tahoe`
+
+---
+
+# 🌦️ Live Weather
+
+The Weather application uses runtime forecast information rather than a fixed weather card.
 
 ```text
-┌───────────────────────────────┐
-│ ⚙️ System Settings            │
-├───────────────────────────────┤
-│ General                       │
-│ Appearance                    │
-│ Wallpaper                     │
-│ Displays                      │
-│ Desktop & Dock                │
-│ Control Center                │
-│ Battery                       │
-│ Sound                         │
-│ Focus                         │
-│ Notifications                 │
-│ Lock Screen                   │
-│ Privacy & Security            │
-│ Wi-Fi                         │
-│ Network                       │
-│ Bluetooth                     │
-│ Spotlight                     │
-│ Accessibility                 │
-│ Intelligence & Siri           │
-│ Keyboard                      │
-│ Trackpad                      │
-│ Game Center                   │
-└───────────────────────────────┘
+🌦️ Weather
+│
+├── 🌡️ Current Temperature
+├── 🌡️ Feels Like
+├── 💧 Relative Humidity
+├── 🌬️ Wind Speed
+├── 🌧️ Precipitation
+├── 🕒 Hourly Forecast
+├── 📅 10-Day Forecast
+├── 🌅 Sunrise
+├── 🌇 Sunset
+├── ☀️ UV Index
+└── 🌧️ Precipitation Probability
 ```
 
-Preferences are persisted locally where appropriate.
+### Weather Features
+
+- 📍 Kandy as the primary portfolio location
+- 🔎 City search
+- ➕ Add cities
+- 🗂️ Saved locations
+- 🌡️ Celsius / Fahrenheit
+- 🕒 City-local time
+- 🗺️ Map panel
+- 🌅 Sunrise / sunset
+- ☀️ UV information
+- 🌧️ Weather-aware visuals
+- 💾 Cached forecast fallback
+
+Forecast data is fetched at runtime using **Open-Meteo**.
 
 ---
 
-# 📱 Application Universe
+# 🎵 Music — Portfolio Soundtrack
 
-## 👨‍💻 Portfolio & Career
+The project includes an interactive Music experience and original/synthesized portfolio audio assets.
 
-| Application | Purpose |
-|---|---|
-| 👤 About | Personal introduction |
-| 💻 Xcode | Project showcase |
-| 📊 Case Studies | Detailed project stories |
-| 🛠️ My Services | Technical & business capabilities |
-| 🤝 Hire Me | Recruitment / collaboration |
-| 📝 Notes | Skills |
-| 📁 Finder | Experience & education |
-| 📄 Preview | CV |
-| 🏆 Achievements | Milestones |
-| 📟 Terminal | CLI portfolio |
-| 🤖 Ask Me AI | Interactive portfolio assistant |
-| ✍️ Guestbook | Visitor interaction |
+### 🎼 Music Features
 
----
+- 🎶 Portfolio music library
+- 🌍 Language-style browsing
+- 🎧 Genre browsing
+- 😊 Mood browsing
+- 🕘 Recently Played
+- 📂 User playlists
+- 🎵 My Songs
+- ➕ Import local music
+- 💾 Browser-local persistence
+- ▶️ Global playback
+- 🎚️ Volume controls
+- 🎼 Now Playing
+- 🔒 Lock Screen media integration
+- 🏝️ Dynamic Island integration
+- 🎛️ Control Centre integration
+- ⌨️ Media-key support where available
+- 📺 Mini-player / PiP concepts
 
-## 💬 Communication
+### 🌍 Musical Styles
 
-`Mail` • `Messages` • `Contacts` • `FaceTime` • `WhatsApp` • `Telegram` • `Yahoo Mail`
+- 🇬🇧 English
+- 🇱🇰 Sinhala
+- 🇱🇰 Tamil
+- 🌙 Arabic
+- 🇮🇳 Hindi
 
----
+### 🎧 Included Portfolio Tracks
 
-## 🎨 Media & Creativity
-
-`Photos` • `Music` • `Podcasts` • `TV` • `Books` • `Camera` • `Voice Memos` • `Freeform` • `Journal`
-
----
-
-## 🧰 Utilities
-
-`Calculator` • `Clock` • `Calendar` • `Reminders` • `Maps` • `Weather` • `Find My` • `Home` • `Measure` • `Dictionary` • `Translate` • `Font Book` • `Grapher` • `Digital Color Meter` • `Activity Monitor` • `Stickies` • `Passwords`
+- Ceylon Rain
+- Focus Mode
+- Galle Sunset
+- Ella Train
+- Hill Train Lofi
+- Kandy Morning
+- Late Night Review
+- Lotus Pond
+- Monsoon Code
+- Night Compile
+- Peradeniya Walk
+- Sigiriya Dawn
+- Tea Country
 
 ---
 
 # 🎮 Game Center
 
+## 🏆 20 Playable Games
+
+| # | Game | Category |
+|---:|---|---|
+| 01 | 🐍 Snake | Arcade |
+| 02 | 🔢 2048 | Puzzle |
+| 03 | 9️⃣ Sudoku | Puzzle |
+| 04 | 🧱 Block Drop | Arcade |
+| 05 | 💣 Minesweeper | Classic |
+| 06 | ❌⭕ Tic-Tac-Toe | Classic |
+| 07 | 🔴 Connect Four | Classic |
+| 08 | 🃏 Memory Match | Brain & IQ |
+| 09 | 🧠 IQ Quiz | Brain & IQ |
+| 10 | ➗ Math Sprint | Brain & IQ |
+| 11 | 🟢 Simon Says | Brain & IQ |
+| 12 | ⚡ Reaction Time | Brain & IQ |
+| 13 | 🔤 Word Guess | Word |
+| 14 | ⌨️ Typing Speed | Word |
+| 15 | 🧱 Brick Breaker | Arcade |
+| 16 | 🐤 Flappy Dot | Arcade |
+| 17 | 🏙️ Stack Tower | Arcade |
+| 18 | 🐹 Whack-a-Mole | Arcade |
+| 19 | 🏓 Pong | Classic |
+| 20 | ✂️ Rock Paper Scissors | Classic |
+
+### 🏆 Game Center Systems
+
+- Daily Challenge
+- Daily target
+- Streaks
+- Achievements
+- Achievement notifications
+- Local leaderboards
+- Best scores
+- Continue Playing
+- Search
+- Categories
+- Persistent progress
+- Keyboard controls
+- Touch controls
+- Swipe controls where supported
+
+```text
+🎮 PLAY
+   │
+   ▼
+🏁 FINISH
+   │
+   ▼
+🧮 SCORE
+   │
+   ├──────────► 🏆 LEADERBOARD
+   │
+   ├──────────► 🥇 ACHIEVEMENT
+   │
+   ├──────────► 📅 DAILY CHALLENGE
+   │
+   └──────────► 🔥 STREAK
+```
+
+---
+
+# 💬 Guestbook
+
+Visitors can interact with the portfolio through the Guestbook.
+
+### Guestbook Features
+
+- ✍️ Sign Guestbook
+- 📝 Edit
+- 🗑️ Delete
+- ❤️ Like
+- 📋 Copy
+- 📤 Share
+- 🔎 Search
+- ↕️ Sort
+- 🙂 Mood
+- 📍 Optional location
+- 💾 Local persistence behavior
+- 🌐 Remote-aware behavior
+- ✉️ Optional owner-notification endpoint
+
+---
+
+# 📂 Finder + My Files
+
 <div align="center">
 
-### 🕹️ 20+ Interactive Game Experiences
+<img src="./public/assets/screenshots/experience.jpg" width="92%" alt="Finder Experience">
 
 </div>
 
-Game categories include:
+Finder acts both as a portfolio navigator and local file environment.
 
-```text
-🧩 PUZZLE      ███████████████████
-🕹️ ARCADE      █████████████████
-🧠 BRAIN & IQ  ████████████████
-♟️ CLASSIC     ███████████████
-🔤 WORD        █████████████
-```
+### 🗂️ Portfolio Locations
 
-Examples include:
+- 💼 All Experience
+- ✨ Entrepreneurial
+- 💻 Technology
+- 📊 Business
+- ⭐ Leadership
+- 🎓 University
+- 🎓 Education
+- 🧑‍💻 Projects
+- 🕒 Timeline
+- 📁 My Files
+- 🗑️ Trash
+- 🏷️ Tags
 
-| 🧩 Puzzle | 🕹️ Arcade | 🧠 Brain | ♟️ Classic |
-|---|---|---|---|
-| 2048 | Snake | Memory | Tic-Tac-Toe |
-| Sudoku | Pong | Simon | Connect Four |
-| Minesweeper | Flappy | Math Sprint | RPS |
-| Block Drop | Bricks | IQ Quiz | Reaction |
-| Word Guess | Stack | Typing | Whack |
+## 📁 My Files
 
-Game Center also includes locally managed experiences such as:
+Visitors can add files from their own device.
 
-- 🏆 Achievements
-- 📊 Leaderboards
-- ▶️ Continue Playing
-- 📅 Daily Challenge
-- 🔥 Streak tracking
-- 🎉 Seasonal events
+### Supported Experiences
+
+- 🖼️ Image preview
+- 🎬 Video preview
+- 🎵 Audio playback
+- 📄 PDF preview
+- 📝 Text preview
+- 💻 Code preview
+- ✏️ Rename
+- 📑 Duplicate
+- ⬇️ Download
+- 🗑️ Delete
+- 🏷️ Tags
+- 💾 Browser-local persistence
+
+Visitor files are designed to remain local to the browser rather than being silently uploaded.
 
 ---
 
-# 💼 What I Build
+# 📸 Photos
+
+### Photos Features
+
+- Portfolio photo library
+- Wallpaper album
+- Video section
+- Portfolio recordings
+- Imports
+- Drag-and-drop photos
+- Add Photos
+- Use Photo as Wallpaper
+- Local visitor imports
+- Recently Deleted concepts
+- Hidden album concepts
+- Editing concepts
+
+---
+
+# 🌐 Safari-Style Browser
+
+### Safari Features
+
+- Tabs
+- Mac-style tab strip
+- iPhone tab grid
+- Private Browsing concepts
+- Reading List
+- Favorites
+- GitHub shortcuts
+- External navigation
+- Device-specific layouts
+
+---
+
+# 🔔 Notification System
+
+```text
+📱 Application
+      │
+      ▼
+🔔 Notification Engine
+      │
+      ├── Banner
+      ├── Sound
+      ├── Badge
+      ├── Notification Centre
+      ├── Read / Unread
+      └── Browser Notification
+```
+
+### Notification Features
+
+- Glass notification cards
+- Read/unread state
+- Close controls
+- Swipe dismiss
+- Context actions
+- Action buttons
+- Application badges
+- Mark All Read
+- Clear All
+- Per-app banners
+- Per-app sounds
+- Per-app badges
+- Show Previews
+- Scheduled Summary
+- Reminder notifications
+- Browser notifications where supported
+
+---
+
+# 🧊 Control Centre Architecture
+
+```text
+                    🎛️ CONTROL CENTRE
+                           │
+        ┌──────────────────┼──────────────────┐
+        │                  │                  │
+        ▼                  ▼                  ▼
+   ⭐ Favourites       🎵 Media          📶 Connectivity
+        │
+        ├──────────────► 💼 Work
+        │
+        └──────────────► ✏️ Edit Mode
+                              │
+                  ┌───────────┼────────────┐
+                  ▼           ▼            ▼
+              ➕ Add       ↔️ Move      ↔ Resize
+                  │
+                  ├────────► 🗑 Remove
+                  ├────────► 📱 Browse by App
+                  └────────► ♻️ Restore Defaults
+```
+
+The controls adapt across Mac, iPhone and iPad layouts.
+
+---
+
+# 🏝️ Dynamic Island Activity Model
+
+```text
+                     🏝️ DYNAMIC ISLAND
+                            │
+      ┌─────────┬───────────┼──────────┬─────────┐
+      ▼         ▼           ▼          ▼         ▼
+    🎵 Music  ⏱️ Timer   🤖 Assistant  🎙️ Rec   📞 Call
+      │         │           │          │         │
+      └─────────┴───────────┼──────────┴─────────┘
+                            ▼
+                       Expanded View
+
+Additional temporary states:
+🌙 Focus · 🔕 Silent · 🔋 Battery · 🔦 Torch
+```
+
+---
+
+# 🔒 Lock Screen System
+
+### Features
+
+- Saved Lock Screens
+- Long-press switching
+- Create new
+- Customize
+- Delete
+- Wallpaper selection
+- Clock font
+- Clock colour
+- Notification style
+- Torch shortcut
+- Camera shortcut
+- Lock sound
+- Separate Home/Lock wallpaper
+
+---
+
+# 🧩 Widgets & Smart Stacks
+
+### 💻 Mac
+
+- Widget gallery
+- Live previews
+- Desktop placement
+- Notification Centre placement
+- Grid snapping
+
+### 📱 iPhone
+
+- Widget gallery
+- Edit mode
+- Movement
+- Grid snapping
+- Smart Stacks
+- Swipe stacks
+- App deep links
+
+### 🖥️ iPad
+
+- Larger widget layouts
+- Tablet placement
+- Edit mode
+- Smart Stack concepts
+- Responsive grids
+
+---
+
+# 🤖 Portfolio Assistant
+
+The assistant is presented as **M.R.Ahamed's Portfolio Assistant**.
+
+It can help visitors explore:
+
+- 👤 About
+- 🧑‍💻 Projects
+- 💻 Skills
+- 💼 Experience
+- 🎓 Education
+- 🛠️ Services
+- 📚 Case Studies
+- ⚙️ Settings
+- 🎨 Wallpapers
+- ⏱️ Timers
+- 📞 Contact
+- 🤝 Hiring information
+
+---
+
+# 📚 Learning Hub
+
+### Learning Features
+
+- 📖 Learning topics
+- ✅ Mark as studied
+- 📝 Save to Notes
+- ❓ Quizzes
+- 🃏 Flashcards
+- 🎯 Focus Planner
+- 📋 Goals & Tasks
+- 💼 Business Planner
+- 💻 Code Playground
+- 📄 Documents
+- 📖 Guidebook
+
+---
+
+# 📖 Built-In Guidebook
+
+The project includes an A–Z Guidebook containing real screenshots from the portfolio.
+
+## 💻 Mac Guide
+
+<div align="center">
+
+<img src="./public/assets/guide/mac-desktop.webp" width="31%" alt="Mac Desktop">
+<img src="./public/assets/guide/mac-launchpad.webp" width="31%" alt="Mac Launchpad">
+<img src="./public/assets/guide/mac-spotlight.webp" width="31%" alt="Mac Spotlight">
+
+</div>
+
+## 📱 iPhone Guide
+
+<div align="center">
+
+<img src="./public/assets/guide/iphone-home.webp" width="30%" alt="iPhone Home">
+<img src="./public/assets/guide/iphone-cc.webp" width="30%" alt="iPhone Control Centre">
+<img src="./public/assets/guide/iphone-island.webp" width="30%" alt="Dynamic Island">
+
+</div>
+
+## 🖥️ iPad Guide
+
+<div align="center">
+
+<img src="./public/assets/guide/ipad-home.webp" width="31%" alt="iPad Home">
+<img src="./public/assets/guide/ipad-cc.webp" width="31%" alt="iPad Control Centre">
+<img src="./public/assets/guide/ipad-switcher.webp" width="31%" alt="iPad App Switcher">
+
+</div>
+
+---
+
+# 🧑‍💼 Portfolio Modes
+
+### 👔 Recruiter Mode
+
+Focuses on:
+
+`Skills` · `Experience` · `CV` · `Projects` · `Contact`
+
+### 🤝 Client Mode
+
+Focuses on:
+
+`Services` · `Case Studies` · `Business` · `Hire Me`
+
+### 👨‍💻 Developer Mode
+
+Focuses on:
+
+`Architecture` · `GitHub` · `Technology` · `Terminal` · `Projects`
+
+### 🎤 Presentation Mode
+
+Designed for guided portfolio walkthroughs.
+
+---
+
+# 💼 Professional Portfolio Applications
+
+| App | Purpose |
+|---|---|
+| 👤 About | Personal profile |
+| 🧑‍💻 Projects / Xcode | Project showcase |
+| 📚 Case Studies | Detailed project stories |
+| 📝 Notes | Skills and technical knowledge |
+| 📂 Finder | Experience and education |
+| 📄 Preview | Résumé / CV |
+| 🛠️ My Services | Services |
+| 🤝 Hire Me | Professional contact |
+| 🏆 Achievements | Milestones |
+| ⌨️ Terminal | CLI portfolio |
+| 🤖 Ask Me AI | Portfolio Assistant |
+| 💬 Guestbook | Visitor interaction |
+| 📖 Guidebook | Complete system guide |
+
+---
+
+# 🛠️ Services
 
 ## 💻 Technology
 
-<table>
-<tr>
-<td width="50%" valign="top">
+- Full-Stack Development
+- Web Applications
+- APIs
+- Database Development
+- UI/UX
+- Mobile-oriented Development
+- Software Engineering
+- Business Systems
 
-### 🌐 Full-Stack Web Development
+## 💼 Entrepreneurship & Business
 
-Modern frontend and backend web applications with responsive interfaces, APIs and database integration.
-
-</td>
-
-<td width="50%" valign="top">
-
-### 🎨 UI/UX Design & Development
-
-Interactive interfaces focused on usability, responsiveness and polished digital experiences.
-
-</td>
-</tr>
-
-<tr>
-<td width="50%" valign="top">
-
-### 📱 Mobile Application Development
-
-Mobile-focused application development and interface implementation.
-
-</td>
-
-<td width="50%" valign="top">
-
-### 🔌 API Development & Integration
-
-REST API development, integration and application communication.
-
-</td>
-</tr>
-
-<tr>
-<td width="50%" valign="top">
-
-### 🗄️ Database & Business Systems
-
-Structured application data, business workflows and database-backed systems.
-
-</td>
-
-<td width="50%" valign="top">
-
-### 🧾 POS System Development
-
-Business-oriented point-of-sale and management system development.
-
-</td>
-</tr>
-</table>
+- Automotive
+- Import / Export
+- Mobile & Electronics
+- Property Development
+- Sales
+- Marketing
+- Business Development
+- Customer Relationships
 
 ---
 
-# 🚀 Entrepreneurship & Business
+# 🧰 Utility Applications
 
-```mermaid
-mindmap
-  root((M.R.Ahamed))
-    Automotive
-      Vehicle Sales
-      Vehicle Sourcing
-      Imports
-      Dealer Coordination
-    International Trade
-      Import
-      Export
-      Product Sourcing
-      Wholesale
-      Retail
-    Mobile & Electronics
-      Mobile Phones
-      Accessories
-      Electronics
-      Technology Sales
-    Property
-      Land Selection
-      Residential Development
-      Architectural Planning
-      Project Coordination
-    Business
-      Sales
-      Marketing
-      Business Development
-      Customer Relationships
+The portfolio ecosystem includes utilities such as:
+
+`Calculator` · `Calendar` · `Clock` · `Weather` · `Maps` · `Find My` · `Home` · `Measure` · `Dictionary` · `Translate` · `Font Book` · `Grapher` · `Digital Color Meter` · `Activity Monitor` · `Passwords` · `Time Machine` · `iPhone Mirroring` · `System Settings`
+
+---
+
+# 🗓️ Productivity Applications
+
+`Notes` · `Reminders` · `Calendar` · `Pages` · `Documents` · `Flashcards` · `Focus Planner` · `Goals & Tasks` · `Business Planner` · `Code Playground` · `Learning Hub` · `Journal` · `Freeform` · `Voice Memos`
+
+---
+
+# 💬 Communication Applications
+
+`Mail` · `Messages` · `Contacts` · `FaceTime` · `Phone` · `WhatsApp` · `Telegram` · `Yahoo Mail` · `X`
+
+External communication actions are handed off to appropriate real services where applicable.
+
+---
+
+# 🌍 Web & Service Applications
+
+The application ecosystem also provides launch experiences for services such as:
+
+`GitHub` · `LinkedIn` · `Gmail` · `Google Drive` · `Google Photos` · `Classroom` · `Google Docs` · `Microsoft Word` · `Excel` · `PowerPoint` · `ChatGPT` · `Claude` · `Gemini` · `DeepSeek` · `Figma` · `Canva` · `Discord` · `Reddit` · `Pinterest` · `Stack Overflow` · `W3Schools`
+
+---
+
+# 🕰️ Time Machine
+
+Time Machine introduces snapshot and restore concepts for supported visitor-created state.
+
+### Features
+
+- Snapshot concepts
+- Restore earlier state
+- Browser-local persistence
+- Visitor-created content recovery
+
+---
+
+# 📱 iPhone Mirroring
+
+The Mac environment can expose the portfolio's iPhone experience inside an iPhone Mirroring window.
+
+```text
+💻 Mac Portfolio
+      │
+      ▼
+📱 iPhone Mirroring
+      │
+      ├── 🏠 Home
+      ├── 📱 Apps
+      ├── 🏝️ Dynamic Island
+      ├── 🎛️ Control Centre
+      └── 🔄 Mobile interactions
+```
+
+---
+
+# 🎥 Picture in Picture
+
+Supported media experiences can include:
+
+- 🎵 Music mini-player
+- 📺 Video Picture in Picture
+- Browser-native PiP where supported
+- In-page fallback behavior
+
+---
+
+# 🎤 Dictation
+
+Supported text-entry areas can use browser speech recognition where available.
+
+When speech recognition is unavailable, the application falls back gracefully.
+
+---
+
+# ⏳ Screen Time
+
+### Screen Time Features
+
+- Daily usage
+- Weekly usage
+- Date selection
+- Application usage
+- App limits
+- Downtime
+- Limit overlays
+- One More Minute
+- Ignore Limit for Today
+
+---
+
+# ♿ Accessibility
+
+Accessibility-oriented features include:
+
+- Keyboard navigation
+- Skip link
+- Text size controls
+- Bold text
+- Increase Contrast
+- Reduce Transparency
+- Reduce Motion
+- AssistiveTouch
+- Custom AssistiveTouch menu
+- Back Tap concepts
+- Display Zoom
+- Focus states
+- Motion-aware wallpaper fallback
+
+---
+
+# 🌐 Languages
+
+The system interface supports:
+
+- 🇬🇧 English
+- 🇱🇰 Sinhala
+- 🇱🇰 Tamil
+
+---
+
+# 📦 PWA + Offline Experience
+
+```text
+                  🌐 PORTFOLIO
+                       │
+             ┌─────────┴─────────┐
+             ▼                   ▼
+       📄 Web Manifest       ⚙️ Service Worker
+             │                   │
+             ▼             ┌─────┴─────┐
+        📲 Installable      ▼           ▼
+                        💾 Cache     📴 Offline
+```
+
+Repository assets include:
+
+- `manifest.webmanifest`
+- `sw.js`
+- `offline.html`
+- PWA icons
+- Apple touch icon
+- Maskable icon
+
+---
+
+# 🔋 Browser Capabilities
+
+| Capability | Portfolio Use |
+|---|---|
+| 🔔 Web Notifications | Optional notifications |
+| 🎵 Media Session | Media controls |
+| 🔋 Battery Status | Battery presentation where supported |
+| 📤 Web Share | Native sharing |
+| 📷 Media Devices | Camera/self-view experiences |
+| 🎤 Speech Recognition | Dictation |
+| 🖥️ Fullscreen | Immersive experience |
+| 💾 IndexedDB | My Files / persistence |
+| 🗃️ Local Storage | Settings / application state |
+| 📺 Picture in Picture | Media mini-player |
+| 📦 Service Worker | Offline/PWA behavior |
+
+> Browser capabilities depend on the visitor's browser, operating system and permissions.
+
+---
+
+# 🔐 Local-First Visitor Data
+
+```text
+👤 Visitor Device
+      │
+      ├── ⚙️ Settings
+      ├── 🎮 Game Scores
+      ├── 📁 My Files
+      ├── 📸 Imported Photos
+      ├── 🎵 Imported Music
+      ├── 🧩 Layout Preferences
+      └── 💾 Application State
+```
+
+Where designed as local data, information remains in the visitor's browser.
+
+---
+
+# 🧠 Architecture
+
+```text
+                         main.tsx
+                            │
+                            ▼
+                           App
+                            │
+              ┌─────────────┼─────────────┐
+              ▼             ▼             ▼
+           💻 Mac         📱 iPhone     🖥️ iPad
+              │             │             │
+              ├───────┬─────┴─────┬───────┤
+              ▼       ▼           ▼       ▼
+           Windows   Dock       Mobile   Widgets
+              │                   Shell
+              └──────────┬────────┘
+                         ▼
+                 Application Layer
+                         │
+        ┌────────────────┼────────────────┐
+        ▼                ▼                ▼
+   Portfolio Apps   System Apps      Media/Games
+        │                │                │
+        └────────────────┼────────────────┘
+                         ▼
+                   System State
+                         │
+              ┌──────────┼──────────┐
+              ▼          ▼          ▼
+          Settings    Storage    Browser APIs
+```
+
+---
+
+# 🧱 System Layers
+
+```text
+┌──────────────────────────────────────────────────────┐
+│                 DEVICE EXPERIENCES                   │
+│          💻 Mac · 📱 iPhone · 🖥️ iPad             │
+├──────────────────────────────────────────────────────┤
+│                   SYSTEM SURFACES                    │
+│ Dock · Menu Bar · Control Centre · Notifications    │
+│ Lock Screen · Dynamic Island · Widgets · Search     │
+├──────────────────────────────────────────────────────┤
+│                    APPLICATIONS                      │
+│ Portfolio · Productivity · Media · Games · Utility  │
+│ Communication · Learning · Services · Files         │
+├──────────────────────────────────────────────────────┤
+│                       STATE                          │
+│ Settings · Windows · Music · Files · Persistence    │
+├──────────────────────────────────────────────────────┤
+│                BROWSER CAPABILITIES                  │
+│ IndexedDB · Media · PWA · Notifications · Share     │
+└──────────────────────────────────────────────────────┘
+```
+
+---
+
+# 🗂️ Project Structure
+
+```text
+M.R.Ahamed-Portfolio/
+│
+├── api/
+│   ├── ask.js
+│   └── guestbook-notify.js
+│
+├── public/
+│   ├── assets/
+│   │   ├── guide/
+│   │   │   ├── mac-*.webp
+│   │   │   ├── iphone-*.webp
+│   │   │   └── ipad-*.webp
+│   │   ├── music/
+│   │   ├── photos/
+│   │   ├── screenshots/
+│   │   ├── videos/
+│   │   └── wallpapers/
+│   ├── cv/
+│   ├── icons/
+│   ├── images/
+│   ├── 404.html
+│   ├── offline.html
+│   ├── manifest.webmanifest
+│   └── sw.js
+│
+├── src/
+│   ├── apps/
+│   │   ├── portfolio apps
+│   │   ├── productivity apps
+│   │   ├── media apps
+│   │   ├── communication apps
+│   │   ├── utility apps
+│   │   ├── games/
+│   │   └── settings/
+│   ├── components/
+│   ├── data/
+│   ├── styles/
+│   ├── system/
+│   ├── App.tsx
+│   └── main.tsx
+│
+├── tools/
+├── README.md
+├── UPDATE-GUIDE.md
+├── package.json
+├── package-lock.json
+├── vite.config.ts
+├── tsconfig.json
+├── eslint.config.js
+└── vercel.json
 ```
 
 ---
@@ -726,226 +1567,62 @@ mindmap
 
 <div align="center">
 
-### ⚛️ Frontend
+### Core
 
-![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=black)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?style=flat-square&logo=typescript&logoColor=white)
-![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
-![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white)
-![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3&logoColor=white)
+![React](https://img.shields.io/badge/React-19.1-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
 
-### ⚙️ Tooling
+### Development
 
-![Vite](https://img.shields.io/badge/Vite-6-646CFF?style=flat-square&logo=vite&logoColor=white)
-![Git](https://img.shields.io/badge/Git-Version_Control-F05032?style=flat-square&logo=git&logoColor=white)
-![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=flat-square&logo=github&logoColor=white)
-![npm](https://img.shields.io/badge/npm-Package_Manager-CB3837?style=flat-square&logo=npm&logoColor=white)
-![Vercel](https://img.shields.io/badge/Vercel-Production-000000?style=flat-square&logo=vercel&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-6-646CFF?style=for-the-badge&logo=vite&logoColor=white)
+![ESLint](https://img.shields.io/badge/ESLint-9-4B32C3?style=for-the-badge&logo=eslint&logoColor=white)
+![npm](https://img.shields.io/badge/npm-CB3837?style=for-the-badge&logo=npm&logoColor=white)
+![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white)
+![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)
+![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)
 
 </div>
 
 ---
 
-# 📊 Portfolio Technology Map
+# 📈 Engineering Coverage
 
 ```text
-React / Component Architecture    ██████████████████████████████
-TypeScript                        ████████████████████████████
-Desktop UI Engineering            █████████████████████████████
-Responsive Design                 ███████████████████████████
-Browser APIs                      █████████████████████████
-State Management                  ███████████████████████████
-PWA / Offline Experience          ███████████████████████
-Accessibility                     ████████████████████████
-Animation & Interaction           ████████████████████████████
+Multi-Device UX             ██████████████████████████████
+React Architecture          █████████████████████████████
+TypeScript                  ████████████████████████████
+Desktop UI Engineering      █████████████████████████████
+State & Persistence         ████████████████████████████
+Interaction Systems         █████████████████████████████
+Responsive / Touch UX       ████████████████████████████
+Browser APIs                ██████████████████████████
+PWA / Offline               █████████████████████████
+Accessibility               █████████████████████████
 ```
 
-<sub>This graph represents technologies and engineering areas present in the portfolio, not proficiency percentages.</sub>
+> These bars are visual technology-coverage indicators, not benchmark scores.
 
 ---
 
-# 🌐 Browser Capabilities
-
-The portfolio interacts with modern web capabilities including:
-
-```mermaid
-flowchart LR
-    A["🌐 Browser"] --> B["🔔 Notifications"]
-    A --> C["📤 Web Share"]
-    A --> D["🎵 Media Session"]
-    A --> E["📺 Fullscreen"]
-    A --> F["📷 Media Devices"]
-    A --> G["🖥️ Screen Capture"]
-    A --> H["💾 Local Storage"]
-    A --> I["⚙️ Service Worker"]
-    A --> J["📲 Web App Manifest"]
-```
-
-Other capabilities are used where browser support permits.
-
----
-
-# 🧠 React Architecture
+# ⌨️ Interactive Terminal
 
 ```text
-App.tsx
-   │
-   ├── ⚙️ SettingsProvider
-   │      └── Appearance & preferences
-   │
-   ├── 🖥️ SystemProvider
-   │      └── Shared desktop state
-   │
-   ├── 🎵 MusicProvider
-   │      └── Global audio / Now Playing
-   │
-   └── 🪟 WindowManagerProvider
-          │
-          └── Desktop
-               │
-               ├── Wallpaper
-               ├── Menu Bar
-               ├── Desktop Icons
-               ├── Widgets
-               ├── Windows
-               ├── Dock
-               ├── Launchpad
-               ├── Spotlight
-               ├── Control Center
-               └── Notification Center
+╭──────────────────────────────────────────────────╮
+│ M.R.Ahamed@portfolio ~ % whoami                  │
+│                                                  │
+│ M.R.Ahamed                                       │
+│ Computer Science Undergraduate                   │
+│ Full-Stack Developer                             │
+│ Entrepreneur                                     │
+│                                                  │
+│ M.R.Ahamed@portfolio ~ % _                       │
+╰──────────────────────────────────────────────────╯
 ```
 
----
-
-# 🗂️ Project Architecture
-
-```text
-M.R.Ahamed-Portfolio/
-│
-├── 📁 public/
-│   │
-│   ├── assets/
-│   │   ├── 🎵 music/
-│   │   ├── 📸 photos/
-│   │   ├── 🖼️ screenshots/
-│   │   ├── 🎬 videos/
-│   │   └── 🌄 wallpapers/
-│   │
-│   ├── 📄 cv/
-│   └── 🖼️ images/
-│
-├── 📁 src/
-│   │
-│   ├── 📱 apps/
-│   │   ├── portfolio apps
-│   │   ├── system apps
-│   │   ├── utilities
-│   │   ├── media apps
-│   │   ├── communication apps
-│   │   └── Game Center
-│   │
-│   ├── 🧩 components/
-│   │   ├── Desktop
-│   │   ├── Dock
-│   │   ├── MenuBar
-│   │   ├── Window
-│   │   ├── Widgets
-│   │   ├── Wallpaper
-│   │   └── DesktopIcons
-│   │
-│   ├── 📊 data/
-│   │   ├── portfolio.ts
-│   │   ├── services.ts
-│   │   └── media.ts
-│   │
-│   ├── ⚙️ system/
-│   │   ├── WindowManager
-│   │   ├── SettingsContext
-│   │   ├── SystemContext
-│   │   ├── MusicContext
-│   │   └── application registry
-│   │
-│   ├── 🎨 styles/
-│   ├── App.tsx
-│   └── main.tsx
-│
-├── index.html
-├── package.json
-├── package-lock.json
-├── tsconfig.json
-├── vite.config.ts
-├── eslint.config.js
-├── UPDATE-GUIDE.md
-└── README.md
-```
-
----
-
-# 🗃️ Centralized Portfolio Data
-
-Core portfolio information is primarily maintained inside:
-
-```text
-src/data/portfolio.ts
-```
-
-It contains reusable information for areas such as:
-
-```mermaid
-flowchart TB
-
-    A["📊 portfolio.ts"]
-
-    A --> B["👤 Profile"]
-    A --> C["🧠 Skills"]
-    A --> D["💻 Projects"]
-    A --> E["💼 Experience"]
-    A --> F["🎓 Education"]
-    A --> G["🏆 Leadership"]
-    A --> H["🌍 Languages"]
-    A --> I["📞 Contact"]
-    A --> J["📄 CV"]
-
-    D --> K["Xcode"]
-    D --> L["Case Studies"]
-    C --> M["Notes"]
-    E --> N["Finder"]
-```
-
-Services are maintained through:
-
-```text
-src/data/services.ts
-```
-
-Media configuration is maintained through:
-
-```text
-src/data/media.ts
-```
-
----
-
-# ⌨️ Terminal Portfolio
-
-```text
-╭──────────────────────────────────────────────────────────╮
-│ 🔴  🟡  🟢     M.R.Ahamed — Terminal                    │
-├──────────────────────────────────────────────────────────┤
-│                                                          │
-│  M.R.Ahamed@portfolio ~ % whoami                         │
-│                                                          │
-│  M.R.Ahamed                                              │
-│  Computer Science Undergraduate                          │
-│  Full-Stack Developer                                    │
-│  Entrepreneur                                            │
-│                                                          │
-│  M.R.Ahamed@portfolio ~ % _                              │
-│                                                          │
-╰──────────────────────────────────────────────────────────╯
-```
-
-Available commands include:
+### Commands
 
 ```bash
 help
@@ -966,7 +1643,9 @@ casestudy
 ask
 guestbook
 share
+download cv
 neofetch
+lang
 date
 uptime
 pwd
@@ -975,48 +1654,86 @@ echo
 history
 man
 theme
-lang
-clear
+wallpaper
+motion
+mode
+open
 sleep
 restart
 shutdown
 shortcuts
+clear
 ```
 
-Terminal features include command history, keyboard navigation, completion and interactive portfolio actions.
+Terminal functionality also includes command history and completion behavior.
 
 ---
 
-# 🎨 Appearance
+# 🧑‍💻 Projects
 
 <div align="center">
 
-<img src="./public/assets/screenshots/appearance.jpg" width="85%" alt="Portfolio appearance settings">
+<img src="./public/assets/screenshots/xcode.jpg" width="92%" alt="Projects">
 
 </div>
 
-<br>
+Projects are presented through an Xcode-inspired development environment.
 
-Personalization options include:
+---
 
-- ☀️ Light mode
-- 🌙 Dark mode
-- 🌓 Automatic appearance
-- 🎨 Accent colors
-- 🌄 Wallpaper selection
-- 🖼️ Custom wallpaper
-- 📌 Dock position
-- 📏 Dock size
-- 🔍 Dock magnification
-- 👻 Dock auto-hide
-- 🪄 Minimize effects
-- 🗂️ Stage Manager
-- 🌙 Night Shift
-- 🔤 Text size
-- **Bold text**
-- ◐ Contrast
-- 💎 Transparency
-- 🐢 Reduced motion
+# 📚 Case Studies
+
+<div align="center">
+
+<img src="./public/assets/screenshots/casestudies-dark.jpg" width="92%" alt="Case Studies">
+
+</div>
+
+Case studies provide deeper project explanations including:
+
+`Problem` → `Goals` → `Role` → `Process` → `Challenges` → `Solutions` → `Outcomes` → `Next Steps`
+
+---
+
+# 📝 Skills
+
+<div align="center">
+
+<img src="./public/assets/screenshots/notes.jpg" width="92%" alt="Skills">
+
+</div>
+
+---
+
+# 💼 Experience
+
+<div align="center">
+
+<img src="./public/assets/screenshots/experience.jpg" width="92%" alt="Experience">
+
+</div>
+
+---
+
+# 🏆 Achievements
+
+<div align="center">
+
+<img src="./public/assets/screenshots/achievements.jpg" width="92%" alt="Achievements">
+
+</div>
+
+The portfolio contains professional achievements plus hidden/exploration and Game Center achievements.
+
+---
+
+# 🛠️ Services
+
+<div align="center">
+
+<img src="./public/assets/screenshots/services.jpg" width="92%" alt="Services">
+
+</div>
 
 ---
 
@@ -1024,246 +1741,55 @@ Personalization options include:
 
 <div align="center">
 
-<img src="./public/assets/screenshots/dark-mode.jpg" width="85%" alt="M.R.Ahamed portfolio dark mode">
+<img src="./public/assets/screenshots/dark-mode.jpg" width="92%" alt="Dark Mode">
 
 </div>
 
 ---
 
-# 🎵 Music Experience
+# 📊 Grapher
 
-The integrated music system connects multiple parts of the desktop.
+<div align="center">
 
-```mermaid
-flowchart LR
-    A["🎵 Music App"] --> D["🎧 MusicProvider"]
-    B["🖥️ Desktop Widget"] --> D
-    C["🎛️ Control Center"] --> D
+<img src="./public/assets/screenshots/grapher.jpg" width="92%" alt="Grapher">
 
-    D --> E["▶️ Playback"]
-    D --> F["⏭️ Track Controls"]
-    D --> G["🔊 Volume"]
-    D --> H["📊 Progress"]
-    D --> I["🎶 Media Session"]
-```
-
-Features include:
-
-- Play / pause
-- Previous / next
-- Progress tracking
-- Volume
-- Albums
-- Artists
-- Playlists
-- Favorites
-- Recently played
-- Mini player
-- Media-key integration where supported
+</div>
 
 ---
 
-# 📸 Screenshots
+# 🔐 Real Features vs OS-Inspired Simulation
 
-<details>
-<summary><b>🖥️ Desktop</b></summary>
-<br>
-<div align="center">
-<img src="./public/assets/screenshots/desktop.jpg" width="90%" alt="Desktop">
-</div>
-</details>
+The portfolio deliberately separates browser-backed functionality from operating-system-inspired simulation.
 
-<details>
-<summary><b>🚀 Applications</b></summary>
-<br>
-<div align="center">
-<img src="./public/assets/screenshots/applications.jpg" width="90%" alt="Applications">
-</div>
-</details>
+## ✅ Browser-Backed Functionality
 
-<details>
-<summary><b>💻 Xcode / Projects</b></summary>
-<br>
-<div align="center">
-<img src="./public/assets/screenshots/xcode.jpg" width="90%" alt="Xcode Projects">
-</div>
-</details>
+- 🌦️ Live weather requests
+- 📁 Local file import
+- 💾 IndexedDB persistence
+- ⚙️ Local settings
+- 🎵 Media playback
+- 📤 Web Share where supported
+- 🔔 Browser notifications with permission
+- 📷 Camera access with permission
+- 🎤 Speech recognition where supported
+- 📦 PWA/service worker
+- 📺 Picture in Picture where supported
+- 🔗 Real external links
 
-<details>
-<summary><b>🧠 Notes / Skills</b></summary>
-<br>
-<div align="center">
-<img src="./public/assets/screenshots/notes.jpg" width="90%" alt="Notes and Skills">
-</div>
-</details>
+## 🎭 OS-Inspired Simulation
 
-<details>
-<summary><b>🛠️ Services</b></summary>
-<br>
-<div align="center">
-<img src="./public/assets/screenshots/services.jpg" width="90%" alt="Services">
-</div>
-</details>
+- Wi-Fi UI does not change the visitor's actual Wi-Fi
+- Bluetooth UI does not control real Bluetooth hardware
+- Display settings do not change the physical monitor
+- Trackpad controls do not alter hardware settings
+- Mobile keyboard settings do not change the real phone keyboard
+- FaceTime-inspired interfaces do not pretend to make native FaceTime calls
 
-<details>
-<summary><b>⚙️ System Preferences</b></summary>
-<br>
-<div align="center">
-<img src="./public/assets/screenshots/system-preferences.jpg" width="90%" alt="System Preferences">
-</div>
-</details>
-
-<details>
-<summary><b>🏆 Achievements</b></summary>
-<br>
-<div align="center">
-<img src="./public/assets/screenshots/achievements.jpg" width="90%" alt="Achievements">
-</div>
-</details>
-
-<details>
-<summary><b>💼 Experience</b></summary>
-<br>
-<div align="center">
-<img src="./public/assets/screenshots/experience.jpg" width="90%" alt="Experience">
-</div>
-</details>
-
-<details>
-<summary><b>📈 Grapher</b></summary>
-<br>
-<div align="center">
-<img src="./public/assets/screenshots/grapher.jpg" width="90%" alt="Grapher">
-</div>
-</details>
+This keeps the portfolio technically impressive **without making false hardware claims**.
 
 ---
 
-# 📱 Responsive Experience
-
-```text
-┌───────────────────┐
-│ 🖥️ DESKTOP        │
-│                   │
-│ Floating windows  │
-│ Full Dock          │
-│ Widgets            │
-│ Desktop controls  │
-└─────────┬─────────┘
-          │
-          ▼
-┌───────────────────┐
-│ 📱 TABLET          │
-│                   │
-│ Adaptive windows  │
-│ Responsive Dock   │
-│ Touch support     │
-└─────────┬─────────┘
-          │
-          ▼
-┌───────────────────┐
-│ 📲 MOBILE          │
-│                   │
-│ Full-screen apps  │
-│ Touch controls    │
-│ Mobile Dock       │
-└───────────────────┘
-```
-
----
-
-# ♿ Accessibility
-
-The project includes accessibility-oriented features such as:
-
-```text
-Keyboard Navigation        ███████████████████████
-Visible Focus States       ███████████████████████
-Reduced Motion             ███████████████████████
-Reduced Transparency       █████████████████████
-Increased Contrast         █████████████████████
-Adjustable Text Size       ███████████████████████
-Bold Text                  ████████████████████
-Touch-Friendly Controls    ███████████████████████
-```
-
-The interface also respects supported browser and operating-system preferences where possible.
-
----
-
-# 📲 Progressive Web App
-
-```mermaid
-flowchart TB
-    A["🖥️ Portfolio"] --> B["📄 Web App Manifest"]
-    A --> C["⚙️ Service Worker"]
-
-    C --> D["📦 Cached Resources"]
-    C --> E["🌐 Offline Support"]
-
-    B --> F["📲 Installable Experience"]
-
-    A --> G["🎵 Media Session"]
-    A --> H["🔔 Web Notifications"]
-```
-
-PWA capabilities include:
-
-- Web App Manifest
-- Service Worker
-- Installable experience
-- Cached resource support
-- Offline capabilities
-- Application icons
-- Media Session integration
-- Browser notification integration
-
----
-
-# 🔐 Privacy & Permissions
-
-Some applications use browser capabilities that require permission.
-
-| Capability | Example |
-|---|---|
-| 📷 Camera | Camera application |
-| 🎙️ Microphone | Voice features |
-| 🔔 Notifications | Notification Center |
-| 🖥️ Screen Capture | Screen tools |
-| 📺 Fullscreen | Desktop experience |
-| 📍 Location-related capabilities | Supported contextual features |
-
-Permissions are requested only when a relevant feature requires them.
-
-Browser limitations are respected. Hardware controls such as real Wi-Fi, Bluetooth and cellular radios cannot normally be controlled by a website and are therefore represented as simulated desktop interfaces unless a supported browser API is available.
-
----
-
-# ⚡ Performance Architecture
-
-Many applications are loaded separately using application-level code splitting.
-
-```text
-                         ┌─────────────┐
-                         │  index.js   │
-                         └──────┬──────┘
-                                │
-          ┌─────────────────────┼─────────────────────┐
-          ▼                     ▼                     ▼
-     Portfolio Apps        System Apps           Game Center
-          │                     │                     │
-     Lazy Loaded           Lazy Loaded           Lazy Loaded
-          │                     │                     │
-          └─────────────────────┼─────────────────────┘
-                                ▼
-                       Interactive Desktop
-```
-
-This allows many applications to be delivered as separate production chunks instead of placing every application implementation into one file.
-
----
-
-# 🚀 Quick Start
+# 🧪 Run Locally
 
 ## 1. Clone
 
@@ -1289,40 +1815,15 @@ npm install
 npm run dev
 ```
 
-Vite will display the local development URL.
-
 ---
 
-# 🏗️ Production
-
-Build the optimized project:
+# 🏗️ Production Build
 
 ```bash
 npm run build
 ```
 
-Production pipeline:
-
-```text
-TypeScript
-     │
-     ▼
-Type Validation
-     │
-     ▼
-Vite Build
-     │
-     ▼
-Optimization
-     │
-     ▼
-Code Splitting
-     │
-     ▼
-dist/
-```
-
-Preview the production build:
+Then preview:
 
 ```bash
 npm run preview
@@ -1330,94 +1831,223 @@ npm run preview
 
 ---
 
-# ☁️ Production Deployment
+# 📜 Commands
+
+| Command | Purpose |
+|---|---|
+| `npm run dev` | Development server |
+| `npm run build` | TypeScript + production build |
+| `npm run preview` | Preview production build |
+| `npm run lint` | ESLint |
+| `npm run typecheck` | TypeScript validation |
+
+---
+
+# 🚀 Deployment
 
 <div align="center">
 
-[![Status](https://img.shields.io/badge/STATUS-LIVE-34C759?style=for-the-badge)](https://m-r-ahamed-portfolio.vercel.app/)
-[![Platform](https://img.shields.io/badge/PLATFORM-VERCEL-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://m-r-ahamed-portfolio.vercel.app/)
-[![Responsive](https://img.shields.io/badge/RESPONSIVE-DESKTOP_TABLET_MOBILE-BF5AF2?style=for-the-badge)](https://m-r-ahamed-portfolio.vercel.app/)
+[![Production](https://img.shields.io/badge/PRODUCTION-LIVE-34C759?style=for-the-badge)](https://m-r-ahamed-portfolio.vercel.app/)
+[![Vercel](https://img.shields.io/badge/HOSTED_ON-VERCEL-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://m-r-ahamed-portfolio.vercel.app/)
+[![Main](https://img.shields.io/badge/BRANCH-main-181717?style=for-the-badge&logo=git&logoColor=white)](https://github.com/Ahamed369/M.R.Ahamed-Portfolio/tree/main)
 
 <br>
 
-### [Open the live portfolio](https://m-r-ahamed-portfolio.vercel.app/)
+<img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=600&size=17&duration=2000&pause=600&color=34C759&center=true&vCenter=true&width=850&height=50&lines=Production+Portfolio+Online;Mac+%7C+iPhone+%7C+iPad;Explore+the+Interactive+Experience" alt="Deployment animation">
 
-<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=16&duration=2000&pause=700&color=34C759&center=true&vCenter=true&repeat=true&width=760&height=38&lines=Build+Complete+%7C+Deployment+Live;Responsive+Experience+Ready;Explore+M.R.Ahamed+Portfolio" alt="Deployment status typing animation" />
+<br>
+
+### [🚀 OPEN LIVE PORTFOLIO](https://m-r-ahamed-portfolio.vercel.app/)
 
 </div>
 
 ---
 
-# 🧪 Commands
+# 🖼️ Visual Gallery
 
-| Command | Purpose |
-|---|---|
-| `npm run dev` | Start development server |
-| `npm run build` | Create production build |
-| `npm run preview` | Preview production build |
-| `npm run lint` | Run ESLint |
-| `npm run typecheck` | Run TypeScript validation |
+<details open>
+<summary><b>💻 Mac Desktop</b></summary>
+<br>
+<p align="center">
+<img src="./public/assets/guide/mac-desktop.webp" width="92%" alt="Mac Desktop">
+</p>
+</details>
 
----
+<details>
+<summary><b>🚀 Launchpad</b></summary>
+<br>
+<p align="center">
+<img src="./public/assets/guide/mac-launchpad.webp" width="92%" alt="Launchpad">
+</p>
+</details>
 
-# 📦 Production Build Status
+<details>
+<summary><b>🔎 Spotlight</b></summary>
+<br>
+<p align="center">
+<img src="./public/assets/guide/mac-spotlight.webp" width="88%" alt="Spotlight">
+</p>
+</details>
 
-```text
-✓ TypeScript compilation
-✓ Vite production build
-✓ 196 modules transformed
-✓ Application chunks generated
-✓ Production output generated in dist/
-✓ Build completed successfully
-```
+<details>
+<summary><b>🎛️ Mac Control Center</b></summary>
+<br>
+<p align="center">
+<img src="./public/assets/guide/mac-cc.webp" width="82%" alt="Mac Control Center">
+</p>
+</details>
 
-> The current build succeeds. Vite reports a non-blocking large-chunk optimization warning, so additional bundle optimization remains a future performance opportunity.
+<details>
+<summary><b>🔔 Mac Notification Center</b></summary>
+<br>
+<p align="center">
+<img src="./public/assets/guide/mac-nc.webp" width="82%" alt="Mac Notification Center">
+</p>
+</details>
 
----
+<details>
+<summary><b>🪟 Mission Control</b></summary>
+<br>
+<p align="center">
+<img src="./public/assets/guide/mac-mission.webp" width="90%" alt="Mission Control">
+</p>
+</details>
 
-# 🛠️ Updating the Portfolio
+<details>
+<summary><b>🧩 Mac Widgets</b></summary>
+<br>
+<p align="center">
+<img src="./public/assets/guide/mac-widgets.webp" width="90%" alt="Mac Widgets">
+</p>
+</details>
 
-### 👤 Personal information
+<details>
+<summary><b>📱 iPhone Home</b></summary>
+<br>
+<p align="center">
+<img src="./public/assets/guide/iphone-home.webp" width="45%" alt="iPhone Home">
+</p>
+</details>
 
-```text
-src/data/portfolio.ts
-```
+<details>
+<summary><b>🔒 iPhone Lock Screen</b></summary>
+<br>
+<p align="center">
+<img src="./public/assets/guide/iphone-lock.webp" width="45%" alt="iPhone Lock Screen">
+</p>
+</details>
 
-### 💼 Services
+<details>
+<summary><b>🏝️ Dynamic Island</b></summary>
+<br>
+<p align="center">
+<img src="./public/assets/guide/iphone-island.webp" width="45%" alt="Dynamic Island">
+</p>
+</details>
 
-```text
-src/data/services.ts
-```
+<details>
+<summary><b>🎛️ iPhone Control Centre</b></summary>
+<br>
+<p align="center">
+<img src="./public/assets/guide/iphone-cc.webp" width="45%" alt="iPhone Control Centre">
+</p>
+</details>
 
-### 🎵 Media
+<details>
+<summary><b>🔔 iPhone Notification Centre</b></summary>
+<br>
+<p align="center">
+<img src="./public/assets/guide/iphone-nc.webp" width="45%" alt="iPhone Notification Centre">
+</p>
+</details>
 
-```text
-src/data/media.ts
-```
+<details>
+<summary><b>🔄 iPhone App Switcher</b></summary>
+<br>
+<p align="center">
+<img src="./public/assets/guide/iphone-switcher.webp" width="45%" alt="iPhone App Switcher">
+</p>
+</details>
 
-### 📄 CV
+<details>
+<summary><b>🖥️ iPad Home</b></summary>
+<br>
+<p align="center">
+<img src="./public/assets/guide/ipad-home.webp" width="78%" alt="iPad Home">
+</p>
+</details>
 
-```text
-public/cv/
-```
+<details>
+<summary><b>🎛️ iPad Control Centre</b></summary>
+<br>
+<p align="center">
+<img src="./public/assets/guide/ipad-cc.webp" width="78%" alt="iPad Control Centre">
+</p>
+</details>
 
-### 🖼️ Images
+<details>
+<summary><b>🔄 iPad App Switcher</b></summary>
+<br>
+<p align="center">
+<img src="./public/assets/guide/ipad-switcher.webp" width="78%" alt="iPad App Switcher">
+</p>
+</details>
 
-```text
-public/images/
-```
+<details>
+<summary><b>🧑‍💻 Projects</b></summary>
+<br>
+<p align="center">
+<img src="./public/assets/screenshots/xcode.jpg" width="92%" alt="Projects">
+</p>
+</details>
 
-### 🌄 Wallpapers / Screenshots / Media
+<details>
+<summary><b>📚 Case Studies</b></summary>
+<br>
+<p align="center">
+<img src="./public/assets/screenshots/casestudies-dark.jpg" width="92%" alt="Case Studies">
+</p>
+</details>
 
-```text
-public/assets/
-```
+<details>
+<summary><b>📝 Skills</b></summary>
+<br>
+<p align="center">
+<img src="./public/assets/screenshots/notes.jpg" width="92%" alt="Skills">
+</p>
+</details>
 
-For additional maintenance information:
+<details>
+<summary><b>💼 Experience</b></summary>
+<br>
+<p align="center">
+<img src="./public/assets/screenshots/experience.jpg" width="92%" alt="Experience">
+</p>
+</details>
 
-```text
-UPDATE-GUIDE.md
-```
+<details>
+<summary><b>🛠️ Services</b></summary>
+<br>
+<p align="center">
+<img src="./public/assets/screenshots/services.jpg" width="92%" alt="Services">
+</p>
+</details>
+
+<details>
+<summary><b>🏆 Achievements</b></summary>
+<br>
+<p align="center">
+<img src="./public/assets/screenshots/achievements.jpg" width="92%" alt="Achievements">
+</p>
+</details>
+
+<details>
+<summary><b>🌙 Dark Mode</b></summary>
+<br>
+<p align="center">
+<img src="./public/assets/screenshots/dark-mode.jpg" width="92%" alt="Dark Mode">
+</p>
+</details>
 
 ---
 
@@ -1432,56 +2062,85 @@ UPDATE-GUIDE.md
 
 </div>
 
-Some advanced APIs depend on browser, operating system, device and permission support.
+Advanced browser features depend on browser support and permissions.
 
 ---
 
-# 🗺️ Roadmap
+# 🗺️ Portfolio Evolution
 
-```mermaid
-flowchart LR
-
-    A["🖥️ Desktop Portfolio"] --> B["⚡ Performance Optimization"]
-    B --> C["🧪 Automated Testing"]
-    C --> D["♿ Accessibility Refinement"]
-    D --> E["📱 Responsive Improvements"]
-    E --> F["☁️ Optional Cloud Features"]
-    F --> G["🚀 Expanded Portfolio"]
+```text
+v7
+│
+▼
+Expanded Applications + Game Center
+│
+▼
+v8
+│
+▼
+Notifications + Window Systems + PWA
+│
+▼
+v9
+│
+▼
+Services + Settings + Utilities
+│
+▼
+v10
+│
+▼
+My Files + Multi-Device System
+│
+▼
+v10.2
+│
+▼
+Dynamic Island + Control Centre + Device Rebuild
+│
+▼
+v10.3
+│
+▼
+Guidebook + Widgets + Music + Learning
 ```
 
-Potential future improvements include:
+---
 
-- Additional bundle optimization
-- More portfolio case studies
-- Expanded automated testing
-- Additional accessibility testing
-- Further mobile refinements
-- Backend-powered guestbook capabilities
-- Optional cloud integrations
-- Additional applications
-- Further PWA improvements
+# 🧭 Continuous Improvement
+
+Future refinements can focus on:
+
+- ⚡ Bundle-size optimization
+- 🧪 More automated testing
+- ♿ Expanded accessibility testing
+- 📚 Additional case studies
+- 📊 Performance profiling
+- 🌐 Browser compatibility
+- 🔒 Security refinement
+- 🚀 Further performance improvements
 
 ---
 
 # ⚠️ Project Notice
 
-This is a **web-based portfolio inspired by desktop operating-system interaction patterns**.
+This is an independent **web-based personal portfolio inspired by familiar desktop and mobile operating-system interaction patterns**.
 
-It is **not macOS** and is not affiliated with or endorsed by Apple Inc.
+It is **not macOS, iOS or iPadOS** and is not affiliated with, sponsored by or endorsed by Apple Inc.
 
-Apple, macOS and other third-party product or service names belong to their respective owners.
-
-Third-party application names, logos and services referenced within the portfolio remain the property of their respective owners and are used only for identification, portfolio demonstration or navigation purposes.
+Apple and other third-party names, marks, products and services remain the property of their respective owners.
 
 ---
 
-# 👨‍💻 About the Developer
+# 👨‍💻 About M.R.Ahamed
 
 <div align="center">
 
 ## M.R.Ahamed
 
-<img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=500&size=18&duration=2500&pause=700&color=34C759&center=true&vCenter=true&repeat=true&width=720&height=45&lines=Computer+Science+Undergraduate;Full-Stack+Developer;Software+%26+UI%2FUX+Enthusiast;Entrepreneur;Building+Technology+%2B+Business" alt="Developer roles typing animation">
+<img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=650&size=19&duration=2200&pause=650&color=34C759&center=true&vCenter=true&width=850&height=50&lines=Computer+Science+Undergraduate;Full-Stack+Developer;Software+%26+UI%2FUX+Builder;Entrepreneur;Builder+%2B+Operator;Technology+%2B+Business" alt="M.R.Ahamed roles">
+
+<br>
 
 📍 **Kandy, Sri Lanka**
 
@@ -1495,26 +2154,21 @@ Third-party application names, logos and services referenced within the portfoli
 
 <br>
 
----
+[![Launch Portfolio](https://img.shields.io/badge/🚀_LAUNCH_PORTFOLIO-FF9F0A?style=for-the-badge)](https://m-r-ahamed-portfolio.vercel.app/)
 
-### 💻 Explore the Code
-### 🖥️ Launch the Desktop
-### 🚀 Discover the Projects
-### 🤝 Let's Build Something Meaningful
+[![Explore Source](https://img.shields.io/badge/💻_EXPLORE_SOURCE-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Ahamed369/M.R.Ahamed-Portfolio)
 
-<br>
+<br><br>
 
-[![Launch Live Portfolio](https://img.shields.io/badge/LAUNCH_LIVE_PORTFOLIO-FF9F0A?style=for-the-badge&logo=vercel&logoColor=white)](https://m-r-ahamed-portfolio.vercel.app/)
+<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=16&duration=1900&pause=550&color=0A84FF&center=true&vCenter=true&width=850&height=48&lines=Explore.+Interact.+Discover.;Not+just+a+portfolio+—+an+experience.;Think+Different.+Build+Different." alt="Closing animation">
 
-<br>
+<br><br>
 
-<img src="https://capsule-render.vercel.app/api?type=waving&height=120&section=footer&color=gradient" width="100%" alt="footer">
-
-###  Think Different. Build Different.
+### ✨ Think Different. Build Different.
 
 **Designed & Developed by M.R.Ahamed**
 
-`React 19` • `TypeScript` • `Vite 6`
+`React 19` · `TypeScript 5.8` · `Vite 6` · `Vercel`
 
 **© 2026 M.R.Ahamed**
 
