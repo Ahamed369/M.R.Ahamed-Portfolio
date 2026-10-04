@@ -130,3 +130,9 @@
 .iw-profile.s b { font-size: 15px; line-height: 1.15; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .iw-profile.s small { font-size: 11px; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .iw-profile.s div { min-height: 0; overflow: hidden; }
+
+/* v10.3 fix — icons and widgets used to block the browser's horizontal swipe (touch-action: none),
+   so swiping between Home Screen pages only worked on empty space. Horizontal swipes now page natively;
+   vertical moves (pull down for Search, Smart Stack) and long-press stay with the portfolio's own handlers. */
+.ios-pages .ios-cell { touch-action: pan-x; }
+.ios-home.editing .ios-pages .ios-cell { touch-action: none; }

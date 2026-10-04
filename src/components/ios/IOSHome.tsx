@@ -321,7 +321,9 @@ export function IOSHome() {
     const dx = e.clientX - p.x;
     const dy = e.clientY - p.y;
     if (p.mouse && Math.abs(dx) > 30 && Math.abs(dx) > Math.abs(dy) && !editing) {
-      goPage(page + (dx < 0 ? 1 : -1));
+      // one page per swipe, counted from where the drag started (the live drag already moved `page`)
+      const start = Math.round(p.scroll0 / Math.max(1, scroller.current?.clientWidth ?? 1));
+      goPage(start + (dx < 0 ? 1 : -1));
       return;
     } else if (p.mouse && scroller.current && scroller.current.scrollLeft !== p.scroll0) goPage(page);
     // pull down on a Home Screen page → Search
@@ -890,8 +892,14 @@ function QuickActions({
   const sh = document.querySelector('.ios-shell')?.getBoundingClientRect();
   const left = sh ? Math.min(Math.max(menu.x - 120, sh.left + 10), sh.right - 250) - sh.left : menu.x;
   const top = sh ? Math.min(menu.y + 8, sh.bottom - 300) - sh.top : menu.y;
+  const qaDown = useRef(false);
   return (
-    <div className="ios-qa-back" onClick={onClose}>
+    <div
+      className="ios-qa-back"
+      // v10.3 fix — only a new tap closes the menu; the finger lifting from the long-press that opened it does not
+      onPointerDown={() => (qaDown.current = true)}
+      onClick={() => qaDown.current && onClose()}
+    >
       <div className="ios-qa ios-glass" style={{ left, top }} role="menu" onClick={(e) => e.stopPropagation()}>
         {extra.map(([label, g, run]) => (
           <button
