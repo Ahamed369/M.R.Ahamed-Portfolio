@@ -1227,3 +1227,7 @@
 @keyframes fh-in { from { opacity: 0; } }
 @keyframes fh-nudge-x { 50% { transform: translateX(5px); } }
 @keyframes fh-nudge-y { 50% { transform: translateY(4px); } }
+
+/* v10.3.2 fix — "… quit unexpectedly" card inside dark-chrome windows (Assistant, Clock…):
+   the window's light text colour made the card's text almost invisible on its light background */
+.window.dark-chrome .app-crash { background: #1c1c1e; color: #f5f5f7; }

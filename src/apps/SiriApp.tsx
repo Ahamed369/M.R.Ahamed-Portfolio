@@ -46,7 +46,11 @@ export default function SiriApp() {
 
   const Rec = (window as unknown as { SpeechRecognition?: new () => SR; webkitSpeechRecognition?: new () => SR }).SpeechRecognition ?? (window as unknown as { webkitSpeechRecognition?: new () => SR }).webkitSpeechRecognition;
 
-  useEffect(() => endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' }), [msgs, thinking]);
+  // v10.3.2 fix — braces matter: newer Chrome returns a Promise from scrollIntoView(), and React
+  // would treat a returned value as the effect's clean-up function ("q is not a function" crash)
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  }, [msgs, thinking]);
   useEffect(() => () => {
     recRef.current?.stop();
     window.speechSynthesis?.cancel();
